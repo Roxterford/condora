@@ -223,7 +223,10 @@ export function RegistrarCuotaForm({ proveedores }: RegistrarCuotaFormProps) {
 
         <section>
           <div className="flex justify-between items-center">
-            <h3>Desglose de gastos</h3>
+            <h3>
+              Desglose de gastos
+              {gastos.length > 0 && <> ({gastos.length})</>}
+            </h3>
             <Button
               type="button"
               variant="outline"

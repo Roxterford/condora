@@ -10,6 +10,7 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -49,15 +50,17 @@ export function DesgloseDeGastos({
     onRemove?.(gasto);
   };
 
+  const total = gastos.reduce((acc, g) => acc + g.total, 0);
+
   return (
     <Table>
       <TableHeader>
         <TableRow>
           <TableHead className="table__head">ID</TableHead>
           <TableHead className="table__head">Concepto</TableHead>
-          <TableHead className="table__head">Monto</TableHead>
           <TableHead className="table__head">Fecha</TableHead>
           <TableHead className="table__head">Proveedor</TableHead>
+          <TableHead className="table__head text-right">Monto</TableHead>
           {showActions && <TableHead className="text-right">Actions</TableHead>}
         </TableRow>
       </TableHeader>
@@ -71,9 +74,11 @@ export function DesgloseDeGastos({
                 </label>
               </TableCell>
               <TableCell>{gasto.concepto}</TableCell>
-              <TableCell>{money(gasto.total)}</TableCell>
               <TableCell>{gasto.fecha.toLocaleDateString("es")}</TableCell>
               <TableCell>{gasto.proveedor.nombre}</TableCell>
+              <TableCell className="text-right tabular-nums">
+                {money(gasto.total)}
+              </TableCell>
               {showActions && (
                 <TableCell className="text-right">
                   <DropdownMenu>
@@ -100,12 +105,23 @@ export function DesgloseDeGastos({
           ))
         ) : (
           <TableRow>
-            <TableCell colSpan={6}>
+            <TableCell colSpan={showActions ? 6 : 5}>
               <EmptyState />
             </TableCell>
           </TableRow>
         )}
       </TableBody>
+      {gastos.length > 0 && (
+        <TableFooter className="bg-transparent">
+          <TableRow>
+            <TableCell colSpan={4} className="text-base font-medium">Total</TableCell>
+            <TableCell className="text-right text-base font-semibold tabular-nums">
+              {money(total)}
+            </TableCell>
+            {showActions && <TableCell />}
+          </TableRow>
+        </TableFooter>
+      )}
     </Table>
   );
 }
