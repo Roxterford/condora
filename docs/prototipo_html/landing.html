@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Condora · Administración de condominios, simple y transparente</title>
+<link rel="stylesheet" href="landing.css">
+</head>
+<body>
+
+<!-- ================= NAVBAR ================= -->
+<header class="navbar" id="navbar">
+  <div class="nav-inner">
+    <a href="#inicio" class="brand">
+      <div class="logo">C</div>
+      <div class="brand-txt"><span class="b-name">Condora</span><span class="b-sub">Gestión de condominios</span></div>
+    </a>
+    <nav class="nav-links" id="navLinks">
+      <a href="#funcionalidades">Funcionalidades</a>
+      <a href="#como-funciona">Cómo funciona</a>
+      <a href="#precios">Precios</a>
+      <a href="#faq">Preguntas frecuentes</a>
+      <a href="#contacto">Contacto</a>
+    </nav>
+    <div class="nav-cta">
+      <a href="index.html" class="btn btn-ghost-light">Ingresar</a>
+      <a href="index.html" class="btn btn-primary">Ver demo</a>
+    </div>
+    <button class="burger" id="burger" aria-label="Abrir menú">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- ================= HERO ================= -->
+<section class="hero" id="inicio">
+  <div class="hero-bg">
+    <span class="blob b1"></span>
+    <span class="blob b2"></span>
+    <span class="blob b3"></span>
+    <div class="grid-lines"></div>
+  </div>
+  <div class="hero-inner">
+    <div class="hero-text reveal">
+      <span class="pill">Nuevo · Recaudación en USD y VES</span>
+      <h1>El control financiero de tu condominio,<br><span class="grad">sin planillas ni confusiones</span></h1>
+      <p>Condora centraliza cuotas, gastos, proyectos y cobranza de tu edificio en un solo panel. Recaudación clara, deudas al día y reportes que de verdad se entienden.</p>
+      <div class="hero-actions">
+        <a href="index.html" class="btn btn-primary btn-lg">Explorar el panel →</a>
+        <a href="#funcionalidades" class="btn btn-ghost-light btn-lg">Ver funcionalidades</a>
+      </div>
+      <div class="hero-meta">
+        <span>✓ Sin instalación</span>
+        <span>✓ Multi-moneda</span>
+        <span>✓ Para administradores</span>
+      </div>
+    </div>
+
+    <!-- Mockup del panel -->
+    <div class="mock reveal" aria-hidden="true">
+      <div class="mock-window">
+        <div class="mock-titlebar"><span></span><span></span><span></span><em>panel · Residencias Los Robles</em></div>
+        <div class="mock-body">
+          <aside class="m-side">
+            <div class="m-brand"><i class="m-logo">C</i><div><b>Condora</b><small>Los Robles</small></div></div>
+            <div class="m-nav"><i class="act"></i><i></i><i></i><i></i><i></i></div>
+            <div class="m-user"><i></i><span>AP</span><b>Ana Pérez</b></div>
+          </aside>
+          <div class="m-main">
+            <div class="m-top"><i class="m-search"></i><b>Panel de control</b><i class="m-cta">＋ Registrar pago</i></div>
+            <div class="m-kpis">
+              <div class="m-kpi">
+                <span class="mk-lbl">Recaudado (mes)</span>
+                <strong class="mk-val">$ 18.420</strong>
+                <span class="mk-up">▲ 12.4% vs julio</span>
+              </div>
+              <div class="m-kpi">
+                <span class="mk-lbl">Por cobrar</span>
+                <strong class="mk-val danger">$ 7.950</strong>
+                <span class="mk-warn">3 unidades pendientes</span>
+              </div>
+              <div class="m-kpi">
+                <span class="mk-lbl">Unidades solventes</span>
+                <strong class="mk-val">36 / 42</strong>
+                <span class="mk-up">85.7% al día</span>
+              </div>
+            </div>
+            <div class="m-row">
+              <div class="m-chart">
+                <span class="mc-title">Recaudación · últimos 6 meses</span>
+                <div class="mc-bars">
+                  <i style="height:55%"></i><i style="height:62%"></i><i style="height:48%"></i>
+                  <i style="height:70%"></i><i style="height:66%"></i><i style="height:88%" class="hot"></i>
+                </div>
+              </div>
+              <div class="m-list">
+                <span class="mc-title">Pendientes de pago</span>
+                <div class="ml-item"><b>B-102</b><span>J. Pérez</span><i>$ 360</i></div>
+                <div class="ml-item"><b>A-305</b><span>Inv. Robles</span><i>$ 240</i></div>
+                <div class="ml-item"><b>C-201</b><span>C. Ramírez</span><i>$ 180</i></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mock-glow"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= STATS ================= -->
+<section class="stats reveal">
+  <div class="stats-inner">
+    <div class="stat">
+      <strong class="count" data-count="42">0</strong>
+      <span>unidades gestionadas</span>
+    </div>
+    <div class="stat">
+      <strong>$<span class="count" data-count="18420">0</span></strong>
+      <span>recaudado en el mes</span>
+    </div>
+    <div class="stat">
+      <strong><span class="count" data-count="86">0</span>%</strong>
+      <span>eficiencia de cobro</span>
+    </div>
+    <div class="stat">
+      <strong><span class="count" data-count="100">0</span>%</strong>
+      <span>en la nube</span>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FUNCIONALIDADES ================= -->
+<section class="section" id="funcionalidades">
+  <div class="section-head reveal">
+    <span class="eyebrow">Funcionalidades</span>
+    <h2>Todo lo que tu administración necesita</h2>
+    <p>De la cuota al reporte, cada etapa del ciclo financiero del condominio en un solo lugar.</p>
+  </div>
+  <div class="features">
+    <a class="feature reveal" href="cuotas.html">
+      <div class="f-ico" style="--c:var(--teal)">▤</div>
+      <h3>Cuotas y recaudación</h3>
+      <p>Genera cuotas mensuales, registra pagos con destino automático de la deuda y recargos por mora.</p>
+      <span class="f-link">Ver módulo →</span>
+    </a>
+    <a class="feature reveal" href="unidades.html">
+      <div class="f-ico" style="--c:var(--indigo)">⌂</div>
+      <h3>Unidades y titulares</h3>
+      <p>Estado de cada unidad: activas, exentas, inhabilitadas o en litigio. Fichas con historial completo.</p>
+      <span class="f-link">Ver módulo →</span>
+    </a>
+    <a class="feature reveal" href="proyectos.html">
+      <div class="f-ico" style="--c:var(--cyan)">✦</div>
+      <h3>Proyectos especiales</h3>
+      <p>Imprevistos y obras con cuotas especiales, aprobaciones y seguimiento de cada proyecto.</p>
+      <span class="f-link">Ver módulo →</span>
+    </a>
+    <a class="feature reveal" href="operaciones.html">
+      <div class="f-ico" style="--c:var(--amber)">⇄</div>
+      <h3>Operaciones y gastos</h3>
+      <p>Registro de ingresos y egresos, asientos contables automáticos y conciliación en claro.</p>
+      <span class="f-link">Ver módulo →</span>
+    </a>
+    <a class="feature reveal" href="proveedores.html">
+      <div class="f-ico" style="--c:var(--rose)">⚙</div>
+      <h3>Proveedores</h3>
+      <p>Servicios y contratos de mantenimiento asociados a gastos reidentificables y deducibles.</p>
+      <span class="f-link">Ver módulo →</span>
+    </a>
+    <a class="feature reveal" href="recaudacion.html">
+      <div class="f-ico" style="--c:var(--violet)">◷</div>
+      <h3>Reportes y tasas</h3>
+      <p>Recaudación, eficiencia de cobro y tasas de cambio en USD/VES para decisiones informadas.</p>
+      <span class="f-link">Ver módulo →</span>
+    </a>
+  </div>
+</section>
+
+<!-- ================= CÓMO FUNCIONA ================= -->
+<section class="section alt" id="como-funciona">
+  <div class="section-head reveal">
+    <span class="eyebrow">Cómo funciona</span>
+    <h2>Listo en minutos, no en semanas</h2>
+    <p>Un flujo simple pensado para administradores sin tiempo que perder.</p>
+  </div>
+  <div class="steps">
+    <div class="step reveal">
+      <div class="step-num">1</div>
+      <h3>Carga tus unidades</h3>
+      <p>Importa tu listado de unidades y titulares o créalo en el panel en unos clics.</p>
+    </div>
+    <div class="step reveal">
+      <div class="step-num">2</div>
+      <h3>Genera la cuota del mes</h3>
+      <p>Condora crea las deudas y aplica recargos por mora automáticamente.</p>
+    </div>
+    <div class="step reveal">
+      <div class="step-num">3</div>
+      <h3>Registra y da seguimiento</h3>
+      <p>Los pagos se distribuyen solo a la deuda y los reportes se actualizan al instante.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= BENEFICIOS ================= -->
+<section class="section" id="beneficios">
+  <div class="bent-split">
+    <div class="bent-text reveal">
+      <span class="eyebrow">Para administradores</span>
+      <h2>Deja de perseguir planillas y estados de cuenta</h2>
+      <ul class="bens">
+        <li><b>Destino inteligente del pago</b><span>Elige cómo se imputa cada pago: específico, FIFO, prorrateo o abono a capital.</span></li>
+        <li><b>Multi-moneda desde el inicio</b><span>Recaudación en USD y VES con tasas de cambio siempre a la vista.</span></li>
+        <li><b>Mora y litigios sin sorpresas</b><span>Recargos calculados con reglas claras y visibles para cada unidad.</span></li>
+        <li><b>Traza contable</b><span>Cada operación deja un asiento auditable que respalda tus reportes.</span></li>
+      </ul>
+      <a href="index.html" class="btn btn-primary btn-lg">Probar el panel de control</a>
+    </div>
+    <div class="bent-visual reveal">
+      <div class="bcard bc-1">
+        <span class="bc-ico">✓</span>
+        <div><b>Eficiencia de cobro</b><small>86% este mes</small></div>
+        <div class="bc-progress"><i style="width:86%"></i></div>
+      </div>
+      <div class="bcard bc-2">
+        <span class="bc-ico w">!</span>
+        <div><b>3 unidades en mora</b><small>Acciones automáticas listas</small></div>
+      </div>
+      <div class="bcard bc-3">
+        <span class="bc-ico v">$</span>
+        <div><b>Tasa de cambio</b><small>1 USD = 36,42 VES</small></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PRECIOS ================= -->
+<section class="section alt" id="precios">
+  <div class="section-head reveal">
+    <span class="eyebrow">Precios</span>
+    <h2>Planes claros, sin letra pequeña</h2>
+    <p>Empieza gratis y crece con tu comunidad.</p>
+  </div>
+  <div class="pricing">
+    <div class="price-card reveal">
+      <span class="p-name">Inicial</span>
+      <div class="p-price">$0<small>/mes</small></div>
+      <p>Para comunidades pequeñas que empiezan a organizarse.</p>
+      <ul>
+        <li>Hasta 15 unidades</li>
+        <li>Registro de pagos y gastos</li>
+        <li>Reportes básicos</li>
+        <li>Soporte por correo</li>
+      </ul>
+      <a href="index.html" class="btn btn-ghost block">Empezar gratis</a>
+    </div>
+    <div class="price-card featured reveal">
+      <span class="p-name">Pro</span>
+      <div class="p-price">$29<small>/mes</small></div>
+      <p>Para administradores que gestionan edificios con supervisión mensual.</p>
+      <ul>
+        <li>Unidades ilimitadas</li>
+        <li>Cuotas, proyectos y mora</li>
+        <li>Multi-moneda (USD/VES)</li>
+        <li>Reportes exportables</li>
+        <li>Soporte prioritario</li>
+      </ul>
+      <a href="index.html" class="btn btn-primary block">Comenzar prueba de 14 días</a>
+    </div>
+    <div class="price-card reveal">
+      <span class="p-name">Corporativo</span>
+      <div class="p-price">A la medida</div>
+      <p>Para administradoras con varias residencias bajo gestión.</p>
+      <ul>
+        <li>Múltiples condominios</li>
+        <li>Roles y permisos por equipo</li>
+        <li>API y exportación avanzada</li>
+        <li>Capacitación incluida</li>
+      </ul>
+      <a href="#contacto" class="btn btn-ghost block">Hablar con ventas</a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TESTIMONIOS ================= -->
+<section class="section" id="testimonios">
+  <div class="section-head reveal">
+    <span class="eyebrow">Testimonios</span>
+    <h2>Administradores que ya no odian los lunes</h2>
+  </div>
+  <div class="quotes">
+    <figure class="quote reveal">
+      <blockquote>“Pasé de revisar carpetas con recibos sueltos a tener la recaudación del mes en un solo vistazo. Mi junta está encantada.”</blockquote>
+      <figcaption><i class="av av1">AP</i><div><b>Ana Pérez</b><span>Administradora · Res. Los Robles</span></div></figcaption>
+    </figure>
+    <figure class="quote reveal">
+      <blockquote>“El destino del pago automático terminó con las discusiones sobre a qué deuda se aplicaba cada abono.”</blockquote>
+      <figcaption><i class="av av2">JM</i><div><b>Jorge Medina</b><span>Condominio El Avila</span></div></figcaption>
+    </figure>
+    <figure class="quote reveal">
+      <blockquote>“Con la mora a la vista y tasas en USD/VES, la junta decide con números y no con impresiones.”</blockquote>
+      <figcaption><i class="av av3">CR</i><div><b>Carmen Ríos</b><span>Vicepresidenta · Torre Central</span></div></figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ================= FAQ ================= -->
+<section class="section alt" id="faq">
+  <div class="faq-wrap reveal">
+    <div class="section-head">
+      <span class="eyebrow">Preguntas frecuentes</span>
+      <h2>Resolvemos tus dudas</h2>
+    </div>
+    <details class="faq" open>
+      <summary>¿Necesito conocimientos contables para usar Condora?</summary>
+      <p>No. El sistema hace la contabilidad por ti: cada pago y gasto genera su asiento automáticamente. Tú solo registras la operación.</p>
+    </details>
+    <details class="faq">
+      <summary>¿Puedo cobrar la cuota en dólares y en bolívares?</summary>
+      <p>Sí. Condora soporta recaudación multi-moneda con tasas de cambio configurables y siempre visibles en el panel.</p>
+    </details>
+    <details class="faq">
+      <summary>¿Cómo se maneja la mora y los recargos?</summary>
+      <p>Puedes definir reglas de recargo por antigüedad. El sistema calcula el recargo y te propone imputar el pago de forma automática (FIFO o específico).</p>
+    </details>
+    <details class="faq">
+      <summary>¿Mis datos están seguros?</summary>
+      <p>Sí. Condora funciona en la nube con copias de seguridad diarias y acceso controlado por roles.</p>
+    </details>
+  </div>
+</section>
+
+<!-- ================= CTA ================= -->
+<section class="cta reveal" id="contacto">
+  <div class="cta-inner">
+    <h2>Empieza a administrar con claridad hoy</h2>
+    <p>Explora el panel de control del prototipo y comprueba por ti mismo. Sin registros, sin demoras.</p>
+    <div class="cta-actions">
+      <a href="index.html" class="btn btn-primary btn-lg">Abrir el panel de control</a>
+      <a href="https://github.com" class="btn btn-ghost-light btn-lg">Contactar al equipo</a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="f-brand">
+      <div class="brand">
+        <div class="logo">C</div>
+        <div class="brand-txt"><span class="b-name">Condora</span><span class="b-sub">Gestión de condominios</span></div>
+      </div>
+      <p>La manera simple y transparente de administrar las finanzas de tu condominio.</p>
+    </div>
+    <div class="f-col">
+      <h4>Producto</h4>
+      <a href="#funcionalidades">Funcionalidades</a>
+      <a href="#precios">Precios</a>
+      <a href="#faq">Preguntas frecuentes</a>
+    </div>
+    <div class="f-col">
+      <h4>Prototipo</h4>
+      <a href="index.html">Panel de control</a>
+      <a href="unidades.html">Unidades</a>
+      <a href="cuotas.html">Cuotas</a>
+      <a href="recaudacion.html">Recaudación</a>
+    </div>
+    <div class="f-col">
+      <h4>Contacto</h4>
+      <a href="mailto:hola@condora.app">hola@condora.app</a>
+      <a href="https://github.com">GitHub</a>
+    </div>
+  </div>
+  <div class="f-bottom">© 2026 Condora · Prototipo de interfaz · Hecho con HTML, CSS y JS</div>
+</footer>
+
+<script src="landing.js"></script>
+</body>
+</html>
