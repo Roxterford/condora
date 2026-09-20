@@ -1,15 +1,7 @@
 @reference "#app.css";
 
-.infoboxes {
-  @apply flex gap-4 p-6 border rounded-lg;
-}
-
-.infoboxes__divider {
-  @apply w-px h-12 bg-border;
-}
-
 .infobox__title {
-  @apply  font-normal text-sm text-gray-600;
+  @apply font-normal text-sm text-gray-600;
 }
 
 .infobox__value {
