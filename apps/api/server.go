@@ -27,9 +27,8 @@ import (
 	httprouter "github.com/Sanaruca/condominio/http"
 	administracionGORM "github.com/Sanaruca/condominio/internal/administracion/adapters/gorm"
 	"github.com/Sanaruca/condominio/internal/administracion/app/command"
-	administracionConfig "github.com/Sanaruca/condominio/internal/administracion/config"
-	administracionEvent "github.com/Sanaruca/condominio/internal/administracion/event"
 	"github.com/Sanaruca/condominio/internal/administracion/models/cuota"
+	"github.com/Sanaruca/condominio/internal/administracion/models/cuota/distribucion"
 	"github.com/Sanaruca/condominio/internal/administracion/models/deuda"
 	"github.com/Sanaruca/condominio/internal/administracion/models/proveedor"
 	administracionService "github.com/Sanaruca/condominio/internal/administracion/service"
@@ -189,7 +188,13 @@ func main() {
 					quantityFactory,
 					operacionFactory,
 				),
-				Outbox: gormAdapter.NewGormOutboxEventStore(tx),
+				Unidades: unidadesGorm.NewGORMUnidadRepository(tx, unidadFactory, sujetoFactory),
+				Deudas: administracionGORM.NewGORMDeudaRepository(
+					tx,
+					deudaFactory,
+					quantityFactory,
+					sujetoFactory,
+				),
 			}
 		},
 	)
@@ -207,22 +212,9 @@ func main() {
 		cuotaFactory,
 		operacionRepository,
 		cuotaUoW,
-		unidadRepository,
-		deudaRepository,
 		deudaFactory,
 		unidad.NewFacturacionPolicyPorDefecto(),
-	)
-
-	administracionConfig.RegisterEventHandlers(
-		dispatcher,
-		administracionService.Commands.AplicarCuota,
-		idempotencyStore,
-	)
-	go bus.Consume(
-		context.Background(),
-		"api-consumer",
-		administracionEvent.CuotaRegistrada{}.EventName(),
-		dispatcher,
+		distribucion.NuevaEstrategiaDistribucionLineal(),
 	)
 
 	transaccionServiceInstance := transaccionService.New(

@@ -20,6 +20,13 @@ type UnidadIDs interface {
 	Codigo() UnidadCodigo
 }
 
+// UnidadConEstado es un snapshot ligero de una unidad con su estado, útil para
+// decisiones de facturación sin hidratar la entidad completa.
+type UnidadConEstado struct {
+	IDs    UnidadIDs
+	Estado estadounidad.EstadoDeUnidad
+}
+
 type uidswraper struct {
 	id, codigo string
 }

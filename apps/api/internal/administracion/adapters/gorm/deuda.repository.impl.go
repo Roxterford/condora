@@ -3,6 +3,7 @@ package gorm
 import (
 	"context"
 	"errors"
+	"time"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -14,6 +15,7 @@ import (
 	"github.com/Sanaruca/condominio/internal/core/common"
 	"github.com/Sanaruca/condominio/internal/core/common/filter"
 	"github.com/Sanaruca/condominio/internal/core/common/quantity"
+	database "github.com/Sanaruca/condominio/internal/shared/adapters/gorm"
 	uadapters "github.com/Sanaruca/condominio/internal/unidades/adapters/gorm"
 	"github.com/Sanaruca/condominio/internal/unidades/models/sujeto"
 	"github.com/Sanaruca/condominio/internal/unidades/models/unidad"
@@ -217,15 +219,26 @@ func (r GORMDeudaRepository) Guardar(
 	ctx context.Context,
 	deudaEntity *deuda.Deuda,
 ) core.Error {
-	model := InternalDeuda{
+	now := time.Now().UTC()
+
+	model := database.IDeuda{
 		ID:            deudaEntity.ID(),
 		UnidadID:      string(deudaEntity.Unidad().Codigo()),
+		Monto:         int(deudaEntity.Monto().Value()),
 		Cuota:         string(deudaEntity.CuotaID()),
 		Registro:      deudaEntity.Registro(),
-		Actualizacion: deudaEntity.Registro(),
+		Actualizacion: now,
 	}
 
-	if err := r.db.WithContext(ctx).Create(&model).Error; err != nil {
+	// UPSERT: si existe actualiza monto y actualizacion, si no crea
+	err := r.db.WithContext(ctx).
+		Clauses(clause.OnConflict{
+			Columns:   []clause.Column{{Name: "id"}},
+			DoUpdates: clause.AssignmentColumns([]string{"monto", "actualizacion"}),
+		}).
+		Create(&model).Error
+
+	if err != nil {
 		return core.WrapError(err)
 	}
 

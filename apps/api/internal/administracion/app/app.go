@@ -18,5 +18,4 @@ type Commands struct {
 	RegistrarProveedor command.RegistrarProveedor
 	EliminarProveedor  command.EliminarProveedor
 	RegistrarCuota     command.RegistrarCuotaRegular
-	AplicarCuota       command.AplicarCuota
 }

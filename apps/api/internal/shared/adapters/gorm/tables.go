@@ -307,8 +307,9 @@ func (Proveedor) TableName() string { return "proveedores" }
 // IDeuda -> internal_deudas
 type IDeuda struct {
 	ID            string `gorm:"primaryKey"`
-	Unidad        string `gorm:"column:unidad"`
+	UnidadID      string `gorm:"column:unidad"`
 	Cuota         string `gorm:"column:cuota"`
+	Monto         int
 	Registro      time.Time
 	Actualizacion time.Time
 }

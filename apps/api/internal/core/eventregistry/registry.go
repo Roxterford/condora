@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"sync"
 
-	administracionEvent "github.com/Sanaruca/condominio/internal/administracion/event"
 	"github.com/Sanaruca/condominio/internal/core/common/events"
 	finanzasEvent "github.com/Sanaruca/condominio/internal/finanzas/event"
 )
@@ -58,12 +57,6 @@ func init() {
 
 	RegisterEventType("transaccion.registrada", func(payload []byte) (events.Event, error) {
 		var e finanzasEvent.TransaccionRegistrada
-		err := json.Unmarshal(payload, &e)
-		return e, err
-	})
-
-	RegisterEventType("cuota.registrada", func(payload []byte) (events.Event, error) {
-		var e administracionEvent.CuotaRegistrada
 		err := json.Unmarshal(payload, &e)
 		return e, err
 	})

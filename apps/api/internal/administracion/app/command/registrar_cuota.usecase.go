@@ -6,11 +6,12 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 
 	"github.com/Sanaruca/condominio/internal/administracion/models/cuota"
+	"github.com/Sanaruca/condominio/internal/administracion/models/cuota/distribucion"
+	"github.com/Sanaruca/condominio/internal/administracion/models/deuda"
 	"github.com/Sanaruca/condominio/internal/administracion/models/periododisponible"
 	"github.com/Sanaruca/condominio/internal/core"
 	"github.com/Sanaruca/condominio/internal/core/adapters/ozzo"
 	"github.com/Sanaruca/condominio/internal/core/common"
-	"github.com/Sanaruca/condominio/internal/core/common/events"
 	"github.com/Sanaruca/condominio/internal/core/common/filter"
 	"github.com/Sanaruca/condominio/internal/core/common/mes"
 	"github.com/Sanaruca/condominio/internal/core/common/periodo"
@@ -18,6 +19,7 @@ import (
 	"github.com/Sanaruca/condominio/internal/core/envirotment"
 	"github.com/Sanaruca/condominio/internal/core/usecase"
 	"github.com/Sanaruca/condominio/internal/finanzas/models/operacion"
+	"github.com/Sanaruca/condominio/internal/unidades/models/unidad"
 )
 
 type RegistrarCuotaRegularDTO struct {
@@ -30,16 +32,20 @@ type RegistrarCuotaRegularDTO struct {
 type CuotaUoWDeps struct {
 	Cuotas      cuota.CuotaRepository
 	Operaciones operacion.OperacionRepository
-	Outbox      events.OutboxEventStoreInterface
+	Unidades    unidad.UnidadRepository
+	Deudas      deuda.DeudaRepository
 }
 
 type RegistrarCuotaRegular usecase.Handler[cc.AdminContext, RegistrarCuotaRegularDTO, *cuota.CuotaRegular]
 
 type registrarCuotaRegular struct {
-	cuotas      cuota.CuotaRepository
-	operaciones operacion.OperacionRepository
-	cf          *cuota.CuotaFactory
-	uow         common.UnitOfWork[CuotaUoWDeps]
+	cuotas                 cuota.CuotaRepository
+	operaciones            operacion.OperacionRepository
+	cf                     *cuota.CuotaFactory
+	uow                    common.UnitOfWork[CuotaUoWDeps]
+	deudaFactory           *deuda.DeudaFactory
+	facturacionPolicy      unidad.FacturacionPolicy
+	estrategiaDistribucion distribucion.EstrategiaDeDistribucion
 }
 
 func NewRegistrarCuotaRegular(
@@ -47,6 +53,9 @@ func NewRegistrarCuotaRegular(
 	operacionRepository operacion.OperacionRepository,
 	cuotaFactory *cuota.CuotaFactory,
 	uow common.UnitOfWork[CuotaUoWDeps],
+	deudaFactory *deuda.DeudaFactory,
+	facturacionPolicy unidad.FacturacionPolicy,
+	estrategiaDistribucion distribucion.EstrategiaDeDistribucion,
 ) RegistrarCuotaRegular {
 
 	if cuotaRepository == nil {
@@ -65,11 +74,26 @@ func NewRegistrarCuotaRegular(
 		panic("uow is nil")
 	}
 
+	if deudaFactory == nil {
+		panic("deudaFactory is nil")
+	}
+
+	if facturacionPolicy == nil {
+		panic("facturacionPolicy is nil")
+	}
+
+	if estrategiaDistribucion == nil {
+		panic("estrategiaDistribucion is nil")
+	}
+
 	return &registrarCuotaRegular{
-		cuotas:      cuotaRepository,
-		operaciones: operacionRepository,
-		cf:          cuotaFactory,
-		uow:         uow,
+		cuotas:                 cuotaRepository,
+		operaciones:            operacionRepository,
+		cf:                     cuotaFactory,
+		uow:                    uow,
+		deudaFactory:           deudaFactory,
+		facturacionPolicy:      facturacionPolicy,
+		estrategiaDistribucion: estrategiaDistribucion,
 	}
 }
 
@@ -132,22 +156,36 @@ func (uc registrarCuotaRegular) Exec(
 		monto = monto.HappyAdd(gasto.Total())
 	}
 
-	correlationID := cc.MustCorrelationID(ctx)
-	causationID := correlationID
-
-	_cuota, err := uc.cf.NuevaRegular(
-		int(monto.Value()),
-		input.Mes,
-		input.Anio,
-		ctx.Session().Usuario().ID,
-		correlationID,
-		causationID,
-	)
-	if err != nil {
-		return nil, core.WrapError(err)
-	}
+	var _cuota *cuota.CuotaRegular
 
 	txerr := uc.uow.Do(ctx, func(tx CuotaUoWDeps) error {
+		elegibles, err := uc.obtenerElegibles(ctx, tx.Unidades)
+		if err != nil {
+			return err
+		}
+
+		montoCuota := monto
+		montoUnidad := int64(0)
+
+		if len(elegibles) > 0 {
+			reparto, derr := uc.estrategiaDistribucion.Distribuir(monto, len(elegibles))
+			if derr != nil {
+				return derr
+			}
+
+			montoCuota = monto.HappyAdd(reparto.AjusteRedondeo)
+			montoUnidad = reparto.MontoUnidad.Value()
+		}
+
+		_cuota, err = uc.cf.NuevaRegular(
+			int(montoCuota.Value()),
+			input.Mes,
+			input.Anio,
+			ctx.Session().Usuario().ID,
+		)
+		if err != nil {
+			return err
+		}
 
 		if _, err := tx.Cuotas.Guardar(ctx, _cuota); err != nil {
 			return err
@@ -162,8 +200,17 @@ func (uc registrarCuotaRegular) Exec(
 			}
 		}
 
-		for _, event := range _cuota.PullEvents() {
-			if err := tx.Outbox.AddEvent(ctx, event); err != nil {
+		for _, _unidad := range elegibles {
+			_nuevaDeuda, derr := uc.deudaFactory.NuevaDeuda(
+				_cuota.ID(),
+				_unidad.IDs,
+				int(montoUnidad),
+			)
+			if derr != nil {
+				return derr
+			}
+
+			if err := tx.Deudas.Guardar(ctx, _nuevaDeuda); err != nil {
 				return err
 			}
 		}
@@ -175,9 +222,30 @@ func (uc registrarCuotaRegular) Exec(
 		return nil, core.WrapError(txerr)
 	}
 
-	_cuota.ClearEvents()
-
 	return _cuota, nil
+}
+
+// obtenerElegibles recupera, según la política de facturación vigente, las
+// unidades obligadas a contribuir con la cuota. El snapshot de unidades y
+// estado se toma en la misma transacción que la emisión de la cuota, no a
+// posteriori.
+func (uc registrarCuotaRegular) obtenerElegibles(
+	ctx cc.AdminContext,
+	repo unidad.UnidadRepository,
+) ([]unidad.UnidadConEstado, error) {
+	unidades, err := repo.ObtenerTodasConEstado(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	elegibles := make([]unidad.UnidadConEstado, 0, len(unidades))
+	for _, _unidad := range unidades {
+		if uc.facturacionPolicy.GeneraDeudaPorCuotaRegular(_unidad.Estado) {
+			elegibles = append(elegibles, _unidad)
+		}
+	}
+
+	return elegibles, nil
 }
 
 func (input *RegistrarCuotaRegularDTO) Validate() core.Error {

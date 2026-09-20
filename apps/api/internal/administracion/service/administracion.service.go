@@ -5,6 +5,7 @@ import (
 	"github.com/Sanaruca/condominio/internal/administracion/app/command"
 	"github.com/Sanaruca/condominio/internal/administracion/app/query"
 	"github.com/Sanaruca/condominio/internal/administracion/models/cuota"
+	"github.com/Sanaruca/condominio/internal/administracion/models/cuota/distribucion"
 	"github.com/Sanaruca/condominio/internal/administracion/models/deuda"
 	"github.com/Sanaruca/condominio/internal/administracion/models/periododisponible"
 	"github.com/Sanaruca/condominio/internal/administracion/models/proveedor"
@@ -28,10 +29,9 @@ func New(
 	cuotaFactory *cuota.CuotaFactory,
 	operacionRepository operacion.OperacionRepository,
 	uow common.UnitOfWork[command.CuotaUoWDeps],
-	unidadRepository unidad.UnidadRepository,
-	deudaRepository deuda.DeudaRepository,
 	deudaFactory *deuda.DeudaFactory,
 	facturacionPolicy unidad.FacturacionPolicy,
+	estrategiaDistribucion distribucion.EstrategiaDeDistribucion,
 ) *AdministracionService {
 
 	registrarProveedor := command.NewRegistrarProveedor(
@@ -61,13 +61,9 @@ func New(
 				operacionRepository,
 				cuotaFactory,
 				uow,
-			),
-			AplicarCuota: command.NewAplicarCuota(
-				cuotaRepository,
-				unidadRepository,
-				deudaRepository,
-				facturacionPolicy,
 				deudaFactory,
+				facturacionPolicy,
+				estrategiaDistribucion,
 			),
 		},
 	}

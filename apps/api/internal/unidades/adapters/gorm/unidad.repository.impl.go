@@ -168,6 +168,25 @@ func (r *GORMUnidadRepository) ObtenerTodas(ctx context.Context) ([]unidad.Unida
 	return codigos, nil
 }
 
+// ObtenerTodasConEstado implementa [unidad.UnidadRepository]. Trae id, codigo y
+// estado de todas las unidades en una sola query (evita el N+1 de ObtenerEstado).
+func (r *GORMUnidadRepository) ObtenerTodasConEstado(ctx context.Context) ([]unidad.UnidadConEstado, core.Error) {
+	var unidades []Unidad
+	if err := r.db.WithContext(ctx).Select("id, codigo, estado").Find(&unidades).Error; err != nil {
+		return nil, core.WrapError(err)
+	}
+
+	result := make([]unidad.UnidadConEstado, len(unidades))
+	for i, u := range unidades {
+		result[i] = unidad.UnidadConEstado{
+			IDs:    unidad.WrapIDs(u.ID, u.Codigo),
+			Estado: estadounidad.EstadoDeUnidad(u.Estado),
+		}
+	}
+
+	return result, nil
+}
+
 func (r *GORMUnidadRepository) ObtenerEstado(
 	ctx context.Context,
 	unidadCodigo unidad.UnidadCodigo,

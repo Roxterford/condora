@@ -5,12 +5,12 @@ SELECT
   u.id AS unidad_id,
   u.codigo AS unidad_codigo,
   d.cuota,
-  c.monto AS monto,
-  c.monto - COALESCE(SUM(dp.destinado), 0) AS deuda,
+  d.monto,
+  d.monto - COALESCE(SUM(dp.destinado), 0) AS deuda,
   CASE
-    WHEN COALESCE(SUM(dp.destinado), 0) = c.monto THEN 'SALDADA'
+    WHEN COALESCE(SUM(dp.destinado), 0) = d.monto THEN 'SALDADA'
     WHEN COALESCE(SUM(dp.destinado), 0) = 0 THEN 'PENDIENTE'
-    WHEN COALESCE(SUM(dp.destinado), 0) < c.monto THEN 'ABONADA'
+    WHEN COALESCE(SUM(dp.destinado), 0) < d.monto THEN 'ABONADA'
   END AS estado,
   d.registro,
   d.actualizacion
@@ -21,4 +21,4 @@ FROM
   LEFT JOIN unidades u ON u.codigo = d.unidad
 GROUP BY
   d.id,
-  c.monto;
+  d.monto;

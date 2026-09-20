@@ -2,7 +2,6 @@ package cuota
 
 import (
 	"github.com/Sanaruca/condominio/internal/core/common/audit"
-	"github.com/Sanaruca/condominio/internal/core/common/events"
 	"github.com/Sanaruca/condominio/internal/core/common/filter"
 	"github.com/Sanaruca/condominio/internal/core/common/mes"
 	"github.com/Sanaruca/condominio/internal/core/common/quantity"
@@ -27,12 +26,11 @@ type CuotaID string
 func (id CuotaID) String() string { return string(id) }
 
 type CuotaBase struct {
-	id     CuotaID
-	monto  quantity.Quantity
-	mes    mes.Mes
-	anio   int
-	Audit  audit.FullAudit[string]
-	events events.PendingEvents
+	id    CuotaID
+	monto quantity.Quantity
+	mes   mes.Mes
+	anio  int
+	Audit audit.FullAudit[string]
 }
 
 func (c CuotaBase) ID() CuotaID              { return c.id }
@@ -45,14 +43,6 @@ func (c *CuotaBase) SetMonto(monto quantity.Quantity)       { c.monto = monto }
 func (c *CuotaBase) SetMes(mes mes.Mes)                     { c.mes = mes }
 func (c *CuotaBase) SetAnio(anio int)                       { c.anio = anio }
 func (c *CuotaBase) SetAudit(audit audit.FullAudit[string]) { c.Audit = audit }
-
-func (c *CuotaBase) PullEvents() []events.Event {
-	return c.events.Dispatch()
-}
-
-func (c *CuotaBase) ClearEvents() {
-	c.events.Clear()
-}
 
 func (c CuotaBase) FilterSpec() filter.Spec {
 	return filter.Spec{

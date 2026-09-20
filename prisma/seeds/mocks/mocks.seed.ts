@@ -305,6 +305,7 @@ export async function main() {
               id: `d${i + v + 1}[${c.id}]v[${v + 1}]`,
               unidad: "villa-" + (v + 1).toString(),
               cuota: c.id,
+              monto: 123
             };
           }),
       });

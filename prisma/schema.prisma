@@ -333,6 +333,7 @@ model IDeuda {
   id            String   @id @default(cuid())
   unidad        String
   cuota         String
+  monto         Int
   registro      DateTime @default(now())
   actualizacion DateTime @default(now()) @updatedAt
 
@@ -348,7 +349,6 @@ view Deuda {
   unidad_id     String
   unidad_codigo String
   cuota         String
-  /// Este valor es el monto de la cuota
   monto         Int
   /// Este valor es el monto restante de la cuota e ira reduciendose a medida que
   /// se realicen los pagos

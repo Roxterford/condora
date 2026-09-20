@@ -107,20 +107,6 @@ func (t Proveedor) ToDomainProveedor(factory *proveedor.ProveedorFactory) *prove
 
 }
 
-// InternalDeuda escribe en la tabla real de deudas. La vista "deudas" es de solo
-// lectura (calcula monto, deuda y estado), por eso las escrituras van aquí.
-type InternalDeuda struct {
-	ID            string
-	UnidadID      string `gorm:"column:unidad"`
-	Cuota         string
-	Registro      time.Time
-	Actualizacion time.Time
-}
-
-func (t InternalDeuda) TableName() string {
-	return "internal_deudas"
-}
-
 type DestinoDePago struct {
 	ID        string
 	Operacion string

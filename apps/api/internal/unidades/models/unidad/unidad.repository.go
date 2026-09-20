@@ -26,6 +26,7 @@ type UnidadRepository interface {
 		paginator common.Paginator,
 	) (*common.Paginated[Unidad], core.Error)
 	ObtenerTodas(ctx context.Context) ([]UnidadIDs, core.Error)
+	ObtenerTodasConEstado(ctx context.Context) ([]UnidadConEstado, core.Error)
 	ObtenerEstado(
 		ctx context.Context,
 		unidad UnidadCodigo,
