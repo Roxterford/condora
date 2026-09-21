@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Sanaruca/condominio/internal/administracion/models/cuota"
 	estadoproyecto "github.com/Sanaruca/condominio/internal/administracion/models/cuota/estadoproyecto"
 	estadodeuda "github.com/Sanaruca/condominio/internal/administracion/models/deuda/estadodeuda"
 	"github.com/Sanaruca/condominio/internal/administracion/types/tipodecuota"
@@ -244,6 +245,53 @@ type Gasto struct {
 }
 
 func (Gasto) TableName() string { return "gastos" }
+
+func (c Cuota) ToDomainCuota(factory *cuota.CuotaFactory) cuota.Cuota {
+
+	switch c.Tipo {
+	case tipodecuota.Regular:
+		return factory.AssembleRegular(
+			c.ID,
+			c.Monto,
+			c.Mes,
+			c.Anio,
+			c.Registro,
+			c.Actualizacion,
+			c.RegistradoPor,
+		)
+
+	case tipodecuota.Especial:
+		return factory.AssembleEspecial(
+			c.ID,
+			c.Mes,
+			c.Anio,
+			c.Monto,
+			c.Proyecto.Titulo,
+			c.Proyecto.Descripcion,
+			c.Proyecto.Justificacion,
+			c.Proyecto.Estado.String(),
+			c.Proyecto.FechaLimite,
+			int64(c.Proyecto.InteresPorMora),
+			c.Proyecto.Registro,
+			c.Proyecto.Actualizacion,
+			c.Proyecto.RegistradoPor,
+			c.Proyecto.ActualizadoPor,
+		)
+
+	case tipodecuota.Semilla:
+		return factory.AssembleSemilla(
+			c.ID,
+			c.Monto,
+			c.Mes,
+			c.Anio,
+			c.Registro,
+			c.Actualizacion,
+			c.RegistradoPor,
+		)
+	}
+
+	return nil
+}
 
 // DestinoDePago -> destino_de_pagos
 type DestinoDePago struct {

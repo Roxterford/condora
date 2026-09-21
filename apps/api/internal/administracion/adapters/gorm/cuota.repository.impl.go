@@ -3,6 +3,7 @@ package gorm
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -15,6 +16,7 @@ import (
 	"github.com/Sanaruca/condominio/internal/core/common/audit"
 	"github.com/Sanaruca/condominio/internal/core/common/filter"
 	"github.com/Sanaruca/condominio/internal/core/common/periodo"
+	database "github.com/Sanaruca/condominio/internal/shared/adapters/gorm"
 )
 
 type GORMCuotaRepository struct {
@@ -133,16 +135,17 @@ func (r *GORMCuotaRepository) Obtener(
 ) (*common.Paginated[cuota.Cuota], core.Error) {
 
 	// Obtener registros paginados
-	registros, err := gorm.G[Cuota](r.db).
+	registros, err := gorm.G[database.Cuota](r.db).
 		Scopes(gormAdapter.GFilter(filter), gormAdapter.GPaginate(paginator)).
 		Joins(clause.LeftJoin.Association("Proyecto"), nil).
+		Order(fmt.Sprintf("%s.registro DESC", new(database.Cuota).TableName())).
 		Find(ctx)
 	if err != nil {
 		return nil, core.WrapError(err)
 	}
 
 	// Obtener total para la metadata de paginación
-	total, err := gorm.G[Cuota](r.db).Scopes(gormAdapter.GFilter(filter)).Count(ctx, "id")
+	total, err := gorm.G[database.Cuota](r.db).Scopes(gormAdapter.GFilter(filter)).Count(ctx, "id")
 	if err != nil {
 		return nil, core.WrapError(err)
 	}

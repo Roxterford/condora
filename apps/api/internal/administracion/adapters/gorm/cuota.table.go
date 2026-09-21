@@ -8,6 +8,9 @@ import (
 	"github.com/Sanaruca/condominio/internal/core/common/mes"
 )
 
+// Legacy
+//
+// Deprecated: use github.com/Sanaruca/condominio/internal/shared/adapters/gorm
 type Cuota struct {
 	ID             string
 	Tipo           tipodecuota.TipoDeCuota
@@ -27,6 +30,7 @@ func (t Cuota) TableName() string {
 	return "cuotas"
 }
 
+// Deprecated: use github.com/Sanaruca/condominio/internal/shared/adapters/gorm
 func (c Cuota) ToDomainCuota(factory *cuota.CuotaFactory) cuota.Cuota {
 
 	switch c.Tipo {
