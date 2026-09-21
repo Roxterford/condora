@@ -12,4 +12,4 @@ CREATE VIEW pagos AS SELECT
   	o.registrado_por,
   	o.registro
 FROM operaciones o 
-WHERE o.tipo = "CREDITO";
+WHERE o.tipo = 'CREDITO';

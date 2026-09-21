@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 
 	"github.com/Sanaruca/condominio/internal/core"
 	gormAdapter "github.com/Sanaruca/condominio/internal/core/adapters/gorm"
@@ -170,7 +171,9 @@ func (r *GORMUnidadRepository) ObtenerTodas(ctx context.Context) ([]unidad.Unida
 
 // ObtenerTodasConEstado implementa [unidad.UnidadRepository]. Trae id, codigo y
 // estado de todas las unidades en una sola query (evita el N+1 de ObtenerEstado).
-func (r *GORMUnidadRepository) ObtenerTodasConEstado(ctx context.Context) ([]unidad.UnidadConEstado, core.Error) {
+func (r *GORMUnidadRepository) ObtenerTodasConEstado(
+	ctx context.Context,
+) ([]unidad.UnidadConEstado, core.Error) {
 	var unidades []Unidad
 	if err := r.db.WithContext(ctx).Select("id, codigo, estado").Find(&unidades).Error; err != nil {
 		return nil, core.WrapError(err)
@@ -211,8 +214,8 @@ func (r *GORMUnidadRepository) Obtener(
 	// Obtener registros paginados
 	registros, err := gorm.G[UnidadInfo](r.db).
 		Scopes(gormAdapter.GFilter(f, map[string][]string{"deuda": {"deuda_total"}}), gormAdapter.GPaginate(p)).
-		Preload("Contacto", nil).
-		Preload("TitularPrimario", nil).
+		Joins(clause.LeftJoin.Association("Contacto"), nil).
+		Joins(clause.LeftJoin.Association("TitularPrimario"), nil).
 		Order("codigo asc"). // TODO: ordenar para que no pase 1, 10, 2, 20 ...
 		Find(ctx)
 	if err != nil {

@@ -11,4 +11,4 @@ SELECT
   (SELECT COUNT(DISTINCT unidad_codigo) FROM deudas WHERE deuda > 0) AS unidades_con_pendientes,
   (SELECT COUNT(DISTINCT unidad_codigo) FROM deudas WHERE unidad_codigo NOT IN (SELECT unidad_codigo FROM deudas WHERE deuda > 0)) AS unidades_solventes,
   (SELECT SUM(deuda) FROM deudas) AS total_pendiente,
-  (SELECT SUM(c.monto) FROM internal_deudas id JOIN cuotas c ON id.cuota = c.id) AS total_asignado;
+  (SELECT SUM(monto) FROM cuotas) AS total_asignado;
