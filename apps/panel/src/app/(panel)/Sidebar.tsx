@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
@@ -76,11 +77,16 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
       <aside className="hidden md:flex md:w-64 bg-white border-r border-gray-200 flex-col">
         {/* Logo */}
         <div className="h-20 flex items-center px-6 border-b border-gray-100">
-          <div className="w-8 h-8 rounded-2xl bg-primary mr-4" />
-          <div>
-            <h1 className="text-xl font-bold text-gray-800">Condora</h1>
-            <p className="text-xs text-gray-400">Dashboard</p>
-          </div>
+          <Link href="/dashboard" className="flex items-center">
+            <Image
+              src="/condora.svg"
+              alt="Condora Logo"
+              width={160}
+              height={32}
+              className="h-8 w-auto"
+              priority
+            />
+          </Link>
         </div>
 
         {/* Menu */}
@@ -119,15 +125,16 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }: SidebarProps) {
             >
               {/* Header */}
               <div className="h-20 px-6 flex items-center justify-between border-b border-gray-100">
-                <div className="flex items-center">
-                  <div className="w-8 h-8 rounded-2xl bg-blue-600 mr-4" />
-                  <div>
-                    <h1 className="text-xl font-bold text-gray-800">
-                      Condora
-                    </h1>
-                    <p className="text-xs text-gray-400">Dashboard</p>
-                  </div>
-                </div>
+                <Link href="/dashboard" className="flex items-center">
+                  <Image
+                    src="/condora.svg"
+                    alt="Condora Logo"
+                    width={160}
+                    height={32}
+                    className="h-8 w-auto"
+                    priority
+                  />
+                </Link>
                 <button
                   onClick={() => setSidebarOpen(false)}
                   className="text-gray-500"
