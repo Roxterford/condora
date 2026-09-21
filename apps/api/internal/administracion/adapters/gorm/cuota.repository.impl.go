@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 
 	"github.com/Sanaruca/condominio/internal/administracion/models/cuota"
 	"github.com/Sanaruca/condominio/internal/administracion/types/tipodecuota"
@@ -79,6 +80,9 @@ func (r *GORMCuotaRepository) Guardar(
 			RegistradoPor:  esp.Audit.CreatedBy,
 			ActualizadoPor: esp.Audit.UpdatedBy,
 		}
+	} else if cuotaEntity.AsSemilla() != nil {
+		tipo = tipodecuota.Semilla
+		audit = cuotaEntity.AsSemilla().Audit
 	}
 
 	model := Cuota{
@@ -131,7 +135,7 @@ func (r *GORMCuotaRepository) Obtener(
 	// Obtener registros paginados
 	registros, err := gorm.G[Cuota](r.db).
 		Scopes(gormAdapter.GFilter(filter), gormAdapter.GPaginate(paginator)).
-		Preload("Proyecto", nil).
+		Joins(clause.LeftJoin.Association("Proyecto"), nil).
 		Find(ctx)
 	if err != nil {
 		return nil, core.WrapError(err)

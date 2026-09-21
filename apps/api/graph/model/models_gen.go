@@ -182,6 +182,38 @@ func (this CuotaRegular) GetGastos() []GastoType {
 
 func (CuotaRegular) IsCuotaType() {}
 
+type CuotaSemilla struct {
+	ID            string       `json:"id"`
+	Monto         float64      `json:"monto"`
+	Mes           mes.Mes      `json:"mes"`
+	Anio          int32        `json:"anio"`
+	Registro      time.Time    `json:"registro"`
+	Actualizacion time.Time    `json:"actualizacion"`
+	Recaudacion   *Recaudacion `json:"recaudacion"`
+	Gastos        []GastoType  `json:"gastos"`
+}
+
+func (CuotaSemilla) IsCuota()                          {}
+func (this CuotaSemilla) GetID() string                { return this.ID }
+func (this CuotaSemilla) GetMonto() float64            { return this.Monto }
+func (this CuotaSemilla) GetMes() mes.Mes              { return this.Mes }
+func (this CuotaSemilla) GetAnio() int32               { return this.Anio }
+func (this CuotaSemilla) GetRegistro() time.Time       { return this.Registro }
+func (this CuotaSemilla) GetActualizacion() time.Time  { return this.Actualizacion }
+func (this CuotaSemilla) GetRecaudacion() *Recaudacion { return this.Recaudacion }
+func (this CuotaSemilla) GetGastos() []GastoType {
+	if this.Gastos == nil {
+		return nil
+	}
+	interfaceSlice := make([]GastoType, 0, len(this.Gastos))
+	for _, concrete := range this.Gastos {
+		interfaceSlice = append(interfaceSlice, concrete)
+	}
+	return interfaceSlice
+}
+
+func (CuotaSemilla) IsCuotaType() {}
+
 type Deuda struct {
 	ID       string                    `json:"id"`
 	Estado   estadodeuda.EstadoDeDeuda `json:"estado"`
@@ -244,6 +276,27 @@ func (this DeudaCuotaRegular) GetRegistro() time.Time      { return this.Registr
 func (this DeudaCuotaRegular) GetActualizacion() time.Time { return this.Actualizacion }
 
 func (DeudaCuotaRegular) IsDeudaCuotaType() {}
+
+type DeudaCuotaSemilla struct {
+	ID            string    `json:"id"`
+	Nombre        string    `json:"nombre"`
+	Monto         float64   `json:"monto"`
+	Mes           mes.Mes   `json:"mes"`
+	Anio          int32     `json:"anio"`
+	Registro      time.Time `json:"registro"`
+	Actualizacion time.Time `json:"actualizacion"`
+}
+
+func (DeudaCuotaSemilla) IsDeudaCuota()                    {}
+func (this DeudaCuotaSemilla) GetID() string               { return this.ID }
+func (this DeudaCuotaSemilla) GetNombre() string           { return this.Nombre }
+func (this DeudaCuotaSemilla) GetMonto() float64           { return this.Monto }
+func (this DeudaCuotaSemilla) GetMes() mes.Mes             { return this.Mes }
+func (this DeudaCuotaSemilla) GetAnio() int32              { return this.Anio }
+func (this DeudaCuotaSemilla) GetRegistro() time.Time      { return this.Registro }
+func (this DeudaCuotaSemilla) GetActualizacion() time.Time { return this.Actualizacion }
+
+func (DeudaCuotaSemilla) IsDeudaCuotaType() {}
 
 type DeudaTitular struct {
 	ID          string `json:"id"`

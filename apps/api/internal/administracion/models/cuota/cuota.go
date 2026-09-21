@@ -19,6 +19,7 @@ type Cuota interface {
 	Anio() int
 	AsRegular() *CuotaRegular
 	AsEspecial() *CuotaEspecial
+	AsSemilla() *CuotaSemilla
 }
 
 type CuotaID string

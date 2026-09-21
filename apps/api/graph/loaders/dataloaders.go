@@ -20,6 +20,7 @@ const (
 type Loaders struct {
 	Unidad            *dataloadgen.Loader[string, *model.Unidad]
 	UnidadIdentifiers *dataloadgen.Loader[string, *model.UnidadIdentifiers]
+	Recaudacion       *dataloadgen.Loader[string, *model.Recaudacion]
 }
 
 func NewLoaders(db *gorm.DB, quantityFactory *quantity.QuantityFactory) *Loaders {
@@ -28,6 +29,7 @@ func NewLoaders(db *gorm.DB, quantityFactory *quantity.QuantityFactory) *Loaders
 	}
 	// define the data loader
 	ur := &unidadReader{db: db, qf: quantityFactory}
+	rr := &recaudacionReader{db: db, qf: quantityFactory}
 	return &Loaders{
 		Unidad: dataloadgen.NewLoader(
 			ur.getUnidades,
@@ -35,6 +37,10 @@ func NewLoaders(db *gorm.DB, quantityFactory *quantity.QuantityFactory) *Loaders
 		),
 		UnidadIdentifiers: dataloadgen.NewLoader(
 			ur.getIdentifiers,
+			dataloadgen.WithWait(time.Millisecond),
+		),
+		Recaudacion: dataloadgen.NewLoader(
+			rr.getRecaudaciones,
 			dataloadgen.WithWait(time.Millisecond),
 		),
 	}

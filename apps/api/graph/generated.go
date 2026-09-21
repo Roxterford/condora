@@ -52,6 +52,7 @@ type Config struct {
 type ResolverRoot interface {
 	CuotaEspecial() CuotaEspecialResolver
 	CuotaRegular() CuotaRegularResolver
+	CuotaSemilla() CuotaSemillaResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
 	Unidad() UnidadResolver
@@ -90,6 +91,17 @@ type ComplexityRoot struct {
 		Registro      func(childComplexity int) int
 	}
 
+	CuotaSemilla struct {
+		Actualizacion func(childComplexity int) int
+		Anio          func(childComplexity int) int
+		Gastos        func(childComplexity int) int
+		ID            func(childComplexity int) int
+		Mes           func(childComplexity int) int
+		Monto         func(childComplexity int) int
+		Recaudacion   func(childComplexity int) int
+		Registro      func(childComplexity int) int
+	}
+
 	Deuda struct {
 		Abonos   func(childComplexity int) int
 		Cuota    func(childComplexity int) int
@@ -113,6 +125,16 @@ type ComplexityRoot struct {
 	}
 
 	Deuda__CuotaRegular struct {
+		Actualizacion func(childComplexity int) int
+		Anio          func(childComplexity int) int
+		ID            func(childComplexity int) int
+		Mes           func(childComplexity int) int
+		Monto         func(childComplexity int) int
+		Nombre        func(childComplexity int) int
+		Registro      func(childComplexity int) int
+	}
+
+	Deuda__CuotaSemilla struct {
 		Actualizacion func(childComplexity int) int
 		Anio          func(childComplexity int) int
 		ID            func(childComplexity int) int
@@ -381,6 +403,10 @@ type CuotaRegularResolver interface {
 	Recaudacion(ctx context.Context, obj *model.CuotaRegular) (*model.Recaudacion, error)
 	Gastos(ctx context.Context, obj *model.CuotaRegular) ([]model.GastoType, error)
 }
+type CuotaSemillaResolver interface {
+	Recaudacion(ctx context.Context, obj *model.CuotaSemilla) (*model.Recaudacion, error)
+	Gastos(ctx context.Context, obj *model.CuotaSemilla) ([]model.GastoType, error)
+}
 type MutationResolver interface {
 	Empty(ctx context.Context) (*string, error)
 	RegistrarCuota(ctx context.Context, input model.RegistrarCuotaDto) (model.CuotaType, error)
@@ -552,6 +578,55 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.CuotaRegular.Registro(childComplexity), true
 
+	case "CuotaSemilla.actualizacion":
+		if e.complexity.CuotaSemilla.Actualizacion == nil {
+			break
+		}
+
+		return e.complexity.CuotaSemilla.Actualizacion(childComplexity), true
+	case "CuotaSemilla.anio":
+		if e.complexity.CuotaSemilla.Anio == nil {
+			break
+		}
+
+		return e.complexity.CuotaSemilla.Anio(childComplexity), true
+	case "CuotaSemilla.gastos":
+		if e.complexity.CuotaSemilla.Gastos == nil {
+			break
+		}
+
+		return e.complexity.CuotaSemilla.Gastos(childComplexity), true
+	case "CuotaSemilla.id":
+		if e.complexity.CuotaSemilla.ID == nil {
+			break
+		}
+
+		return e.complexity.CuotaSemilla.ID(childComplexity), true
+	case "CuotaSemilla.mes":
+		if e.complexity.CuotaSemilla.Mes == nil {
+			break
+		}
+
+		return e.complexity.CuotaSemilla.Mes(childComplexity), true
+	case "CuotaSemilla.monto":
+		if e.complexity.CuotaSemilla.Monto == nil {
+			break
+		}
+
+		return e.complexity.CuotaSemilla.Monto(childComplexity), true
+	case "CuotaSemilla.recaudacion":
+		if e.complexity.CuotaSemilla.Recaudacion == nil {
+			break
+		}
+
+		return e.complexity.CuotaSemilla.Recaudacion(childComplexity), true
+	case "CuotaSemilla.registro":
+		if e.complexity.CuotaSemilla.Registro == nil {
+			break
+		}
+
+		return e.complexity.CuotaSemilla.Registro(childComplexity), true
+
 	case "Deuda.abonos":
 		if e.complexity.Deuda.Abonos == nil {
 			break
@@ -692,6 +767,49 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Deuda__CuotaRegular.Registro(childComplexity), true
+
+	case "Deuda__CuotaSemilla.actualizacion":
+		if e.complexity.Deuda__CuotaSemilla.Actualizacion == nil {
+			break
+		}
+
+		return e.complexity.Deuda__CuotaSemilla.Actualizacion(childComplexity), true
+	case "Deuda__CuotaSemilla.anio":
+		if e.complexity.Deuda__CuotaSemilla.Anio == nil {
+			break
+		}
+
+		return e.complexity.Deuda__CuotaSemilla.Anio(childComplexity), true
+	case "Deuda__CuotaSemilla.id":
+		if e.complexity.Deuda__CuotaSemilla.ID == nil {
+			break
+		}
+
+		return e.complexity.Deuda__CuotaSemilla.ID(childComplexity), true
+	case "Deuda__CuotaSemilla.mes":
+		if e.complexity.Deuda__CuotaSemilla.Mes == nil {
+			break
+		}
+
+		return e.complexity.Deuda__CuotaSemilla.Mes(childComplexity), true
+	case "Deuda__CuotaSemilla.monto":
+		if e.complexity.Deuda__CuotaSemilla.Monto == nil {
+			break
+		}
+
+		return e.complexity.Deuda__CuotaSemilla.Monto(childComplexity), true
+	case "Deuda__CuotaSemilla.nombre":
+		if e.complexity.Deuda__CuotaSemilla.Nombre == nil {
+			break
+		}
+
+		return e.complexity.Deuda__CuotaSemilla.Nombre(childComplexity), true
+	case "Deuda__CuotaSemilla.registro":
+		if e.complexity.Deuda__CuotaSemilla.Registro == nil {
+			break
+		}
+
+		return e.complexity.Deuda__CuotaSemilla.Registro(childComplexity), true
 
 	case "Deuda__Titular.cedula":
 		if e.complexity.Deuda__Titular.Cedula == nil {
@@ -2140,7 +2258,18 @@ type CuotaEspecial implements Cuota {
   gastos: [GastoType!]!
 }
 
-union CuotaType = CuotaRegular | CuotaEspecial
+type CuotaSemilla implements Cuota {
+  id: ID!
+  monto: Float!
+  mes: Mes!
+  anio: Int!
+  registro: DateTime!
+  actualizacion: DateTime!
+  recaudacion: Recaudacion!
+  gastos: [GastoType!]!
+}
+
+union CuotaType = CuotaRegular | CuotaEspecial | CuotaSemilla
 
 type PaginatedCuota {
   data: [CuotaType!]!
@@ -2229,7 +2358,17 @@ type Deuda__CuotaEspecial implements Deuda__Cuota {
   actualizacion: DateTime!
 }
 
-union Deuda__CuotaType = Deuda__CuotaRegular | Deuda__CuotaEspecial
+type Deuda__CuotaSemilla implements Deuda__Cuota {
+  id: ID!
+  nombre: String!
+  monto: Float!
+  mes: Mes!
+  anio: Int!
+  registro: DateTime!
+  actualizacion: DateTime!
+}
+
+union Deuda__CuotaType = Deuda__CuotaRegular | Deuda__CuotaEspecial | Deuda__CuotaSemilla
 
 input DeudaFilter @autofilter {
   cuota: StringCondition
@@ -3621,6 +3760,258 @@ func (ec *executionContext) fieldContext_CuotaRegular_gastos(_ context.Context, 
 	return fc, nil
 }
 
+func (ec *executionContext) _CuotaSemilla_id(ctx context.Context, field graphql.CollectedField, obj *model.CuotaSemilla) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CuotaSemilla_id,
+		func(ctx context.Context) (any, error) {
+			return obj.ID, nil
+		},
+		nil,
+		ec.marshalNID2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CuotaSemilla_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CuotaSemilla",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CuotaSemilla_monto(ctx context.Context, field graphql.CollectedField, obj *model.CuotaSemilla) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CuotaSemilla_monto,
+		func(ctx context.Context) (any, error) {
+			return obj.Monto, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CuotaSemilla_monto(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CuotaSemilla",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CuotaSemilla_mes(ctx context.Context, field graphql.CollectedField, obj *model.CuotaSemilla) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CuotaSemilla_mes,
+		func(ctx context.Context) (any, error) {
+			return obj.Mes, nil
+		},
+		nil,
+		ec.marshalNMes2githubᚗcomᚋSanarucaᚋcondominioᚋinternalᚋcoreᚋcommonᚋmesᚐMes,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CuotaSemilla_mes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CuotaSemilla",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Mes does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CuotaSemilla_anio(ctx context.Context, field graphql.CollectedField, obj *model.CuotaSemilla) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CuotaSemilla_anio,
+		func(ctx context.Context) (any, error) {
+			return obj.Anio, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CuotaSemilla_anio(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CuotaSemilla",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CuotaSemilla_registro(ctx context.Context, field graphql.CollectedField, obj *model.CuotaSemilla) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CuotaSemilla_registro,
+		func(ctx context.Context) (any, error) {
+			return obj.Registro, nil
+		},
+		nil,
+		ec.marshalNDateTime2timeᚐTime,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CuotaSemilla_registro(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CuotaSemilla",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CuotaSemilla_actualizacion(ctx context.Context, field graphql.CollectedField, obj *model.CuotaSemilla) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CuotaSemilla_actualizacion,
+		func(ctx context.Context) (any, error) {
+			return obj.Actualizacion, nil
+		},
+		nil,
+		ec.marshalNDateTime2timeᚐTime,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CuotaSemilla_actualizacion(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CuotaSemilla",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CuotaSemilla_recaudacion(ctx context.Context, field graphql.CollectedField, obj *model.CuotaSemilla) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CuotaSemilla_recaudacion,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.CuotaSemilla().Recaudacion(ctx, obj)
+		},
+		nil,
+		ec.marshalNRecaudacion2ᚖgithubᚗcomᚋSanarucaᚋcondominioᚋgraphᚋmodelᚐRecaudacion,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CuotaSemilla_recaudacion(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CuotaSemilla",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "moneda":
+				return ec.fieldContext_Recaudacion_moneda(ctx, field)
+			case "monto_estimado":
+				return ec.fieldContext_Recaudacion_monto_estimado(ctx, field)
+			case "monto_recaudado":
+				return ec.fieldContext_Recaudacion_monto_recaudado(ctx, field)
+			case "monto_pendiente":
+				return ec.fieldContext_Recaudacion_monto_pendiente(ctx, field)
+			case "pagos_asociados":
+				return ec.fieldContext_Recaudacion_pagos_asociados(ctx, field)
+			case "unidades":
+				return ec.fieldContext_Recaudacion_unidades(ctx, field)
+			case "unidades_aplicadas":
+				return ec.fieldContext_Recaudacion_unidades_aplicadas(ctx, field)
+			case "unidades_solventes":
+				return ec.fieldContext_Recaudacion_unidades_solventes(ctx, field)
+			case "unidades_pendientes":
+				return ec.fieldContext_Recaudacion_unidades_pendientes(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Recaudacion", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CuotaSemilla_gastos(ctx context.Context, field graphql.CollectedField, obj *model.CuotaSemilla) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CuotaSemilla_gastos,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.CuotaSemilla().Gastos(ctx, obj)
+		},
+		nil,
+		ec.marshalNGastoType2ᚕgithubᚗcomᚋSanarucaᚋcondominioᚋgraphᚋmodelᚐGastoTypeᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CuotaSemilla_gastos(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CuotaSemilla",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type GastoType does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Deuda_id(ctx context.Context, field graphql.CollectedField, obj *model.Deuda) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -4304,6 +4695,209 @@ func (ec *executionContext) _Deuda__CuotaRegular_actualizacion(ctx context.Conte
 func (ec *executionContext) fieldContext_Deuda__CuotaRegular_actualizacion(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Deuda__CuotaRegular",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Deuda__CuotaSemilla_id(ctx context.Context, field graphql.CollectedField, obj *model.DeudaCuotaSemilla) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Deuda__CuotaSemilla_id,
+		func(ctx context.Context) (any, error) {
+			return obj.ID, nil
+		},
+		nil,
+		ec.marshalNID2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Deuda__CuotaSemilla_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Deuda__CuotaSemilla",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Deuda__CuotaSemilla_nombre(ctx context.Context, field graphql.CollectedField, obj *model.DeudaCuotaSemilla) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Deuda__CuotaSemilla_nombre,
+		func(ctx context.Context) (any, error) {
+			return obj.Nombre, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Deuda__CuotaSemilla_nombre(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Deuda__CuotaSemilla",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Deuda__CuotaSemilla_monto(ctx context.Context, field graphql.CollectedField, obj *model.DeudaCuotaSemilla) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Deuda__CuotaSemilla_monto,
+		func(ctx context.Context) (any, error) {
+			return obj.Monto, nil
+		},
+		nil,
+		ec.marshalNFloat2float64,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Deuda__CuotaSemilla_monto(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Deuda__CuotaSemilla",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Deuda__CuotaSemilla_mes(ctx context.Context, field graphql.CollectedField, obj *model.DeudaCuotaSemilla) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Deuda__CuotaSemilla_mes,
+		func(ctx context.Context) (any, error) {
+			return obj.Mes, nil
+		},
+		nil,
+		ec.marshalNMes2githubᚗcomᚋSanarucaᚋcondominioᚋinternalᚋcoreᚋcommonᚋmesᚐMes,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Deuda__CuotaSemilla_mes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Deuda__CuotaSemilla",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Mes does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Deuda__CuotaSemilla_anio(ctx context.Context, field graphql.CollectedField, obj *model.DeudaCuotaSemilla) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Deuda__CuotaSemilla_anio,
+		func(ctx context.Context) (any, error) {
+			return obj.Anio, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Deuda__CuotaSemilla_anio(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Deuda__CuotaSemilla",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Deuda__CuotaSemilla_registro(ctx context.Context, field graphql.CollectedField, obj *model.DeudaCuotaSemilla) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Deuda__CuotaSemilla_registro,
+		func(ctx context.Context) (any, error) {
+			return obj.Registro, nil
+		},
+		nil,
+		ec.marshalNDateTime2timeᚐTime,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Deuda__CuotaSemilla_registro(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Deuda__CuotaSemilla",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DateTime does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Deuda__CuotaSemilla_actualizacion(ctx context.Context, field graphql.CollectedField, obj *model.DeudaCuotaSemilla) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Deuda__CuotaSemilla_actualizacion,
+		func(ctx context.Context) (any, error) {
+			return obj.Actualizacion, nil
+		},
+		nil,
+		ec.marshalNDateTime2timeᚐTime,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Deuda__CuotaSemilla_actualizacion(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Deuda__CuotaSemilla",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -12657,6 +13251,13 @@ func (ec *executionContext) _Cuota(ctx context.Context, sel ast.SelectionSet, ob
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
+	case model.CuotaSemilla:
+		return ec._CuotaSemilla(ctx, sel, &obj)
+	case *model.CuotaSemilla:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._CuotaSemilla(ctx, sel, obj)
 	case model.CuotaRegular:
 		return ec._CuotaRegular(ctx, sel, &obj)
 	case *model.CuotaRegular:
@@ -12684,6 +13285,13 @@ func (ec *executionContext) _CuotaType(ctx context.Context, sel ast.SelectionSet
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
+	case model.CuotaSemilla:
+		return ec._CuotaSemilla(ctx, sel, &obj)
+	case *model.CuotaSemilla:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._CuotaSemilla(ctx, sel, obj)
 	case model.CuotaRegular:
 		return ec._CuotaRegular(ctx, sel, &obj)
 	case *model.CuotaRegular:
@@ -12711,6 +13319,13 @@ func (ec *executionContext) _Deuda__Cuota(ctx context.Context, sel ast.Selection
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
+	case model.DeudaCuotaSemilla:
+		return ec._Deuda__CuotaSemilla(ctx, sel, &obj)
+	case *model.DeudaCuotaSemilla:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Deuda__CuotaSemilla(ctx, sel, obj)
 	case model.DeudaCuotaRegular:
 		return ec._Deuda__CuotaRegular(ctx, sel, &obj)
 	case *model.DeudaCuotaRegular:
@@ -12738,6 +13353,13 @@ func (ec *executionContext) _Deuda__CuotaType(ctx context.Context, sel ast.Selec
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
+	case model.DeudaCuotaSemilla:
+		return ec._Deuda__CuotaSemilla(ctx, sel, &obj)
+	case *model.DeudaCuotaSemilla:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Deuda__CuotaSemilla(ctx, sel, obj)
 	case model.DeudaCuotaRegular:
 		return ec._Deuda__CuotaRegular(ctx, sel, &obj)
 	case *model.DeudaCuotaRegular:
@@ -13272,6 +13894,142 @@ func (ec *executionContext) _CuotaRegular(ctx context.Context, sel ast.Selection
 	return out
 }
 
+var cuotaSemillaImplementors = []string{"CuotaSemilla", "Cuota", "CuotaType"}
+
+func (ec *executionContext) _CuotaSemilla(ctx context.Context, sel ast.SelectionSet, obj *model.CuotaSemilla) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, cuotaSemillaImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CuotaSemilla")
+		case "id":
+			out.Values[i] = ec._CuotaSemilla_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "monto":
+			out.Values[i] = ec._CuotaSemilla_monto(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "mes":
+			out.Values[i] = ec._CuotaSemilla_mes(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "anio":
+			out.Values[i] = ec._CuotaSemilla_anio(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "registro":
+			out.Values[i] = ec._CuotaSemilla_registro(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "actualizacion":
+			out.Values[i] = ec._CuotaSemilla_actualizacion(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "recaudacion":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._CuotaSemilla_recaudacion(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "gastos":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._CuotaSemilla_gastos(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var deudaImplementors = []string{"Deuda"}
 
 func (ec *executionContext) _Deuda(ctx context.Context, sel ast.SelectionSet, obj *model.Deuda) graphql.Marshaler {
@@ -13457,6 +14215,75 @@ func (ec *executionContext) _Deuda__CuotaRegular(ctx context.Context, sel ast.Se
 			}
 		case "actualizacion":
 			out.Values[i] = ec._Deuda__CuotaRegular_actualizacion(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var deuda__CuotaSemillaImplementors = []string{"Deuda__CuotaSemilla", "Deuda__Cuota", "Deuda__CuotaType"}
+
+func (ec *executionContext) _Deuda__CuotaSemilla(ctx context.Context, sel ast.SelectionSet, obj *model.DeudaCuotaSemilla) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deuda__CuotaSemillaImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Deuda__CuotaSemilla")
+		case "id":
+			out.Values[i] = ec._Deuda__CuotaSemilla_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "nombre":
+			out.Values[i] = ec._Deuda__CuotaSemilla_nombre(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "monto":
+			out.Values[i] = ec._Deuda__CuotaSemilla_monto(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "mes":
+			out.Values[i] = ec._Deuda__CuotaSemilla_mes(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "anio":
+			out.Values[i] = ec._Deuda__CuotaSemilla_anio(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "registro":
+			out.Values[i] = ec._Deuda__CuotaSemilla_registro(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "actualizacion":
+			out.Values[i] = ec._Deuda__CuotaSemilla_actualizacion(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

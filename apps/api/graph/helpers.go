@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/Sanaruca/condominio/graph/model"
-	"github.com/Sanaruca/condominio/internal/administracion/app/query"
 	"github.com/Sanaruca/condominio/internal/core/common"
 	"github.com/Sanaruca/condominio/internal/core/common/filter"
 	cc "github.com/Sanaruca/condominio/internal/core/context"
@@ -13,34 +12,6 @@ import (
 )
 
 ///////////////////////////
-
-func resolverObtenerRecaudacion(
-	ctx context.Context,
-	r *Resolver,
-	cuotaID string,
-) (*model.Recaudacion, error) {
-	baseCtx, err := cc.Wrap(ctx).AsBase()
-	if err != nil {
-		return nil, err
-	}
-
-	recaudacion, err := r.Administracion.Queries.ObtenerRecaudacion.Exec(
-		baseCtx,
-		query.ObtenerRecaudacionDTO{
-			CuotaID: cuotaID,
-		},
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	if recaudacion == nil {
-		return nil, nil
-	}
-
-	result := model.RecaudacionFromDomain(*recaudacion)
-	return &result, nil
-}
 
 func resolverObtenerGastos(
 	ctx context.Context,

@@ -11,3 +11,7 @@ func (c *CuotaRegular) AsRegular() *CuotaRegular {
 func (c *CuotaRegular) AsEspecial() *CuotaEspecial {
 	return nil
 }
+
+func (c *CuotaRegular) AsSemilla() *CuotaSemilla {
+	return nil
+}

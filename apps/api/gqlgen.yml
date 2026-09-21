@@ -152,6 +152,12 @@ models:
         resolver: true
       gastos:
         resolver: true
+  CuotaSemilla:
+    fields:
+      recaudacion:
+        resolver: true
+      gastos:
+        resolver: true
 
   ID:
     model:

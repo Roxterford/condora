@@ -58,6 +58,17 @@ func (c Cuota) ToDomainCuota(factory *cuota.CuotaFactory) cuota.Cuota {
 			c.Proyecto.RegistradoPor,
 			c.Proyecto.ActualizadoPor,
 		)
+
+	case tipodecuota.Semilla:
+		return factory.AssembleSemilla(
+			c.ID,
+			c.Monto,
+			c.Mes,
+			c.Anio,
+			c.Registro,
+			c.Actualizacion,
+			c.RegistradoPor,
+		)
 	}
 
 	return nil

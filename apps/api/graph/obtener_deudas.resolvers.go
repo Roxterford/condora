@@ -113,6 +113,16 @@ func (r *queryResolver) ObtenerDeudas(ctx context.Context, filtro *model.DeudaFi
 				Registro:      deuda.Cuota.Registro,
 				Actualizacion: deuda.Cuota.Actualizacion,
 			}
+		} else if deuda.Cuota.Tipo.Semilla() {
+			cuota = model.DeudaCuotaSemilla{
+				ID:            deuda.Cuota.ID,
+				Nombre:        deuda.Cuota.Nombre(),
+				Monto:         r.qf.Assemble(int64(deuda.Cuota.Monto)).Float(),
+				Mes:           deuda.Cuota.Mes,
+				Anio:          int32(deuda.Cuota.Anio),
+				Registro:      deuda.Cuota.Registro,
+				Actualizacion: deuda.Cuota.Actualizacion,
+			}
 		} else {
 			logger.ErrorCtx(ctx, nil, "No se pudo determinar el tipo de cuota", "cuota.tipo", deuda.Cuota.Tipo)
 			return nil, core.ErrInternal

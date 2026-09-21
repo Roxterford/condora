@@ -41,7 +41,17 @@ type Deuda__CuotaEspecial implements Deuda__Cuota {
   actualizacion: DateTime!
 }
 
-union Deuda__CuotaType = Deuda__CuotaRegular | Deuda__CuotaEspecial
+type Deuda__CuotaSemilla implements Deuda__Cuota {
+  id: ID!
+  nombre: String!
+  monto: Float!
+  mes: Mes!
+  anio: Int!
+  registro: DateTime!
+  actualizacion: DateTime!
+}
+
+union Deuda__CuotaType = Deuda__CuotaRegular | Deuda__CuotaEspecial | Deuda__CuotaSemilla
 
 input DeudaFilter @autofilter {
   cuota: StringCondition

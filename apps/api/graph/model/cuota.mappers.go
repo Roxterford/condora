@@ -30,6 +30,7 @@ func CuotaTypeFromDomain(cuota cuota.Cuota) CuotaType {
 	}
 	cuota_regular := cuota.AsRegular()
 	cuota_especial := cuota.AsEspecial()
+	cuota_semilla := cuota.AsSemilla()
 
 	if cuota_regular != nil {
 		return CuotaRegular{
@@ -60,6 +61,17 @@ func CuotaTypeFromDomain(cuota cuota.Cuota) CuotaType {
 				Registro:       cuota_especial.Detalles.Audit.CreatedAt,
 				Actualizacion:  cuota_especial.Detalles.Audit.UpdatedAt,
 			},
+		}
+	}
+
+	if cuota_semilla != nil {
+		return CuotaSemilla{
+			ID:            string(cuota_semilla.ID()),
+			Monto:         cuota_semilla.Monto().Float(),
+			Mes:           cuota_semilla.Mes(),
+			Anio:          int32(cuota_semilla.Anio()),
+			Registro:      cuota_semilla.Audit.CreatedAt,
+			Actualizacion: cuota_semilla.Audit.UpdatedAt,
 		}
 	}
 

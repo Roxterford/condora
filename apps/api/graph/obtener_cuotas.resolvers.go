@@ -10,7 +10,6 @@ import (
 
 	"github.com/Sanaruca/condominio/graph/model"
 	"github.com/Sanaruca/condominio/internal/administracion/app/query"
-	"github.com/Sanaruca/condominio/internal/core/common"
 	corecontext "github.com/Sanaruca/condominio/internal/core/context"
 )
 
@@ -23,7 +22,7 @@ func (r *queryResolver) ObtenerCuotas(ctx context.Context, filter *model.CuotaFi
 	}
 
 	cuotas, err := r.Administracion.Queries.ObtenerCuotas.Exec(baseContext, query.ObtenerCuotasDTO{
-		Paginator: common.Paginator{},
+		Paginator: paginator.ToDomainPaginator(),
 		Filter:    filter.ToFilter(),
 	})
 

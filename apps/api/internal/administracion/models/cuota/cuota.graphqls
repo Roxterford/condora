@@ -32,7 +32,18 @@ type CuotaEspecial implements Cuota {
   gastos: [GastoType!]!
 }
 
-union CuotaType = CuotaRegular | CuotaEspecial
+type CuotaSemilla implements Cuota {
+  id: ID!
+  monto: Float!
+  mes: Mes!
+  anio: Int!
+  registro: DateTime!
+  actualizacion: DateTime!
+  recaudacion: Recaudacion!
+  gastos: [GastoType!]!
+}
+
+union CuotaType = CuotaRegular | CuotaEspecial | CuotaSemilla
 
 type PaginatedCuota {
   data: [CuotaType!]!

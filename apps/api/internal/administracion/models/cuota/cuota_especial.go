@@ -12,3 +12,7 @@ func (c *CuotaEspecial) AsEspecial() *CuotaEspecial {
 func (c *CuotaEspecial) AsRegular() *CuotaRegular {
 	return nil
 }
+
+func (c *CuotaEspecial) AsSemilla() *CuotaSemilla {
+	return nil
+}

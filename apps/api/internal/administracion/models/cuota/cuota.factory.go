@@ -125,6 +125,72 @@ func (f *CuotaFactory) NuevaEspecial(
 	}, nil
 }
 
+func (f *CuotaFactory) NuevaSemilla(
+	monto int,
+	mes mes.Mes,
+	anio int,
+	registrador string,
+) (*CuotaSemilla, core.Error) {
+
+	if monto <= 0 {
+		return nil, core.NewValidationError("el monto debe ser mayor a cero")
+	}
+
+	if mes < 1 || mes > 12 {
+		return nil, core.NewValidationError("el mes debe estar entre 1 y 12")
+	}
+
+	if anio < 2000 {
+		return nil, core.NewValidationError("el año debe ser mayor a 2000")
+	}
+
+	ahora := time.Now()
+	id := CuotaID(cuid.New())
+
+	base := new(CuotaBase)
+	base.SetID(id)
+	base.SetMonto(f.qf.New(int64(monto)))
+	base.SetMes(mes)
+	base.SetAnio(anio)
+	base.SetAudit(audit.FullAudit[string]{
+		CreatedAt: ahora,
+		CreatedBy: registrador,
+		UpdatedAt: ahora,
+		UpdatedBy: registrador,
+	})
+
+	return &CuotaSemilla{
+		CuotaBase: *base,
+	}, nil
+}
+
+func (f *CuotaFactory) AssembleSemilla(
+	id string,
+	monto int,
+	mes mes.Mes,
+	anio int,
+	creado_en time.Time,
+	actualizado_en time.Time,
+	registrador string,
+) *CuotaSemilla {
+
+	base := new(CuotaBase)
+	base.SetID(CuotaID(id))
+	base.SetMonto(f.qf.Assemble(int64(monto)))
+	base.SetMes(mes)
+	base.SetAnio(anio)
+	base.SetAudit(audit.FullAudit[string]{
+		CreatedAt: creado_en,
+		CreatedBy: registrador,
+		UpdatedAt: actualizado_en,
+		UpdatedBy: registrador,
+	})
+
+	return &CuotaSemilla{
+		CuotaBase: *base,
+	}
+}
+
 func (f *CuotaFactory) AssembleRegular(
 	id string,
 	monto int,

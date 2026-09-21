@@ -8,12 +8,13 @@ package graph
 import (
 	"context"
 
+	"github.com/Sanaruca/condominio/graph/loaders"
 	"github.com/Sanaruca/condominio/graph/model"
 )
 
 // Recaudacion is the resolver for the recaudacion field.
 func (r *cuotaEspecialResolver) Recaudacion(ctx context.Context, obj *model.CuotaEspecial) (*model.Recaudacion, error) {
-	return resolverObtenerRecaudacion(ctx, r.Resolver, obj.ID)
+	return loaders.GetRecaudacion(ctx, obj.ID)
 }
 
 // Gastos is the resolver for the gastos field.
@@ -23,11 +24,21 @@ func (r *cuotaEspecialResolver) Gastos(ctx context.Context, obj *model.CuotaEspe
 
 // Recaudacion is the resolver for the recaudacion field.
 func (r *cuotaRegularResolver) Recaudacion(ctx context.Context, obj *model.CuotaRegular) (*model.Recaudacion, error) {
-	return resolverObtenerRecaudacion(ctx, r.Resolver, obj.ID)
+	return loaders.GetRecaudacion(ctx, obj.ID)
 }
 
 // Gastos is the resolver for the gastos field.
 func (r *cuotaRegularResolver) Gastos(ctx context.Context, obj *model.CuotaRegular) ([]model.GastoType, error) {
+	return resolverObtenerGastos(ctx, r.Resolver, obj.GetID())
+}
+
+// Recaudacion is the resolver for the recaudacion field.
+func (r *cuotaSemillaResolver) Recaudacion(ctx context.Context, obj *model.CuotaSemilla) (*model.Recaudacion, error) {
+	return loaders.GetRecaudacion(ctx, obj.ID)
+}
+
+// Gastos is the resolver for the gastos field.
+func (r *cuotaSemillaResolver) Gastos(ctx context.Context, obj *model.CuotaSemilla) ([]model.GastoType, error) {
 	return resolverObtenerGastos(ctx, r.Resolver, obj.GetID())
 }
 
@@ -37,5 +48,9 @@ func (r *Resolver) CuotaEspecial() CuotaEspecialResolver { return &cuotaEspecial
 // CuotaRegular returns CuotaRegularResolver implementation.
 func (r *Resolver) CuotaRegular() CuotaRegularResolver { return &cuotaRegularResolver{r} }
 
+// CuotaSemilla returns CuotaSemillaResolver implementation.
+func (r *Resolver) CuotaSemilla() CuotaSemillaResolver { return &cuotaSemillaResolver{r} }
+
 type cuotaEspecialResolver struct{ *Resolver }
 type cuotaRegularResolver struct{ *Resolver }
+type cuotaSemillaResolver struct{ *Resolver }
