@@ -32,4 +32,7 @@ type UnidadRepository interface {
 		unidad UnidadCodigo,
 	) (estadounidad.EstadoDeUnidad, core.Error)
 	Guardar(ctx context.Context, unidad *Unidad) core.Error
+	// Recalcular actualiza los campos denormalizados (deuda_total, estado_cuenta,
+	// cuotas_pendientes, cuenta) de una unidad basándose en sus deudas, pagos y abonos.
+	Recalcular(ctx context.Context, unidadID UnidadID) core.Error
 }

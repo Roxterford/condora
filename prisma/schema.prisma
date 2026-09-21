@@ -85,6 +85,12 @@ model Unidad {
   contacto         String?
   descripcion      String?
 
+  // Campos denormalizados (migración 001)
+  deuda_total       Int      @default(0)
+  estado_cuenta     String   @default("SOLVENTE")
+  cuotas_pendientes Int      @default(0)
+  cuenta            Int      @default(0)
+
   Titular     Sujeto?      @relation("titular_primario", fields: [titular_primario], references: [id])
   Contacto    Sujeto?      @relation("representante", fields: [contacto], references: [id])
   Deudas      Deuda[]
@@ -94,8 +100,6 @@ model Unidad {
   Titulares Titularidad[]
 
   @@unique([id, codigo])
-  @@index([codigo])
-  @@map("unidades")
 }
 
 enum TipoDeSujeto {

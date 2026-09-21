@@ -70,6 +70,12 @@ type Unidad struct {
 	ContactoID        *string `gorm:"column:contacto"`
 	Descripcion       *string
 
+	// Campos denormalizados (migración 001)
+	DeudaTotal       int    `gorm:"column:deuda_total"`
+	EstadoCuenta     string `gorm:"column:estado_cuenta"`
+	CuotasPendientes int    `gorm:"column:cuotas_pendientes"`
+	Cuenta           int    `gorm:"column:cuenta"`
+
 	TitularPrimario *Sujeto `gorm:"foreignKey:TitularPrimarioID"`
 	Contacto        *Sujeto
 }
@@ -404,10 +410,7 @@ func (Recaudacion) TableName() string { return "recaudacion" }
 // UnidadInfo (view) -> unidades_info
 type UnidadInfo struct {
 	Unidad
-	DeudaTotal       int    `gorm:"column:deuda_total"`
-	EstadoCuenta     string `gorm:"column:estado_cuenta"`
-	Wallet           int    `gorm:"column:cuenta"`
-	CuotasPendientes int    `gorm:"column:cuotas_pendientes"`
+	Wallet int `gorm:"column:cuenta"`
 }
 
 func (UnidadInfo) TableName() string { return "unidades_info" }

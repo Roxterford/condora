@@ -171,6 +171,14 @@ func (uc *registrarTransaccion) Exec(
 		return nil, err
 	}
 
+	// Si es un pago, recalcular los campos denormalizados de la unidad
+	// TODO: también llamar después de aplicar el pago a deudas (crear destino_de_pagos)
+	if input.Tipo == TipoPago && input.Unidad != nil {
+		if err := uc.unidades.Recalcular(ctx, unidad.UnidadID(*input.Unidad)); err != nil {
+			return nil, err
+		}
+	}
+
 	for _, event := range op.PullEvents() {
 		if err := uc.outbox.AddEvent(ctx, event); err != nil {
 			return nil, core.WrapError(err)

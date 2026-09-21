@@ -8,10 +8,7 @@ import (
 
 type UnidadInfo struct {
 	Unidad
-	DeudaTotal       int    `gorm:"column:deuda_total"`
-	EstadoCuenta     string `gorm:"column:estado_cuenta"`
-	Wallet           int    `gorm:"column:cuenta"`
-	CuotasPendientes int    `gorm:"column:cuotas_pendientes"`
+	Wallet int `gorm:"column:cuenta"`
 }
 
 func (u *UnidadInfo) TableName() string {

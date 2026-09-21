@@ -13,6 +13,12 @@ type Unidad struct {
 	ContactoID        *string `gorm:"column:contacto"`
 	Descripcion       *string
 
+	// Campos denormalizados (migración 001)
+	DeudaTotal       int    `gorm:"column:deuda_total"`
+	EstadoCuenta     string `gorm:"column:estado_cuenta"`
+	CuotasPendientes int    `gorm:"column:cuotas_pendientes"`
+	Cuenta           int    `gorm:"column:cuenta"`
+
 	TitularPrimario *Sujeto
 	Contacto        *Sujeto
 }

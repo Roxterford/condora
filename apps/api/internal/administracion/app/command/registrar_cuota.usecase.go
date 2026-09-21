@@ -199,6 +199,8 @@ func (uc registrarCuotaRegular) Exec(
 				return err
 			}
 		}
+		// Guardar IDs de unidades afectadas para recalcular sus campos denormalizados
+		unidadesAfectadas := make([]unidad.UnidadID, 0, len(elegibles))
 
 		for _, _unidad := range elegibles {
 			_nuevaDeuda, derr := uc.deudaFactory.NuevaDeuda(
@@ -211,6 +213,15 @@ func (uc registrarCuotaRegular) Exec(
 			}
 
 			if err := tx.Deudas.Guardar(ctx, _nuevaDeuda); err != nil {
+				return err
+			}
+
+			unidadesAfectadas = append(unidadesAfectadas, _unidad.IDs.ID())
+		}
+
+		// Recalcular campos denormalizados de las unidades afectadas
+		for _, uid := range unidadesAfectadas {
+			if err := tx.Unidades.Recalcular(ctx, uid); err != nil {
 				return err
 			}
 		}

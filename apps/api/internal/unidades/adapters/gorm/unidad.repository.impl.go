@@ -3,6 +3,7 @@ package gorm
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -205,47 +206,128 @@ func (r *GORMUnidadRepository) ObtenerEstado(
 	return estadounidad.EstadoDeUnidad(u.Estado), nil
 }
 
+// Obtener implementa [unidad.UnidadRepository].
+//
+// Los campos calculados (deuda_total, estado_cuenta, cuotas_pendientes, cuenta)
+// están denormalizados en la tabla `unidades`. La vista `unidades_info` es ligera
+// (solo joins de contacto/titular), así que la consulta es directa sin subqueries
+// ni dos fases.
 func (r *GORMUnidadRepository) Obtener(
 	ctx context.Context,
 	f filter.Clause,
 	p common.Paginator,
 ) (*common.Paginated[unidad.Unidad], core.Error) {
 	p.Sanitize()
-	// Obtener registros paginados
+
+	// Los campos del filtro mapean directamente a columnas de la vista/unidades
+	aliases := map[string][]string{
+		"id":                {fmt.Sprintf("%s.id", new(UnidadInfo).TableName())},
+		"codigo":            {fmt.Sprintf("%s.codigo", new(UnidadInfo).TableName())},
+		"estado":            {fmt.Sprintf("%s.estado", new(UnidadInfo).TableName())},
+		"deuda":             {fmt.Sprintf("%s.deuda_total", new(UnidadInfo).TableName())},
+		"estado_cuenta":     {fmt.Sprintf("%s.estado_cuenta", new(UnidadInfo).TableName())},
+		"cuotas_pendientes": {fmt.Sprintf("%s.cuotas_pendientes", new(UnidadInfo).TableName())},
+	}
+
+	// Registros paginados directamente desde la vista ligera
 	registros, err := gorm.G[UnidadInfo](r.db).
-		Scopes(gormAdapter.GFilter(f, map[string][]string{"deuda": {"deuda_total"}}), gormAdapter.GPaginate(p)).
+		Scopes(gormAdapter.GFilter(f, aliases), gormAdapter.GPaginate(p)).
 		Joins(clause.LeftJoin.Association("Contacto"), nil).
 		Joins(clause.LeftJoin.Association("TitularPrimario"), nil).
-		Order("codigo asc"). // TODO: ordenar para que no pase 1, 10, 2, 20 ...
+		Order(fmt.Sprintf("%s.codigo asc", new(UnidadInfo).TableName())).
 		Find(ctx)
 	if err != nil {
 		return nil, core.WrapError(err)
 	}
 
-	// Obtener total para la metadata de paginación
-	total, err := gorm.G[UnidadInfo](
-		r.db,
-	).Scopes(gormAdapter.GFilter(f, map[string][]string{"deuda": {"deuda_total"}})).
-		Count(ctx, "id")
+	// Total para la metadata de paginación
+	total, err := gorm.G[UnidadInfo](r.db).
+		Scopes(gormAdapter.GFilter(f, aliases)).
+		Count(ctx, fmt.Sprintf("%s.id", new(UnidadInfo).TableName()))
 	if err != nil {
 		return nil, core.WrapError(err)
 	}
 
-	// Cálculo de páginas optimizado
-	pages := (int(total) + p.Limit - 1) / p.Limit
-
-	// 5. Mapeo final a objetos de dominio
+	// Mapeo final a objetos de dominio
 	unidades := make([]unidad.Unidad, 0, len(registros))
 	for _, u := range registros {
-		// Se pasa el detalle (si no existe en el mapa, será el valor cero de la estructura)
 		unidades = append(unidades, u.ToDomainUnidad(r.uf, r.sf))
 	}
 
-	return &common.Paginated[unidad.Unidad]{
-		Data:  unidades,
-		Total: int(total),
-		Page:  p.Page,
-		Pages: pages,
-		Limit: p.Limit,
-	}, nil
+	return common.NewPaginated(unidades, int(total), p), nil
+}
+
+// Recalcular implementa [unidad.UnidadRepository].
+// Ejecuta la misma lógica que la migración para recalcular los campos
+// denormalizados de una unidad: deuda_total, estado_cuenta, cuotas_pendientes, cuenta.
+// Usa subconsultas correlacionadas de dos niveles (compatible con SQLite) para
+// evitar el error de "misuse of aggregate function" al anidar SUM.
+func (r *GORMUnidadRepository) Recalcular(
+	ctx context.Context,
+	unidadID unidad.UnidadID,
+) core.Error {
+	const sql = `
+		UPDATE unidades
+		SET
+			deuda_total = COALESCE((
+				SELECT SUM(dd.deuda)
+				FROM (
+					SELECT d.unidad, d.monto - COALESCE(SUM(dp.destinado), 0) AS deuda
+					FROM internal_deudas d
+					JOIN cuotas c ON c.id = d.cuota
+					LEFT JOIN destino_de_pagos dp ON dp.deuda = d.id
+					WHERE d.unidad = unidades.codigo
+					GROUP BY d.id, d.monto, d.unidad
+				) dd
+			), 0),
+			estado_cuenta = CASE
+				WHEN COALESCE((
+					SELECT SUM(dd.deuda)
+					FROM (
+						SELECT d.unidad, d.monto - COALESCE(SUM(dp.destinado), 0) AS deuda
+						FROM internal_deudas d
+						JOIN cuotas c ON c.id = d.cuota
+						LEFT JOIN destino_de_pagos dp ON dp.deuda = d.id
+						WHERE d.unidad = unidades.codigo
+						GROUP BY d.id, d.monto, d.unidad
+					) dd
+				), 0) = 0 THEN 'SOLVENTE'
+				WHEN COALESCE((
+					SELECT SUM(dd.deuda)
+					FROM (
+						SELECT d.unidad, d.monto - COALESCE(SUM(dp.destinado), 0) AS deuda
+						FROM internal_deudas d
+						JOIN cuotas c ON c.id = d.cuota
+						LEFT JOIN destino_de_pagos dp ON dp.deuda = d.id
+						WHERE d.unidad = unidades.codigo
+						GROUP BY d.id, d.monto, d.unidad
+					) dd
+				), 0) < (
+					SELECT SUM(c.monto)
+					FROM internal_deudas id JOIN cuotas c ON id.cuota = c.id
+					WHERE id.unidad = unidades.codigo
+				) THEN 'ABONADA'
+				ELSE 'PENDIENTE'
+			END,
+			cuotas_pendientes = (
+				SELECT COUNT(*)
+				FROM internal_deudas d
+				JOIN cuotas c ON c.id = d.cuota
+				WHERE d.unidad = unidades.codigo
+			),
+			cuenta = (
+				SELECT COALESCE(SUM(op.monto), 0)
+				FROM operaciones op
+				WHERE op.unidad_codigo = unidades.codigo AND op.tipo = 'CREDITO' AND op.rol = 'UNIDAD'
+			) - (
+				SELECT COALESCE(SUM(dp.destinado), 0)
+				FROM destino_de_pagos dp JOIN operaciones op ON dp.operacion = op.id
+				WHERE op.unidad_codigo = unidades.codigo AND op.tipo = 'CREDITO' AND op.rol = 'UNIDAD'
+			)
+		WHERE id = ?
+	`
+	if err := r.db.WithContext(ctx).Exec(sql, unidadID.String()).Error; err != nil {
+		return core.WrapError(err)
+	}
+	return nil
 }
