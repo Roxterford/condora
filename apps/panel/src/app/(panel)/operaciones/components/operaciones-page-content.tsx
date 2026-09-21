@@ -13,7 +13,6 @@ import {
   Plus,
   Receipt,
 } from "lucide-react";
-import { Spinner } from "@/components/ui/spinner";
 import { Paginacion } from "@/components/paginacion/paginacion";
 import { PaginacionFooter } from "@/components/paginacion/pagination-footer";
 import { RESULTADOS_POR_PAGINA } from "@/components/paginacion/resultados-por-pagina";
@@ -121,7 +120,7 @@ export function OperacionesPageContent() {
     ? { and: [{ tipo: { eq: tipo } }, busquedaFiltro] }
     : busquedaFiltro;
 
-  const { data, isLoading, refetch } = useQuery({
+  const { data, isFetching, refetch } = useQuery({
     queryKey: ["operaciones", tab, busquda, currentPage, limit],
     queryFn: async () => {
       const result = await execute(PageQuery, {
@@ -242,10 +241,6 @@ export function OperacionesPageContent() {
                   </EmptyDescription>
                 </EmptyHeader>
               </Empty>
-            ) : isLoading ? (
-              <div className="flex justify-center py-8">
-                <Spinner className="size-6" />
-              </div>
             ) : (
               <>
                 <div className="flex">
@@ -267,7 +262,11 @@ export function OperacionesPageContent() {
                     className="justify-end"
                   />
                 </div>
-                <OperacionesTable data={operaciones?.data ?? []} />
+                <OperacionesTable
+                  data={operaciones?.data ?? []}
+                  loading={isFetching}
+                  loadingRows={limit}
+                />
                 <PaginacionFooter
                   currentPage={currentPage}
                   totalPages={totalPages}

@@ -21,6 +21,8 @@ import { AvatarIniciales } from "@/components/avatar-iniciales/avatar-iniciales"
 import { Titular, Unidad } from "@/providers/graphql/graphql";
 import { EstadoUnidadTag } from "@/components/estado-unidad-tag";
 import { money } from "@/lib/money-display";
+import { Skeleton } from "@/components/ui/skeleton";
+import { TableSkeleton } from "@/components/table-skeleton/table-skeleton";
 
 export interface VillasTableData extends Pick<
   Unidad,
@@ -39,12 +41,16 @@ export interface VillasTableProps {
   busqueda?: boolean;
   emptyTitle?: string;
   emptyDescription?: string;
+  loading?: boolean;
+  loadingRows?: number;
 }
 export function VillasTable({
   data,
   busqueda,
   emptyTitle,
   emptyDescription,
+  loading,
+  loadingRows = 5,
 }: VillasTableProps) {
   return (
     <Table>
@@ -60,7 +66,48 @@ export function VillasTable({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {data.length ? (
+        {loading ? (
+          <TableSkeleton
+            rows={loadingRows}
+            columns={7}
+            cell={(col) => {
+              switch (col) {
+                case 0:
+                  return <Skeleton className="h-4 w-14" />;
+                case 1:
+                  return (
+                    <div className="flex items-center gap-2">
+                      <Skeleton className="size-10 rounded-full" />
+                      <div className="grid gap-1.5">
+                        <Skeleton className="h-3.5 w-28" />
+                        <Skeleton className="h-3 w-20" />
+                      </div>
+                    </div>
+                  );
+                case 2:
+                  return (
+                    <div className="grid gap-1.5">
+                      <Skeleton className="h-3.5 w-28" />
+                      <Skeleton className="h-3 w-32" />
+                    </div>
+                  );
+                case 3:
+                  return <Skeleton className="h-5 w-14 rounded-full" />;
+                case 4:
+                  return <Skeleton className="h-5 w-20 rounded-full" />;
+                case 5:
+                  return <Skeleton className="ml-auto h-4 w-16" />;
+                default:
+                  return (
+                    <div className="flex justify-end gap-2">
+                      <Skeleton className="h-8 w-24 rounded-md" />
+                      <Skeleton className="size-8 rounded-md" />
+                    </div>
+                  );
+              }
+            }}
+          />
+        ) : data.length ? (
           data.map((villa) => (
             <TableRow key={villa.codigo}>
               <TableCell>

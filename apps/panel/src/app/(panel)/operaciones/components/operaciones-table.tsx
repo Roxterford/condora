@@ -31,6 +31,8 @@ import {
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { ChevronRight, MoveDownRight, MoveUpRight, SearchX } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { TableSkeleton } from "@/components/table-skeleton/table-skeleton";
 
 const UnidadTitularQuery = graphql(/* GraphQL */ `
   query UnidadTitular($codigo: String!) {
@@ -52,8 +54,12 @@ const UnidadTitularQuery = graphql(/* GraphQL */ `
 
 export function OperacionesTable({
   data,
+  loading,
+  loadingRows = 5,
 }: {
   data: OperacionesPageQuery["operaciones"]["data"];
+  loading?: boolean;
+  loadingRows?: number;
 }) {
   const { open } = useDrawer();
 
@@ -109,7 +115,40 @@ export function OperacionesTable({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {data.length ? (
+        {loading ? (
+          <TableSkeleton
+            rows={loadingRows}
+            columns={7}
+            cell={(col) => {
+              switch (col) {
+                case 0:
+                  return (
+                    <div className="flex items-center gap-3">
+                      <Skeleton className="size-7 rounded-md" />
+                      <Skeleton className="h-4 w-32" />
+                    </div>
+                  );
+                case 1:
+                  return (
+                    <div className="grid gap-1.5">
+                      <Skeleton className="h-3.5 w-28" />
+                      <Skeleton className="h-3 w-24" />
+                    </div>
+                  );
+                case 2:
+                  return <Skeleton className="mx-auto h-5 w-14 rounded-full" />;
+                case 3:
+                  return <Skeleton className="h-4 w-16" />;
+                case 4:
+                  return <Skeleton className="h-4 w-20" />;
+                case 5:
+                  return <Skeleton className="h-4 w-32" />;
+                default:
+                  return <Skeleton className="ml-auto size-4" />;
+              }
+            }}
+          />
+        ) : data.length ? (
           data.map((operacion) => (
             <TableRow
               key={operacion.operacion}

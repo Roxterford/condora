@@ -1,6 +1,7 @@
 "use client";
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Paginacion } from "@/components/paginacion/paginacion";
 import {
   CuotasTable,
   CuotasTableProps,
@@ -10,9 +11,21 @@ import { useState } from "react";
 
 export interface CuotasPageTapsProps {
   cuotas: CuotasTableProps["data"];
+  loading?: boolean;
+  loadingRows?: number;
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
 }
 
-export function CuotasPageTaps({ cuotas }: CuotasPageTapsProps) {
+export function CuotasPageTaps({
+  cuotas,
+  loading,
+  loadingRows,
+  currentPage,
+  totalPages,
+  onPageChange,
+}: CuotasPageTapsProps) {
   const [tap, setTap] = useState<TapValue>("todas");
 
   const map_tap_to_show: Record<TapValue, CuotasTableType> = {
@@ -24,7 +37,18 @@ export function CuotasPageTaps({ cuotas }: CuotasPageTapsProps) {
   return (
     <>
       <Taps onChangeAction={setTap} defaultValue={tap} />
-      <CuotasTable data={cuotas} type={map_tap_to_show[tap]} />
+      <Paginacion
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={onPageChange}
+        className="justify-end"
+      />
+      <CuotasTable
+        data={cuotas}
+        type={map_tap_to_show[tap]}
+        loading={loading}
+        loadingRows={loadingRows}
+      />
     </>
   );
 }

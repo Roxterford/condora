@@ -11,7 +11,6 @@ import {
   EstadoDeDeuda,
   EstadoPagosVillaQuery,
 } from "@/providers/graphql/graphql";
-import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import { EstadoDeudaTag } from "@/components/estado-deuda-tag";
 import {
@@ -39,6 +38,8 @@ import { useOverlay } from "@/hooks/useOverlay";
 import { useSingleDoubleClick } from "@/hooks/useSingleDoubleClick";
 import { useDrawer } from "@/contexts/drawer-context";
 import { money } from "@/lib/money-display";
+import { Skeleton } from "@/components/ui/skeleton";
+import { TableSkeleton } from "@/components/table-skeleton/table-skeleton";
 import { RegistrarPagoOverlay } from "@/features/administracion/components/registrar-pago-overlay";
 
 const PageQuery = graphql(/* GraphQL */ `
@@ -84,7 +85,7 @@ export function EstadoPagosVilla({ cuota_id }: { cuota_id: string }) {
   const scrollToTop = useSmoothScrollToTop();
   const { open: abrirDrawer, close: cerrarDrawer } = useDrawer();
 
-  const { data, isLoading, refetch } = useQuery({
+  const { data, isFetching, refetch } = useQuery({
     queryKey: ["cuota.pagos-villa", cuota_id, busqueda, currentPage, limit],
     queryFn: async () => {
       const result = await execute(PageQuery, {
@@ -171,93 +172,111 @@ export function EstadoPagosVilla({ cuota_id }: { cuota_id: string }) {
         />
       </div>
 
-      {isLoading && !data ? (
-        <div className="flex justify-center py-8">
-          <Spinner className="size-6" />
-        </div>
-      ) : (
-        <>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="table__head">Villa</TableHead>
-                <TableHead className="table__head">Propietario</TableHead>
-                <TableHead className="table__head">Estado</TableHead>
-                <TableHead className="table__head">Deuda</TableHead>
-                <TableHead className="table__head text-right">
-                  Acciones
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {deudas?.data.length ? (
-                deudas.data.map((deuda) => (
-                  <TableRow
-                    key={deuda.id}
-                    onClick={(e) => onClickFila(deuda, e)}
-                    className="cursor-pointer"
-                  >
-                    <TableCell className="font-medium">
-                      {deuda.unidad.codigo}
-                    </TableCell>
-                    <TableCell>
-                      {deuda.titular?.display_name ?? "Sin titular"}
-                    </TableCell>
-                    <TableCell>
-                      <EstadoDeudaTag state={deuda.estado} />
-                    </TableCell>
-                    <TableCell className="tabular-nums">
-                      {money(deuda.deuda)} <span className="text-muted-foreground">/ {money(deuda.monto)}</span>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {deuda.estado === EstadoDeDeuda.Pendiente ? (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            abrirRegistrarPago(deuda);
-                          }}
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="table__head">Villa</TableHead>
+            <TableHead className="table__head">Propietario</TableHead>
+            <TableHead className="table__head">Estado</TableHead>
+            <TableHead className="table__head">Deuda</TableHead>
+            <TableHead className="table__head text-right">
+              Acciones
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {isFetching ? (
+            <TableSkeleton
+              rows={limit}
+              columns={5}
+              cell={(col) => {
+                switch (col) {
+                  case 0:
+                    return <Skeleton className="h-4 w-14" />;
+                  case 1:
+                    return <Skeleton className="h-4 w-28" />;
+                  case 2:
+                    return <Skeleton className="h-5 w-16 rounded-full" />;
+                  case 3:
+                    return (
+                      <div className="flex items-center gap-1.5">
+                        <Skeleton className="h-4 w-16" />
+                        <Skeleton className="h-3 w-4" />
+                        <Skeleton className="h-4 w-10" />
+                      </div>
+                    );
+                  default:
+                    return (
+                      <Skeleton className="ml-auto h-7 w-28 rounded-md" />
+                    );
+                }
+              }}
+            />
+          ) : deudas?.data.length ? (
+            deudas.data.map((deuda) => (
+              <TableRow
+                key={deuda.id}
+                onClick={(e) => onClickFila(deuda, e)}
+                className="cursor-pointer"
+              >
+                <TableCell className="font-medium">
+                  {deuda.unidad.codigo}
+                </TableCell>
+                <TableCell>
+                  {deuda.titular?.display_name ?? "Sin titular"}
+                </TableCell>
+                <TableCell>
+                  <EstadoDeudaTag state={deuda.estado} />
+                </TableCell>
+                <TableCell className="tabular-nums">
+                  {money(deuda.deuda)} <span className="text-muted-foreground">/ {money(deuda.monto)}</span>
+                </TableCell>
+                <TableCell className="text-right">
+                  {deuda.estado === EstadoDeDeuda.Pendiente ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        abrirRegistrarPago(deuda);
+                      }}
+                    >
+                      Registrar pago
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      nativeButton={false}
+                      render={
+                        <Link
+                          href={`/villas/${deuda.unidad.codigo}`}
+                          onClick={(e) => e.stopPropagation()}
                         >
-                          Registrar pago
-                        </Button>
-                      ) : (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          nativeButton={false}
-                          render={
-                            <Link
-                              href={`/villas/${deuda.unidad.codigo}`}
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              Ver detalles
-                            </Link>
-                          }
-                        />
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={5}>
-                    {busqueda !== "%%" ? <NotFoundState /> : <EmptyState />}
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-          <PaginacionFooter
-            currentPage={currentPage}
-            totalPages={totalPages}
-            limit={limit}
-            onLimitChange={setLimit}
-            onPageChange={setPage}
-          />
-        </>
-      )}
-
+                          Ver detalles
+                        </Link>
+                      }
+                    />
+                  )}
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={5}>
+                {busqueda !== "%%" ? <NotFoundState /> : <EmptyState />}
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+      <PaginacionFooter
+        currentPage={currentPage}
+        totalPages={totalPages}
+        limit={limit}
+        onLimitChange={setLimit}
+        onPageChange={setPage}
+      />
       <RegistrarPagoOverlay
         {...registrarPago.overlayProps}
         unidad={unidadPago}

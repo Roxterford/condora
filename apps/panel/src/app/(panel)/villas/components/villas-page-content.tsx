@@ -6,7 +6,6 @@ import { useState } from "react";
 import { Box, CircleAlert, CircleCheckBig, DollarSign } from "lucide-react";
 import { graphql } from "@/providers/graphql";
 import { execute } from "@/providers/graphql/execute";
-import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StatCard from "@/components/ui/StatCard";
 import { money } from "@/lib/money-display";
@@ -83,7 +82,7 @@ export function VillasPageContent() {
   const [tab, setTab] = useState("todas");
   const scrollToTop = useSmoothScrollToTop();
 
-  const { data, isLoading } = useQuery({
+  const { data, isFetching } = useQuery({
     queryKey: ["villas", tab, busqueda, currentPage, limit],
     queryFn: async () => {
       const result = await execute(PageQuery, {
@@ -191,54 +190,48 @@ export function VillasPageContent() {
           </TabsList>
           {(tab === "todas" || tab === "deuda" || tab === "solventes") && (
             <TabsContent value={tab} className="space-y-5">
-              {isLoading && !data ? (
-                <div className="flex justify-center py-8">
-                  <Spinner className="size-6" />
-                </div>
-              ) : (
-                <>
-                  <div className="flex">
-                    <form>
-                      <InputGroup>
-                        <InputGroupInput
-                          placeholder="Buscar por código"
-                          className="md:min-w-68"
-                          onChange={(e) =>
-                            onDebounceBusqueda(`%${e.target.value}%`)
-                          }
-                        />
-                      </InputGroup>
-                    </form>
-                    <Paginacion
-                      currentPage={currentPage}
-                      totalPages={totalPages}
-                      onPageChange={setPage}
-                      className="justify-end"
+              <div className="flex">
+                <form>
+                  <InputGroup>
+                    <InputGroupInput
+                      placeholder="Buscar por código"
+                      className="md:min-w-68"
+                      onChange={(e) =>
+                        onDebounceBusqueda(`%${e.target.value}%`)
+                      }
                     />
-                  </div>
-                  <VillasTable
-                    data={villas_table_data}
-                    busqueda={busqueda !== "%%"}
-                    emptyTitle={
-                      tab === "solventes"
-                        ? "No hay unidades solventes"
-                        : undefined
-                    }
-                    emptyDescription={
-                      tab === "solventes"
-                        ? "Todas las unidades tienen deudas pendientes"
-                        : undefined
-                    }
-                  />
-                  <PaginacionFooter
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    limit={limit}
-                    onLimitChange={setLimit}
-                    onPageChange={setPage}
-                  />
-                </>
-              )}
+                  </InputGroup>
+                </form>
+                <Paginacion
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setPage}
+                  className="justify-end"
+                />
+              </div>
+              <VillasTable
+                data={villas_table_data}
+                busqueda={busqueda !== "%%"}
+                loading={isFetching}
+                loadingRows={limit}
+                emptyTitle={
+                  tab === "solventes"
+                    ? "No hay unidades solventes"
+                    : undefined
+                }
+                emptyDescription={
+                  tab === "solventes"
+                    ? "Todas las unidades tienen deudas pendientes"
+                    : undefined
+                }
+              />
+              <PaginacionFooter
+                currentPage={currentPage}
+                totalPages={totalPages}
+                limit={limit}
+                onLimitChange={setLimit}
+                onPageChange={setPage}
+              />
             </TabsContent>
           )}
         </Tabs>
