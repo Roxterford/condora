@@ -178,17 +178,16 @@ export function EstadoPagosVilla({ cuota_id }: { cuota_id: string }) {
             <TableHead className="table__head">Villa</TableHead>
             <TableHead className="table__head">Propietario</TableHead>
             <TableHead className="table__head">Estado</TableHead>
-            <TableHead className="table__head">Deuda</TableHead>
-            <TableHead className="table__head text-right">
-              Acciones
-            </TableHead>
+            <TableHead className="table__head">Cuenta</TableHead>
+            <TableHead className="table__head">Debe</TableHead>
+            <TableHead className="table__head text-right">Acciones</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {isFetching ? (
             <TableSkeleton
               rows={limit}
-              columns={5}
+              columns={6}
               cell={(col) => {
                 switch (col) {
                   case 0:
@@ -205,10 +204,10 @@ export function EstadoPagosVilla({ cuota_id }: { cuota_id: string }) {
                         <Skeleton className="h-4 w-10" />
                       </div>
                     );
+                  case 4:
+                    return <Skeleton className="h-4 w-16" />;
                   default:
-                    return (
-                      <Skeleton className="ml-auto h-7 w-28 rounded-md" />
-                    );
+                    return <Skeleton className="ml-auto h-7 w-28 rounded-md" />;
                 }
               }}
             />
@@ -229,7 +228,18 @@ export function EstadoPagosVilla({ cuota_id }: { cuota_id: string }) {
                   <EstadoDeudaTag state={deuda.estado} />
                 </TableCell>
                 <TableCell className="tabular-nums">
-                  {money(deuda.deuda)} <span className="text-muted-foreground">/ {money(deuda.monto)}</span>
+                  {money(deuda.monto - deuda.deuda)}{" "}
+                  <span className="text-muted-foreground">
+                    / {money(deuda.monto)}
+                  </span>
+                </TableCell>
+
+                <TableCell className="tabular-nums">
+                  {deuda.deuda ? (
+                    <span className="text-red-600">{money(deuda.deuda)}</span>
+                  ) : (
+                    <span className="text-muted-foreground">-</span>
+                  )}
                 </TableCell>
                 <TableCell className="text-right">
                   {deuda.estado === EstadoDeDeuda.Pendiente ? (
