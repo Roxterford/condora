@@ -104,6 +104,43 @@ export const CuotaDetalleQuery = graphql(/* GraphQL */ `
           }
         }
       }
+      ... on CuotaSemilla {
+        id
+        monto
+        mes
+        anio
+        registro
+        actualizacion
+        recaudacion {
+          moneda
+          monto_estimado
+          monto_recaudado
+          monto_pendiente
+          pagos_asociados
+          unidades
+          unidades_aplicadas
+          unidades_solventes
+          unidades_pendientes
+        }
+        gastos {
+          __typename
+          ... on Gasto {
+            operacion
+            concepto
+            moneda
+            monto
+            fecha
+            tasa
+            total
+          }
+          ... on GastoAProveedor {
+            proveedor {
+              id
+              nombre
+            }
+          }
+        }
+      }
     }
     deudas: obtenerDeudas(
       filtro: { cuota: { eq: $cuota_id }, estado: { neq: "SALDADA" } }
@@ -181,7 +218,9 @@ function TagSection({ cuota }: { cuota: CuotaDetalleCuota }) {
   const tipo =
     cuota.__typename === "CuotaEspecial"
       ? TipoDeCuota.Especial
-      : TipoDeCuota.Regular;
+      : cuota.__typename === "CuotaSemilla"
+        ? TipoDeCuota.Semilla
+        : TipoDeCuota.Regular;
 
   return (
     <div className="flex flex-wrap gap-2">
@@ -238,7 +277,13 @@ function DetalleDeLaCuota({ cuota }: { cuota: CuotaDetalleCuota }) {
       <dl>
         <Fila
           label="Tipo"
-          value={cuota.__typename === "CuotaEspecial" ? "Especial" : "Regular"}
+          value={
+            cuota.__typename === "CuotaEspecial"
+              ? "Especial"
+              : cuota.__typename === "CuotaSemilla"
+                ? "Semilla"
+                : "Regular"
+          }
         />
         <Fila
           label="Mes / Año"

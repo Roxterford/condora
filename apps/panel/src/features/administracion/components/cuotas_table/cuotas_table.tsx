@@ -13,6 +13,7 @@ import {
 import {
   CuotaEspecial,
   CuotaRegular,
+  CuotaSemilla,
   Mes,
   Moneda,
   Proyecto,
@@ -29,6 +30,8 @@ import {
 import { TipoCuotaTag } from "@/components/tipo-cuota-tag";
 import { ChevronRight } from "lucide-react";
 import { money } from "@/lib/money-display";
+import { Skeleton } from "@/components/ui/skeleton";
+import { TableSkeleton } from "@/components/table-skeleton/table-skeleton";
 import type { ReactNode } from "react";
 
 const NOMBRE_DE_MES: Record<Mes, string> = {
@@ -51,7 +54,7 @@ export type CuotasTableType = "regular" | "especial" | "default";
 export interface CuotasTableData<
   T extends CuotasTableType = "default",
 > extends Pick<
-  CuotaEspecial | CuotaRegular,
+  CuotaEspecial | CuotaRegular | CuotaSemilla,
   "id" | "__typename" | "monto" | "mes" | "anio" | "registro" | "actualizacion"
 > {
   detalles: T extends "regular"
@@ -69,6 +72,8 @@ export interface CuotasTableData<
 export interface CuotasTableProps {
   type?: CuotasTableType;
   data: CuotasTableData[];
+  loading?: boolean;
+  loadingRows?: number;
 }
 
 type ColumnConfig = {
@@ -114,7 +119,9 @@ const COLUMNS: ColumnConfig[] = [
         type={
           c.__typename === "CuotaEspecial"
             ? TipoDeCuota.Especial
-            : TipoDeCuota.Regular
+            : c.__typename === "CuotaSemilla"
+              ? TipoDeCuota.Semilla
+              : TipoDeCuota.Regular
         }
       />
     ),
@@ -169,12 +176,16 @@ const COLUMNS: ColumnConfig[] = [
 function tipoDeCuota(cuota: CuotasTableData): TipoDeCuota {
   return cuota.__typename === "CuotaEspecial"
     ? TipoDeCuota.Especial
-    : TipoDeCuota.Regular;
+    : cuota.__typename === "CuotaSemilla"
+      ? TipoDeCuota.Semilla
+      : TipoDeCuota.Regular;
 }
 
 export function CuotasTable({
   data: cuotas,
   type = "default",
+  loading,
+  loadingRows = 5,
 }: CuotasTableProps) {
   const { open } = useDrawer();
   const router = useRouter();
@@ -232,32 +243,69 @@ export function CuotasTable({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {filteredCuotas.map((cuota) => (
-          <TableRow
-            key={cuota.id}
-            onClick={(e) => onClickFila(cuota, e)}
-            className="cursor-pointer"
-          >
-            {COLUMNS.map((col) => (
-              <TableCell key={col.label} className={col.className}>
-                {col.getValue(cuota)}
+        {loading ? (
+          <TableSkeleton
+            rows={loadingRows}
+            columns={6}
+            cell={(col) => {
+              switch (col) {
+                case 0:
+                  return (
+                    <div className="grid min-w-48 gap-1.5">
+                      <Skeleton className="h-4 w-28" />
+                      <Skeleton className="h-3 w-20" />
+                    </div>
+                  );
+                case 1:
+                  return <Skeleton className="h-5 w-16 rounded-full" />;
+                case 2:
+                  return <Skeleton className="h-4 w-16 tabular-nums" />;
+                case 3:
+                  return (
+                    <div className="flex items-center justify-center gap-2">
+                      <Skeleton className="h-2 w-24" />
+                      <Skeleton className="h-3 w-12" />
+                    </div>
+                  );
+                case 4:
+                  return <Skeleton className="mx-auto h-5 w-20 rounded-full" />;
+                default:
+                  return (
+                    <div className="flex justify-end">
+                      <Skeleton className="h-8 w-28 rounded-md" />
+                    </div>
+                  );
+              }
+            }}
+          />
+        ) : (
+          filteredCuotas.map((cuota) => (
+            <TableRow
+              key={cuota.id}
+              onClick={(e) => onClickFila(cuota, e)}
+              className="cursor-pointer"
+            >
+              {COLUMNS.map((col) => (
+                <TableCell key={col.label} className={col.className}>
+                  {col.getValue(cuota)}
+                </TableCell>
+              ))}
+              <TableCell className="text-right">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    verDetalles(cuota);
+                  }}
+                >
+                  Ver detalles
+                  <ChevronRight className="ml-1 size-4" />
+                </Button>
               </TableCell>
-            ))}
-            <TableCell className="text-right">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  verDetalles(cuota);
-                }}
-              >
-                Ver detalles
-                <ChevronRight className="ml-1 size-4" />
-              </Button>
-            </TableCell>
-          </TableRow>
-        ))}
+            </TableRow>
+          ))
+        )}
       </TableBody>
     </Table>
   );

@@ -73,7 +73,19 @@ export type CuotaRegular = Cuota & {
   registro: Scalars['DateTime']['output'];
 };
 
-export type CuotaType = CuotaEspecial | CuotaRegular;
+export type CuotaSemilla = Cuota & {
+  __typename?: 'CuotaSemilla';
+  actualizacion: Scalars['DateTime']['output'];
+  anio: Scalars['Int']['output'];
+  gastos: Array<GastoType>;
+  id: Scalars['ID']['output'];
+  mes: Mes;
+  monto: Scalars['Float']['output'];
+  recaudacion: Recaudacion;
+  registro: Scalars['DateTime']['output'];
+};
+
+export type CuotaType = CuotaEspecial | CuotaRegular | CuotaSemilla;
 
 export type Deuda = {
   __typename?: 'Deuda';
@@ -129,7 +141,18 @@ export type Deuda__CuotaRegular = Deuda__Cuota & {
   registro: Scalars['DateTime']['output'];
 };
 
-export type Deuda__CuotaType = Deuda__CuotaEspecial | Deuda__CuotaRegular;
+export type Deuda__CuotaSemilla = Deuda__Cuota & {
+  __typename?: 'Deuda__CuotaSemilla';
+  actualizacion: Scalars['DateTime']['output'];
+  anio: Scalars['Int']['output'];
+  id: Scalars['ID']['output'];
+  mes: Mes;
+  monto: Scalars['Float']['output'];
+  nombre: Scalars['String']['output'];
+  registro: Scalars['DateTime']['output'];
+};
+
+export type Deuda__CuotaType = Deuda__CuotaEspecial | Deuda__CuotaRegular | Deuda__CuotaSemilla;
 
 export type Deuda__Titular = {
   __typename?: 'Deuda__Titular';
@@ -765,14 +788,22 @@ export type CuotaPageQuery = { __typename?: 'Query', cuota?:
         | { __typename: 'GastoACondominio', operacion: string, concepto: string, moneda: Moneda, monto: number, fecha: Date, tasa: number, total: number }
         | { __typename: 'GastoAProveedor', operacion: string, concepto: string, moneda: Moneda, monto: number, fecha: Date, tasa: number, total: number, proveedor: { __typename?: 'Proveedor', id: string, nombre: string, rif: string, telefono?: string | null, email?: string | null } }
       > }
+    | { __typename: 'CuotaSemilla', id: string, mes: Mes, anio: number, monto: number, registro: Date, recaudacion: { __typename?: 'Recaudacion', moneda: Moneda, monto_estimado: number, monto_recaudado: number, monto_pendiente: number, unidades_aplicadas: number, unidades_solventes: number, unidades_pendientes: number }, gastos: Array<
+        | { __typename: 'GastoACondominio', operacion: string, concepto: string, moneda: Moneda, monto: number, fecha: Date, tasa: number, total: number }
+        | { __typename: 'GastoAProveedor', operacion: string, concepto: string, moneda: Moneda, monto: number, fecha: Date, tasa: number, total: number, proveedor: { __typename?: 'Proveedor', id: string, nombre: string, rif: string, telefono?: string | null, email?: string | null } }
+      > }
    | null };
 
-export type CuotasPageQueryVariables = Exact<{ [key: string]: never; }>;
+export type CuotasPageQueryVariables = Exact<{
+  page: Scalars['Int']['input'];
+  limit: Scalars['Int']['input'];
+}>;
 
 
-export type CuotasPageQuery = { __typename?: 'Query', cuotas: { __typename?: 'PaginatedCuota', data: Array<
+export type CuotasPageQuery = { __typename?: 'Query', cuotas: { __typename?: 'PaginatedCuota', limit: number, page: number, pages: number, total: number, data: Array<
       | { __typename: 'CuotaEspecial', id: string, monto: number, mes: Mes, anio: number, registro: Date, recaudacion: { __typename?: 'Recaudacion', unidades_aplicadas: number, pagos_asociados: number, monto_estimado: number, monto_recaudado: number, moneda: Moneda }, detalles: { __typename?: 'Proyecto', titulo: string, descripcion: string } }
       | { __typename: 'CuotaRegular', id: string, monto: number, mes: Mes, anio: number, registro: Date, recaudacion: { __typename?: 'Recaudacion', unidades_aplicadas: number, pagos_asociados: number, monto_estimado: number, monto_recaudado: number, moneda: Moneda } }
+      | { __typename: 'CuotaSemilla', id: string, monto: number, mes: Mes, anio: number, registro: Date, recaudacion: { __typename?: 'Recaudacion', unidades_aplicadas: number, pagos_asociados: number, monto_estimado: number, monto_recaudado: number, moneda: Moneda } }
     > } };
 
 export type RegistrarCuotaPageQueryVariables = Exact<{ [key: string]: never; }>;
@@ -848,6 +879,7 @@ export type VillaPageQuery = { __typename?: 'Query', ultimo_pago: { __typename?:
     > | null } | null, pagos: { __typename?: 'PaginatedPago', data: Array<{ __typename: 'Pago', fecha: Date, operacion: string, concepto: string, metodo: MetodoDeOperacion, moneda: Moneda, monto: number, registro: Date, tasa: number, total: number, unidad: { __typename?: 'UnidadIdentifiers', id: string, codigo: string } }> }, deudas: { __typename?: 'PaginatedDeuda', data: Array<{ __typename?: 'Deuda', id: string, deuda: number, monto: number, estado: EstadoDeDeuda, cuota:
         | { __typename: 'Deuda__CuotaEspecial', id: string, nombre: string }
         | { __typename: 'Deuda__CuotaRegular', id: string, nombre: string }
+        | { __typename: 'Deuda__CuotaSemilla', id: string, nombre: string }
        }> }, deudas_pendientes: { __typename?: 'PaginatedDeuda', total: number } };
 
 export type VillasPageQueryVariables = Exact<{
@@ -873,6 +905,10 @@ export type CuotaDetalleQuery = { __typename?: 'Query', cuota?:
         | { __typename: 'GastoAProveedor', operacion: string, concepto: string, moneda: Moneda, monto: number, fecha: Date, tasa: number, total: number, proveedor: { __typename?: 'Proveedor', id: string, nombre: string } }
       > }
     | { __typename: 'CuotaRegular', id: string, monto: number, mes: Mes, anio: number, registro: Date, actualizacion: Date, recaudacion: { __typename?: 'Recaudacion', moneda: Moneda, monto_estimado: number, monto_recaudado: number, monto_pendiente: number, pagos_asociados: number, unidades: number, unidades_aplicadas: number, unidades_solventes: number, unidades_pendientes: number }, gastos: Array<
+        | { __typename: 'GastoACondominio', operacion: string, concepto: string, moneda: Moneda, monto: number, fecha: Date, tasa: number, total: number }
+        | { __typename: 'GastoAProveedor', operacion: string, concepto: string, moneda: Moneda, monto: number, fecha: Date, tasa: number, total: number, proveedor: { __typename?: 'Proveedor', id: string, nombre: string } }
+      > }
+    | { __typename: 'CuotaSemilla', id: string, monto: number, mes: Mes, anio: number, registro: Date, actualizacion: Date, recaudacion: { __typename?: 'Recaudacion', moneda: Moneda, monto_estimado: number, monto_recaudado: number, monto_pendiente: number, pagos_asociados: number, unidades: number, unidades_aplicadas: number, unidades_solventes: number, unidades_pendientes: number }, gastos: Array<
         | { __typename: 'GastoACondominio', operacion: string, concepto: string, moneda: Moneda, monto: number, fecha: Date, tasa: number, total: number }
         | { __typename: 'GastoAProveedor', operacion: string, concepto: string, moneda: Moneda, monto: number, fecha: Date, tasa: number, total: number, proveedor: { __typename?: 'Proveedor', id: string, nombre: string } }
       > }
@@ -911,6 +947,7 @@ export type RegistrarCuotaMutationVariables = Exact<{
 export type RegistrarCuotaMutation = { __typename?: 'Mutation', registrarCuota:
     | { __typename: 'CuotaEspecial', id: string }
     | { __typename: 'CuotaRegular', id: string }
+    | { __typename: 'CuotaSemilla', id: string }
    };
 
 export type RegistrarPagoOverlayUnidadesQueryVariables = Exact<{
@@ -1041,8 +1078,8 @@ export const CuotaPageDocument = new TypedDocumentString(`
 }
     `) as unknown as TypedDocumentString<CuotaPageQuery, CuotaPageQueryVariables>;
 export const CuotasPageDocument = new TypedDocumentString(`
-    query CuotasPage {
-  cuotas: obtenerCuotas {
+    query CuotasPage($page: Int!, $limit: Int!) {
+  cuotas: obtenerCuotas(paginator: {limit: $limit, page: $page}) {
     data {
       __typename
       ... on Cuota {
@@ -1073,6 +1110,10 @@ export const CuotasPageDocument = new TypedDocumentString(`
         }
       }
     }
+    limit
+    page
+    pages
+    total
   }
 }
     `) as unknown as TypedDocumentString<CuotasPageQuery, CuotasPageQueryVariables>;
@@ -1414,6 +1455,43 @@ export const CuotaDetalleDocument = new TypedDocumentString(`
         }
       }
     }
+    ... on CuotaSemilla {
+      id
+      monto
+      mes
+      anio
+      registro
+      actualizacion
+      recaudacion {
+        moneda
+        monto_estimado
+        monto_recaudado
+        monto_pendiente
+        pagos_asociados
+        unidades
+        unidades_aplicadas
+        unidades_solventes
+        unidades_pendientes
+      }
+      gastos {
+        __typename
+        ... on Gasto {
+          operacion
+          concepto
+          moneda
+          monto
+          fecha
+          tasa
+          total
+        }
+        ... on GastoAProveedor {
+          proveedor {
+            id
+            nombre
+          }
+        }
+      }
+    }
   }
   deudas: obtenerDeudas(
     filtro: {cuota: {eq: $cuota_id}, estado: {neq: "SALDADA"}}
@@ -1513,10 +1591,7 @@ export const RegistrarCuotaDocument = new TypedDocumentString(`
     mutation RegistrarCuota($input: RegistrarCuotaDTO!) {
   registrarCuota(input: $input) {
     __typename
-    ... on CuotaRegular {
-      id
-    }
-    ... on CuotaEspecial {
+    ... on Cuota {
       id
     }
   }

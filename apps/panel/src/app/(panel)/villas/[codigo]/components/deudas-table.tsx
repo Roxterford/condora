@@ -43,6 +43,7 @@ const TIPO_POR_TIPO_DEUDA: Record<
 > = {
   Deuda__CuotaEspecial: TipoDeCuota.Especial,
   Deuda__CuotaRegular: TipoDeCuota.Regular,
+  Deuda__CuotaSemilla: TipoDeCuota.Semilla,
 };
 
 export function DeudasTable({ deudas }: { deudas: Deuda[] }) {

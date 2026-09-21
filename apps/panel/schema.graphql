@@ -72,7 +72,18 @@ type CuotaRegular implements Cuota {
   registro: DateTime!
 }
 
-union CuotaType = CuotaEspecial | CuotaRegular
+type CuotaSemilla implements Cuota {
+  actualizacion: DateTime!
+  anio: Int!
+  gastos: [GastoType!]!
+  id: ID!
+  mes: Mes!
+  monto: Float!
+  recaudacion: Recaudacion!
+  registro: DateTime!
+}
+
+union CuotaType = CuotaEspecial | CuotaRegular | CuotaSemilla
 
 scalar DateTime
 
@@ -127,7 +138,17 @@ type Deuda__CuotaRegular implements Deuda__Cuota {
   registro: DateTime!
 }
 
-union Deuda__CuotaType = Deuda__CuotaEspecial | Deuda__CuotaRegular
+type Deuda__CuotaSemilla implements Deuda__Cuota {
+  actualizacion: DateTime!
+  anio: Int!
+  id: ID!
+  mes: Mes!
+  monto: Float!
+  nombre: String!
+  registro: DateTime!
+}
+
+union Deuda__CuotaType = Deuda__CuotaEspecial | Deuda__CuotaRegular | Deuda__CuotaSemilla
 
 type Deuda__Titular {
   cedula: String!

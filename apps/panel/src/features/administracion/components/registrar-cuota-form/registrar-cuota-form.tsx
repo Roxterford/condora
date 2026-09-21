@@ -59,10 +59,7 @@ const RegistrarCuotaMutation = graphql(/* GraphQL */ `
   mutation RegistrarCuota($input: RegistrarCuotaDTO!) {
     registrarCuota(input: $input) {
       __typename
-      ... on CuotaRegular {
-        id
-      }
-      ... on CuotaEspecial {
+      ... on Cuota {
         id
       }
     }
