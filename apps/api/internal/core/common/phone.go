@@ -155,6 +155,9 @@ func (p Phone) String() string {
 
 func (f *PhoneFactory) Assemble(raw string) Phone {
 	clean := strings.ReplaceAll(raw, " ", "")
+	if !strings.HasPrefix(clean, "+") || len(clean) < 6 {
+		return Phone{}
+	}
 	number := clean[1:]
 	cc_len := 2
 	cc := number[0:cc_len]
