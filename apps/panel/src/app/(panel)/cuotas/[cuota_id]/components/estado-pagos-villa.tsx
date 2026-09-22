@@ -3,7 +3,7 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { Box, CreditCardPlus, ReceiptText, SearchX } from "lucide-react";
+import { Box, CreditCardPlus, ReceiptText, Search, SearchX } from "lucide-react";
 import Link from "next/link";
 import { graphql } from "@/providers/graphql";
 import { execute } from "@/providers/graphql/execute";
@@ -28,7 +28,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
-import { InputGroup, InputGroupInput } from "@/components/ui/input-group";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Paginacion } from "@/components/paginacion/paginacion";
 import { PaginacionFooter } from "@/components/paginacion/pagination-footer";
 import { RESULTADOS_POR_PAGINA } from "@/components/paginacion/resultados-por-pagina";
@@ -162,6 +162,9 @@ export function EstadoPagosVilla({ cuota_id }: { cuota_id: string }) {
               className="md:min-w-68"
               onChange={(e) => onDebounceBusqueda(`%${e.target.value}%`)}
             />
+            <InputGroupAddon>
+              <Search />
+            </InputGroupAddon>
           </InputGroup>
         </form>
         <Paginacion

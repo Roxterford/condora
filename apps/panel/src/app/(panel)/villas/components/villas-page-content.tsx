@@ -3,7 +3,13 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { Box, CircleAlert, CircleCheckBig, DollarSign } from "lucide-react";
+import {
+  Box,
+  CircleAlert,
+  CircleCheckBig,
+  DollarSign,
+  Search,
+} from "lucide-react";
 import { graphql } from "@/providers/graphql";
 import { execute } from "@/providers/graphql/execute";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,7 +18,11 @@ import { money } from "@/lib/money-display";
 import { Paginacion } from "@/components/paginacion/paginacion";
 import { PaginacionFooter } from "@/components/paginacion/pagination-footer";
 import { RESULTADOS_POR_PAGINA } from "@/components/paginacion/resultados-por-pagina";
-import { InputGroup, InputGroupInput } from "@/components/ui/input-group";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useSmoothScrollToTop } from "@/hooks/useSmoothScrollToTop";
 import {
@@ -200,6 +210,9 @@ export function VillasPageContent() {
                         onDebounceBusqueda(`%${e.target.value}%`)
                       }
                     />
+                    <InputGroupAddon>
+                      <Search />
+                    </InputGroupAddon>
                   </InputGroup>
                 </form>
                 <Paginacion
@@ -215,9 +228,7 @@ export function VillasPageContent() {
                 loading={isFetching}
                 loadingRows={limit}
                 emptyTitle={
-                  tab === "solventes"
-                    ? "No hay unidades solventes"
-                    : undefined
+                  tab === "solventes" ? "No hay unidades solventes" : undefined
                 }
                 emptyDescription={
                   tab === "solventes"

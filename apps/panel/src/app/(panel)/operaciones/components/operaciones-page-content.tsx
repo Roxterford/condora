@@ -12,6 +12,7 @@ import {
   CreditCardPlus,
   DollarSign,
   Receipt,
+  Search,
 } from "lucide-react";
 import { Paginacion } from "@/components/paginacion/paginacion";
 import { PaginacionFooter } from "@/components/paginacion/pagination-footer";
@@ -21,7 +22,11 @@ import { RegistrarPagoOverlay } from "@/features/administracion/components/regis
 import { useOverlay } from "@/hooks/useOverlay";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StatCard from "@/components/ui/StatCard";
-import { InputGroup, InputGroupInput } from "@/components/ui/input-group";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useSmoothScrollToTop } from "@/hooks/useSmoothScrollToTop";
 import { useState } from "react";
@@ -182,7 +187,7 @@ export function OperacionesPageContent() {
             <ArrowLeftRight /> Transacción
           </Button>
           <Button onClick={registrarPago.open}>
-            <CreditCardPlus/> Pago
+            <CreditCardPlus /> Pago
           </Button>
         </div>
       </header>
@@ -253,6 +258,9 @@ export function OperacionesPageContent() {
                           onDebounceBusqueda(`%${e.target.value}%`)
                         }
                       />
+                      <InputGroupAddon>
+                        <Search />
+                      </InputGroupAddon>
                     </InputGroup>
                   </form>
                   <Paginacion
