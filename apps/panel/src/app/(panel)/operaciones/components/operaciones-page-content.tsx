@@ -9,8 +9,8 @@ import {
   ArrowLeftRight,
   CircleDollarSign,
   CreditCardMinus,
+  CreditCardPlus,
   DollarSign,
-  Plus,
   Receipt,
 } from "lucide-react";
 import { Paginacion } from "@/components/paginacion/paginacion";
@@ -182,7 +182,7 @@ export function OperacionesPageContent() {
             <ArrowLeftRight /> Transacción
           </Button>
           <Button onClick={registrarPago.open}>
-            <Plus /> Pago
+            <CreditCardPlus/> Pago
           </Button>
         </div>
       </header>

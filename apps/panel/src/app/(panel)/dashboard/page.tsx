@@ -5,8 +5,8 @@ import {
   CircleDollarSign,
   AlertCircle,
   Receipt,
-  Plus,
   CreditCardMinus,
+  CreditCardPlus,
 } from "lucide-react";
 
 import StatCard from "../../../components/ui/StatCard";
@@ -56,7 +56,7 @@ export default function Dashboard() {
             <CreditCardMinus /> Registrar Gasto
           </Button>
           <Button onClick={registrarPagoOverlay.open}>
-            <Plus /> Registrar Pago
+            <CreditCardPlus /> Registrar Pago
           </Button>
         </div>
       </header>
