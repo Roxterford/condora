@@ -62,7 +62,11 @@ func (r *queryResolver) ObtenerPagos(ctx context.Context, filtro *model.PagoFilt
 		return nil, core.WrapError(err)
 	}
 
-	total, err := gorm.G[database.IOperacion](r.db).
+	total, err := gorm.G[database.Operacion](r.db).
+		Where("tipo = ? AND rol = ?", tipoperacion.Credito, roldestinoperacion.Unidad).
+		Scopes(
+			gormAdapter.GFilter(ftr, map[string][]string{"unidad": {"unidad_id", "unidad_codigo"}}),
+		).
 		Count(ctx, "id")
 
 	if err != nil {
