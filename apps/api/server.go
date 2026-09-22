@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -18,7 +17,6 @@ import (
 	"github.com/doganarif/govisual"
 	"github.com/glebarez/sqlite"
 	"github.com/joho/godotenv"
-	"github.com/redis/go-redis/v9"
 	"github.com/vektah/gqlparser/v2/ast"
 	"gorm.io/gorm"
 	gormLogger "gorm.io/gorm/logger"
@@ -33,16 +31,11 @@ import (
 	"github.com/Sanaruca/condominio/internal/administracion/models/proveedor"
 	administracionService "github.com/Sanaruca/condominio/internal/administracion/service"
 	gormAdapter "github.com/Sanaruca/condominio/internal/core/adapters/gorm"
-	redisAdapter "github.com/Sanaruca/condominio/internal/core/adapters/redis"
 	"github.com/Sanaruca/condominio/internal/core/common"
-	"github.com/Sanaruca/condominio/internal/core/common/events"
 	"github.com/Sanaruca/condominio/internal/core/common/quantity"
 	"github.com/Sanaruca/condominio/internal/core/envirotment"
-	"github.com/Sanaruca/condominio/internal/core/lib"
 	appLogger "github.com/Sanaruca/condominio/internal/core/lib/logger"
 	transaccionesGorm "github.com/Sanaruca/condominio/internal/finanzas/adapters/gorm"
-	finanzasConfig "github.com/Sanaruca/condominio/internal/finanzas/config"
-	finanzasEvent "github.com/Sanaruca/condominio/internal/finanzas/event"
 	"github.com/Sanaruca/condominio/internal/finanzas/models/operacion"
 	transaccionService "github.com/Sanaruca/condominio/internal/finanzas/service"
 	"github.com/Sanaruca/condominio/internal/services/tasa"
@@ -82,58 +75,8 @@ func main() {
 		appLogger.LegacyError(err)
 	}
 
-	// EventBus
-	redisClient := setupRedis()
-	bus := redisAdapter.NewRedisEventBus(redisClient)
-
-	// Idempotency Store
-	idempotencyStore := redisAdapter.NewIdempotencyStore(redisClient, 24*time.Hour)
-
-	dispatcher := events.NewDispatcher()
-	finanzasConfig.RegisterEventHandlers(dispatcher, idempotencyStore)
-
-	// Outbox Event Store
+	// Outbox Event Store (solo para inspección manual; publicación desenchufada)
 	outboxStore := gormAdapter.NewGormOutboxEventStore(db)
-
-	// Outbox Publisher with exponential backoff (resilient)
-	outboxPublisher := gormAdapter.NewGormOutboxEventPublisher(outboxStore, bus, 100, 5*time.Minute, 10).
-		WithBackoff(1*time.Second, 60*time.Second, 2.0)
-
-	// Track workers for graceful shutdown
-	var workers []*lib.ResilientWorker
-
-	pubWorker := lib.NewResilientWorker(
-		"outbox-publisher",
-		func(ctx context.Context) error {
-			return outboxPublisher.Start(ctx)
-		},
-		lib.WithRestartDelay(10*time.Second),
-		lib.WithMaxRetries(0), // infinite retries
-	)
-	workers = append(workers, pubWorker)
-	if err := pubWorker.Start(context.Background()); err != nil {
-		appLogger.LegacyError(err)
-	}
-
-	// Resilient consumers
-	for _, eventName := range []string{
-		finanzasEvent.OperacionRegistrada{}.EventName(),
-		finanzasEvent.TransaccionRegistrada{}.EventName(),
-	} {
-		eventName := eventName
-		consumerWorker := lib.NewResilientWorker(
-			"consumer-"+eventName,
-			func(ctx context.Context) error {
-				return bus.Consume(ctx, "api-consumer", eventName, dispatcher)
-			},
-			lib.WithRestartDelay(10*time.Second),
-			lib.WithMaxRetries(0),
-		)
-		workers = append(workers, consumerWorker)
-		if err := consumerWorker.Start(context.Background()); err != nil {
-			appLogger.LegacyError(err)
-		}
-	}
 
 	// Factories
 	emailFactory := common.NewEmailFactory([]string{})
@@ -223,7 +166,7 @@ func main() {
 		operacionFactory,
 		unidadRepository,
 		quantityFactory,
-		outboxStore,
+		nil, // outbox desenchufado: los eventos ya no se persisten ni publican
 	)
 
 	srv := handler.New(
@@ -259,7 +202,7 @@ func main() {
 		Cache: lru.New[string](100),
 	})
 
-	handler := httprouter.NewServer(db, redisClient, outboxStore, quantityFactory, srv).Handler()
+	handler := httprouter.NewServer(db, outboxStore, quantityFactory, srv).Handler()
 
 	if envirotment.GetAppEnv() == envirotment.Dev {
 		handler = govisual.Wrap(
@@ -293,11 +236,6 @@ func main() {
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 	appLogger.Info("shutting down server...")
-
-	// Stop background workers
-	for _, w := range workers {
-		w.Stop()
-	}
 
 	// Shutdown HTTP server with timeout
 	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -346,32 +284,6 @@ func setupDB() *gorm.DB {
 	}
 
 	return db
-}
-
-func setupRedis() *redis.Client {
-	addr := envirotment.Get(envirotment.REDIS_URL)
-	if addr == "" {
-		host := envirotment.Get(envirotment.REDIS_HOST)
-		if host == "" {
-			host = "localhost"
-		}
-		port := envirotment.Get(envirotment.REDIS_PORT)
-		if port == "" {
-			port = "6379"
-		}
-		addr = host + ":" + port
-	}
-
-	client := redis.NewClient(&redis.Options{
-		Addr:     addr,
-		Password: envirotment.Get(envirotment.REDIS_PASSWORD),
-	})
-
-	if err := client.Ping(context.Background()).Err(); err != nil {
-		log.Printf("advertencia: no se pudo conectar a Redis en %s: %v", addr, err)
-	}
-
-	return client
 }
 
 func init() {

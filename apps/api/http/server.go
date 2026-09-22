@@ -5,7 +5,6 @@ import (
 
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 
 	"github.com/Sanaruca/condominio/graph/loaders"
@@ -16,7 +15,6 @@ import (
 // Server agrupa las dependencias necesarias para registrar las rutas HTTP.
 type Server struct {
 	db          *gorm.DB
-	redisClient *redis.Client
 	outboxStore *gormAdapter.GormOutboxEventStore
 	graphQL     http.Handler
 	qf          *quantity.QuantityFactory
@@ -24,14 +22,12 @@ type Server struct {
 
 func NewServer(
 	db *gorm.DB,
-	redisClient *redis.Client,
 	outboxStore *gormAdapter.GormOutboxEventStore,
 	quantityFactory *quantity.QuantityFactory,
 	graphQL http.Handler,
 ) *Server {
 	return &Server{
 		db:          db,
-		redisClient: redisClient,
 		outboxStore: outboxStore,
 		graphQL:     graphQL,
 		qf:          quantityFactory,

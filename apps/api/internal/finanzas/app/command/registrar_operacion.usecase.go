@@ -68,9 +68,6 @@ func NewRegistrarTransaccion(
 	if quantityFactory == nil {
 		panic("qf is nil")
 	}
-	if outbox == nil {
-		panic("outbox is nil")
-	}
 	return &registrarTransaccion{
 		repo:     repo,
 		factory:  factory,
@@ -179,9 +176,12 @@ func (uc *registrarTransaccion) Exec(
 		}
 	}
 
-	for _, event := range op.PullEvents() {
-		if err := uc.outbox.AddEvent(ctx, event); err != nil {
-			return nil, core.WrapError(err)
+	// Desenchufado: si no hay outbox configurado, los eventos no se persisten.
+	if uc.outbox != nil {
+		for _, event := range op.PullEvents() {
+			if err := uc.outbox.AddEvent(ctx, event); err != nil {
+				return nil, core.WrapError(err)
+			}
 		}
 	}
 	op.ClearEvents()
