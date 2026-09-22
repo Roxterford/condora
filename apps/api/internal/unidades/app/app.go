@@ -13,6 +13,7 @@ type Queries struct {
 }
 
 type Commands struct {
-	RegistrarUnidad command.RegistrarUnidad
-	RegistrarSujeto command.RegistrarSujeto
+	RegistrarUnidad  command.RegistrarUnidad
+	RegistrarSujeto  command.RegistrarSujeto
+	ActualizarSujeto command.ActualizarSujeto
 }

@@ -199,13 +199,14 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		Empty           func(childComplexity int) int
-		Login           func(childComplexity int, email string, password string) int
-		RegistrarCuota  func(childComplexity int, input model.RegistrarCuotaDto) int
-		RegistrarGasto  func(childComplexity int, input model.RegistrarGastoDto) int
-		RegistrarPago   func(childComplexity int, input *model.RegistrarPagoDto) int
-		RegistrarSujeto func(childComplexity int, input model.RegistrarSujetoDto) int
-		RegistrarUnidad func(childComplexity int, input model.RegistrarUnidadDto) int
+		ActualizarSujeto func(childComplexity int, id string, data model.ActualizarSujetoDto) int
+		Empty            func(childComplexity int) int
+		Login            func(childComplexity int, email string, password string) int
+		RegistrarCuota   func(childComplexity int, input model.RegistrarCuotaDto) int
+		RegistrarGasto   func(childComplexity int, input model.RegistrarGastoDto) int
+		RegistrarPago    func(childComplexity int, input *model.RegistrarPagoDto) int
+		RegistrarSujeto  func(childComplexity int, input model.RegistrarSujetoDto) int
+		RegistrarUnidad  func(childComplexity int, input model.RegistrarUnidadDto) int
 	}
 
 	Operacion struct {
@@ -412,6 +413,7 @@ type MutationResolver interface {
 	RegistrarCuota(ctx context.Context, input model.RegistrarCuotaDto) (model.CuotaType, error)
 	RegistrarGasto(ctx context.Context, input model.RegistrarGastoDto) (*model.Operacion, error)
 	RegistrarPago(ctx context.Context, input *model.RegistrarPagoDto) (*model.Operacion, error)
+	ActualizarSujeto(ctx context.Context, id string, data model.ActualizarSujetoDto) (bool, error)
 	RegistrarSujeto(ctx context.Context, input model.RegistrarSujetoDto) (model.Sujeto, error)
 	RegistrarUnidad(ctx context.Context, input model.RegistrarUnidadDto) (*model.Unidad, error)
 	Login(ctx context.Context, email string, password string) (*model.LoginCredentialsDto, error)
@@ -1050,6 +1052,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.LoginCredentialsDTO.Token(childComplexity), true
 
+	case "Mutation.actualizarSujeto":
+		if e.complexity.Mutation.ActualizarSujeto == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_actualizarSujeto_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.ActualizarSujeto(childComplexity, args["id"].(string), args["data"].(model.ActualizarSujetoDto)), true
 	case "Mutation._empty":
 		if e.complexity.Mutation.Empty == nil {
 			break
@@ -2001,6 +2014,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	opCtx := graphql.GetOperationContext(ctx)
 	ec := executionContext{opCtx, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
+		ec.unmarshalInputActualizarSujetoDTO,
 		ec.unmarshalInputBooleanCondition,
 		ec.unmarshalInputCuotaFilter,
 		ec.unmarshalInputDeudaFilter,
@@ -2660,6 +2674,14 @@ extend type Query {
   obtenerTasa(anio: Int, mes: Mes, dia: Int): Tasa!
 }
 `, BuiltIn: false},
+	{Name: "../internal/unidades/app/command/actualizar_sujeto.graphqls", Input: `input ActualizarSujetoDTO {
+    email: String
+    telefono: String
+}
+
+extend type Mutation {
+    actualizarSujeto(id: ID!, data: ActualizarSujetoDTO!): Boolean!
+}`, BuiltIn: false},
 	{Name: "../internal/unidades/app/command/registrar_sujeto.graphqls", Input: `input RegistrarSujetoDTO {
   tipo: TipoDeSujeto!
   documento_identidad: String!
@@ -2815,6 +2837,22 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) field_Mutation_actualizarSujeto_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNID2string)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "data", ec.unmarshalNActualizarSujetoDTO2githubᚗcomᚋSanarucaᚋcondominioᚋgraphᚋmodelᚐActualizarSujetoDto)
+	if err != nil {
+		return nil, err
+	}
+	args["data"] = arg1
+	return args, nil
+}
 
 func (ec *executionContext) field_Mutation_login_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
@@ -6289,6 +6327,47 @@ func (ec *executionContext) fieldContext_Mutation_registrarPago(ctx context.Cont
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_registrarPago_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_actualizarSujeto(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_actualizarSujeto,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().ActualizarSujeto(ctx, fc.Args["id"].(string), fc.Args["data"].(model.ActualizarSujetoDto))
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_actualizarSujeto(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_actualizarSujeto_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -12238,6 +12317,40 @@ func (ec *executionContext) fieldContext___Type_isOneOf(_ context.Context, field
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputActualizarSujetoDTO(ctx context.Context, obj any) (model.ActualizarSujetoDto, error) {
+	var it model.ActualizarSujetoDto
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"email", "telefono"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "email":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Email = data
+		case "telefono":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("telefono"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Telefono = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputBooleanCondition(ctx context.Context, obj any) (model.BooleanCondition, error) {
 	var it model.BooleanCondition
 	asMap := map[string]any{}
@@ -14704,6 +14817,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "actualizarSujeto":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_actualizarSujeto(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "registrarSujeto":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_registrarSujeto(ctx, field)
@@ -16603,6 +16723,11 @@ func (ec *executionContext) marshalNAbono2ᚖgithubᚗcomᚋSanarucaᚋcondomini
 		return graphql.Null
 	}
 	return ec._Abono(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNActualizarSujetoDTO2githubᚗcomᚋSanarucaᚋcondominioᚋgraphᚋmodelᚐActualizarSujetoDto(ctx context.Context, v any) (model.ActualizarSujetoDto, error) {
+	res, err := ec.unmarshalInputActualizarSujetoDTO(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v any) (bool, error) {

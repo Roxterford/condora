@@ -1,5 +1,4 @@
-"use client";
-
+"use client";;
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -28,11 +27,11 @@ import {
   CuotaDetalleQuery,
 } from "@/components/cuota-detalle/cuota-detalle";
 import { TipoCuotaTag } from "@/components/tipo-cuota-tag";
-import { ChevronRight } from "lucide-react";
 import { money } from "@/lib/money-display";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TableSkeleton } from "@/components/table-skeleton/table-skeleton";
 import type { ReactNode } from "react";
+import Link from "next/link";
 
 const NOMBRE_DE_MES: Record<Mes, string> = {
   [Mes.Enero]: "Enero",
@@ -292,16 +291,20 @@ export function CuotasTable({
               ))}
               <TableCell className="text-right">
                 <Button
+                  nativeButton={false}
                   variant="outline"
                   size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    verDetalles(cuota);
-                  }}
-                >
-                  Ver detalles
-                  <ChevronRight className="ml-1 size-4" />
-                </Button>
+                  render={
+                    <Link
+                      href={"/cuotas/" + cuota.id}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }}
+                    >
+                      Ver detalles
+                    </Link>
+                  }
+                />
               </TableCell>
             </TableRow>
           ))

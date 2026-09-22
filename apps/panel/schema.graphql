@@ -25,6 +25,11 @@ type Abono {
   pago: ID!
 }
 
+input ActualizarSujetoDTO {
+  email: String
+  telefono: String
+}
+
 input BooleanCondition {
   eq: Boolean
   neq: Boolean
@@ -303,6 +308,7 @@ enum Moneda {
 
 type Mutation {
   _empty: String
+  actualizarSujeto(data: ActualizarSujetoDTO!, id: ID!): Boolean!
   login(email: String!, password: String!): LoginCredentialsDTO!
   registrarCuota(input: RegistrarCuotaDTO!): CuotaType!
   registrarGasto(input: RegistrarGastoDTO!): Operacion

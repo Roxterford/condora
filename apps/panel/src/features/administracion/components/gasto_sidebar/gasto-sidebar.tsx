@@ -1,6 +1,5 @@
 import { OverlayProps } from "@/components/overlay";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
@@ -122,9 +121,6 @@ export function GastoSidebar({
                 </tr>
               </tbody>
             </table>
-          </section>
-          <section>
-            <Button>gola</Button>
           </section>
         </div>
       </SheetContent>

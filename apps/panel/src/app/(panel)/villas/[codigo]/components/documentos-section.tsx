@@ -19,6 +19,7 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { VillaPageQuery } from "@/providers/graphql/graphql";
+import { EditarTitularButton } from "./editar-titular-button";
 import { RegistrarTitularButton } from "./registrar-titular-button";
 
 type Unidad = NonNullable<VillaPageQuery["unidad"]>;
@@ -92,23 +93,26 @@ function TitularDocumento({
 
   return (
     <li className="rounded-xl border p-4 space-y-3">
-      <div className="flex gap-3 items-center">
-        <AvatarIniciales nombre={titular.display_name} />
-        <div className="grid gap-1">
-          <div className="flex gap-2 items-center">
-            <p className="font-medium">{titular.display_name}</p>
-            {esPrincipal && (
-              <Badge className="bg-teal-100 text-teal-700">Principal</Badge>
-            )}
-            <Badge
-              variant="secondary"
-              className={esEnte ? "bg-amber-100 text-amber-700" : ""}
-            >
-              {esEnte ? "Ente jurídico" : "Persona natural"}
-            </Badge>
+      <div className="flex justify-between items-start gap-3">
+        <div className="flex gap-3 items-center">
+          <AvatarIniciales nombre={titular.display_name} />
+          <div className="grid gap-1">
+            <div className="flex gap-2 items-center">
+              <p className="font-medium">{titular.display_name}</p>
+              {esPrincipal && (
+                <Badge className="bg-teal-100 text-teal-700">Principal</Badge>
+              )}
+              <Badge
+                variant="secondary"
+                className={esEnte ? "bg-amber-100 text-amber-700" : ""}
+              >
+                {esEnte ? "Ente jurídico" : "Persona natural"}
+              </Badge>
+            </div>
+            <p className="text-sm text-muted-foreground">{titular.cedula}</p>
           </div>
-          <p className="text-sm text-muted-foreground">{titular.cedula}</p>
         </div>
+        <EditarTitularButton titular={titular} />
       </div>
 
       <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5">

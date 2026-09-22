@@ -1,0 +1,8 @@
+input ActualizarSujetoDTO {
+    email: String
+    telefono: String
+}
+
+extend type Mutation {
+    actualizarSujeto(id: ID!, data: ActualizarSujetoDTO!): Boolean!
+}

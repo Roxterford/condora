@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { RegistrarPagoOverlay } from "@/features/administracion/components/registrar-pago-overlay";
 import { useOverlay } from "@/hooks/useOverlay";
 import { CreditCardPlus } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { VillaPageQuery } from "@/providers/graphql/graphql";
 
 export function RegistrarPagoButton({
@@ -11,7 +13,15 @@ export function RegistrarPagoButton({
 }: {
   unidad: VillaPageQuery["unidad"];
 }) {
-  const registrarPago = useOverlay();
+  const queryClient = useQueryClient();
+  const router = useRouter();
+  const registrarPago = useOverlay({
+    closeOnDone: true,
+    onDone() {
+      queryClient.invalidateQueries({ queryKey: ["villas"] });
+      router.refresh();
+    },
+  });
 
   return (
     <>

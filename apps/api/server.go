@@ -236,6 +236,8 @@ func main() {
 					deudaRepository,
 					unidadFactory,
 					sujetoFactory,
+					emailFactory,
+					phoneFactory,
 				),
 				sistemaService.New(tasaService),
 				transaccionServiceInstance,

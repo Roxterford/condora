@@ -104,6 +104,11 @@ type Abono struct {
 	Fecha time.Time `json:"fecha"`
 }
 
+type ActualizarSujetoDto struct {
+	Email    *string `json:"email,omitempty"`
+	Telefono *string `json:"telefono,omitempty"`
+}
+
 type BooleanCondition struct {
 	Eq  graphql.Omittable[*bool] `json:"eq,omitempty"`
 	Neq graphql.Omittable[*bool] `json:"neq,omitempty"`

@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/Sanaruca/condominio/internal/administracion/models/deuda"
+	"github.com/Sanaruca/condominio/internal/core/common"
 	"github.com/Sanaruca/condominio/internal/unidades/app"
 	"github.com/Sanaruca/condominio/internal/unidades/app/command"
 	"github.com/Sanaruca/condominio/internal/unidades/app/query"
@@ -20,6 +21,8 @@ func NewUnidadesService(
 	deudaRepository deuda.DeudaRepository,
 	unidadFactory *unidad.UnidadFactory,
 	sujetoFactory *sujeto.SujetoFactory,
+	emailFactory *common.EmailFactory,
+	phoneFactory *common.PhoneFactory,
 ) *UnidadesService {
 	return &UnidadesService{
 		Queries: app.Queries{
@@ -37,6 +40,11 @@ func NewUnidadesService(
 			RegistrarSujeto: command.NewRegistrarSujeto(
 				sujetoRepository,
 				sujetoFactory,
+			),
+			ActualizarSujeto: command.NewActualizarSujeto(
+				sujetoRepository,
+				emailFactory,
+				phoneFactory,
 			),
 		},
 	}

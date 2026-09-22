@@ -24,6 +24,11 @@ export type Abono = {
   pago: Scalars['ID']['output'];
 };
 
+export type ActualizarSujetoDto = {
+  email?: InputMaybe<Scalars['String']['input']>;
+  telefono?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type BooleanCondition = {
   eq?: InputMaybe<Scalars['Boolean']['input']>;
   neq?: InputMaybe<Scalars['Boolean']['input']>;
@@ -313,12 +318,19 @@ export enum Moneda {
 export type Mutation = {
   __typename?: 'Mutation';
   _empty?: Maybe<Scalars['String']['output']>;
+  actualizarSujeto: Scalars['Boolean']['output'];
   login: LoginCredentialsDto;
   registrarCuota: CuotaType;
   registrarGasto?: Maybe<Operacion>;
   registrarPago: Operacion;
   registrarSujeto: Sujeto;
   registrarUnidad: Unidad;
+};
+
+
+export type MutationActualizarSujetoArgs = {
+  data: ActualizarSujetoDto;
+  id: Scalars['ID']['input'];
 };
 
 
@@ -854,6 +866,36 @@ export type RegistrarPagoPageQueryVariables = Exact<{
 
 export type RegistrarPagoPageQuery = { __typename?: 'Query', unidades?: { __typename?: 'PaginatedUnidad', data: Array<{ __typename?: 'Unidad', id: string, codigo: string }> } | null };
 
+export type VillaDeudasQueryVariables = Exact<{
+  codigo: Scalars['String']['input'];
+  page: Scalars['Int']['input'];
+  limit: Scalars['Int']['input'];
+}>;
+
+
+export type VillaDeudasQuery = { __typename?: 'Query', deudas: { __typename?: 'PaginatedDeuda', limit: number, page: number, pages: number, total: number, data: Array<{ __typename?: 'Deuda', id: string, deuda: number, monto: number, estado: EstadoDeDeuda, cuota:
+        | { __typename: 'Deuda__CuotaEspecial', id: string, nombre: string }
+        | { __typename: 'Deuda__CuotaRegular', id: string, nombre: string }
+        | { __typename: 'Deuda__CuotaSemilla', id: string, nombre: string }
+       }> } };
+
+export type EditarTitularMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  data: ActualizarSujetoDto;
+}>;
+
+
+export type EditarTitularMutation = { __typename?: 'Mutation', actualizarSujeto: boolean };
+
+export type VillaPagosQueryVariables = Exact<{
+  codigo: Scalars['String']['input'];
+  page: Scalars['Int']['input'];
+  limit: Scalars['Int']['input'];
+}>;
+
+
+export type VillaPagosQuery = { __typename?: 'Query', pagos: { __typename?: 'PaginatedPago', limit: number, page: number, pages: number, total: number, data: Array<{ __typename: 'Pago', fecha: Date, operacion: string, concepto: string, metodo: MetodoDeOperacion, moneda: Moneda, monto: number, registro: Date, tasa: number, total: number, unidad: { __typename?: 'UnidadIdentifiers', id: string, codigo: string } }> } };
+
 export type RegistrarTitularMutationVariables = Exact<{
   input: RegistrarSujetoDto;
 }>;
@@ -876,11 +918,7 @@ export type VillaPageQuery = { __typename?: 'Query', ultimo_pago: { __typename?:
      | null, titulares?: Array<
       | { __typename: 'Ente', id: string, cedula: string, display_name: string, email: string, telefono: string, registro: Date, razon_social: string, representante: { __typename?: 'Persona', id: string, display_name: string, cedula: string, email: string, telefono: string } }
       | { __typename: 'Persona', id: string, cedula: string, display_name: string, email: string, telefono: string, registro: Date, nombres: string, apellidos: string }
-    > | null } | null, pagos: { __typename?: 'PaginatedPago', data: Array<{ __typename: 'Pago', fecha: Date, operacion: string, concepto: string, metodo: MetodoDeOperacion, moneda: Moneda, monto: number, registro: Date, tasa: number, total: number, unidad: { __typename?: 'UnidadIdentifiers', id: string, codigo: string } }> }, deudas: { __typename?: 'PaginatedDeuda', data: Array<{ __typename?: 'Deuda', id: string, deuda: number, monto: number, estado: EstadoDeDeuda, cuota:
-        | { __typename: 'Deuda__CuotaEspecial', id: string, nombre: string }
-        | { __typename: 'Deuda__CuotaRegular', id: string, nombre: string }
-        | { __typename: 'Deuda__CuotaSemilla', id: string, nombre: string }
-       }> }, deudas_pendientes: { __typename?: 'PaginatedDeuda', total: number } };
+    > | null } | null, deudas_pendientes: { __typename?: 'PaginatedDeuda', total: number } };
 
 export type VillasPageQueryVariables = Exact<{
   page: Scalars['Int']['input'];
@@ -1215,6 +1253,66 @@ export const RegistrarPagoPageDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<RegistrarPagoPageQuery, RegistrarPagoPageQueryVariables>;
+export const VillaDeudasDocument = new TypedDocumentString(`
+    query VillaDeudas($codigo: String!, $page: Int!, $limit: Int!) {
+  deudas: obtenerDeudas(
+    filtro: {unidad: {eq: $codigo}}
+    paginador: {limit: $limit, page: $page}
+  ) {
+    data {
+      id
+      cuota {
+        __typename
+        ... on Deuda__Cuota {
+          id
+          nombre
+        }
+      }
+      deuda
+      monto
+      estado
+    }
+    limit
+    page
+    pages
+    total
+  }
+}
+    `) as unknown as TypedDocumentString<VillaDeudasQuery, VillaDeudasQueryVariables>;
+export const EditarTitularDocument = new TypedDocumentString(`
+    mutation EditarTitular($id: ID!, $data: ActualizarSujetoDTO!) {
+  actualizarSujeto(id: $id, data: $data)
+}
+    `) as unknown as TypedDocumentString<EditarTitularMutation, EditarTitularMutationVariables>;
+export const VillaPagosDocument = new TypedDocumentString(`
+    query VillaPagos($codigo: String!, $page: Int!, $limit: Int!) {
+  pagos: obtenerPagos(
+    filtro: {unidad: {eq: $codigo}}
+    paginador: {limit: $limit, page: $page}
+  ) {
+    data {
+      __typename
+      fecha
+      operacion
+      concepto
+      metodo
+      moneda
+      monto
+      registro
+      tasa
+      total
+      unidad {
+        id
+        codigo
+      }
+    }
+    limit
+    page
+    pages
+    total
+  }
+}
+    `) as unknown as TypedDocumentString<VillaPagosQuery, VillaPagosQueryVariables>;
 export const RegistrarTitularDocument = new TypedDocumentString(`
     mutation RegistrarTitular($input: RegistrarSujetoDTO!) {
   registrarSujeto(input: $input) {
@@ -1283,39 +1381,6 @@ export const VillaPageDocument = new TypedDocumentString(`
           telefono
         }
       }
-    }
-  }
-  pagos: obtenerPagos(filtro: {unidad: {eq: $codigo}}) {
-    data {
-      __typename
-      fecha
-      operacion
-      concepto
-      metodo
-      moneda
-      monto
-      registro
-      tasa
-      total
-      unidad {
-        id
-        codigo
-      }
-    }
-  }
-  deudas: obtenerDeudas(filtro: {unidad: {eq: $codigo}}) {
-    data {
-      id
-      cuota {
-        __typename
-        ... on Deuda__Cuota {
-          id
-          nombre
-        }
-      }
-      deuda
-      monto
-      estado
     }
   }
   deudas_pendientes: obtenerDeudas(

@@ -78,39 +78,6 @@ const PageQuery = graphql(/* GraphQL */ `
         }
       }
     }
-    pagos: obtenerPagos(filtro: { unidad: { eq: $codigo } }) {
-      data {
-        __typename
-        fecha
-        operacion
-        concepto
-        metodo
-        moneda
-        monto
-        registro
-        tasa
-        total
-        unidad {
-          id
-          codigo
-        }
-      }
-    }
-    deudas: obtenerDeudas(filtro: { unidad: { eq: $codigo } }) {
-      data {
-        id
-        cuota {
-          __typename
-          ... on Deuda__Cuota {
-            id
-            nombre
-          }
-        }
-        deuda
-        monto
-        estado
-      }
-    }
     deudas_pendientes: obtenerDeudas(
       filtro: {
         unidad: { eq: $codigo }
@@ -134,7 +101,7 @@ export default async function VillaPage(page: VillaPageProps) {
       codigo,
       estado_deuda_pendiente: EstadoDeDeuda.Pendiente,
     }),
-    ({ unidad, pagos, deudas, deudas_pendientes, ...data }) => {
+    ({ unidad, deudas_pendientes, ...data }) => {
       const ultimo_pago = data.ultimo_pago.data.at(0) as
         VillaPageQuery["ultimo_pago"]["data"][0] | undefined;
 
@@ -268,17 +235,13 @@ export default async function VillaPage(page: VillaPageProps) {
               <TabsTrigger value="notificaciones">Notificaciones</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="deudas">
+            <TabsContent value="deudas" className="space-y-5">
               <h3>Historial de deudas</h3>
-              <DeudasTable deudas={deudas.data} />
+              <DeudasTable codigo={unidad.codigo} />
             </TabsContent>
-            <TabsContent value="pagos">
+            <TabsContent value="pagos" className="space-y-5">
               <h3>Historial de pagos</h3>
-              <PagosTable
-                pagos={pagos.data}
-                unidadTitular={unidad.titular_primario}
-                unidad={unidad}
-              />
+              <PagosTable unidadTitular={unidad.titular_primario} unidad={unidad} />
             </TabsContent>
             <TabsContent value="documentos">
               <DocumentosSection unidad={unidad} />

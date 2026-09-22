@@ -29,7 +29,7 @@ func (r *sujetoRepository) ObtenerPorID(
 	id sujeto.SujetoID,
 ) (sujeto.Sujeto, core.Error) {
 
-	s, err := gorm.G[Sujeto](r.db).Where("id = ?", id).Preload("Sujeto", nil).Take(ctx)
+	s, err := gorm.G[Sujeto](r.db).Where("id = ?", id).Preload("Representante", nil).Take(ctx)
 
 	if exception.Is(err, gorm.ErrRecordNotFound) {
 		return nil, nil
