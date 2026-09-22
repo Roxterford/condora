@@ -1,6 +1,9 @@
 # Go delve debug binaries
 __debug_bin*
 
+# Go build output
+bin/
+
 # opencode session data
 .opencode/
 

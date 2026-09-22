@@ -8,6 +8,21 @@ tasks:
     options:
       envFile: "/.env"
 
+  build:
+    command: "go build"
+    args:
+      - "-o"
+      - "./bin/api"
+      - "./server.go"
+    inputs:
+      - "./**/*.go"
+      - "!./**/*_test.go"
+      - "go.mod"
+      - "go.sum"
+    outputs:
+      - "./bin/api"
+    description: "Compila el binario de producción"
+
   codegen:
     script: "go run ./internal/tools/autofilter/autofilter.go && go run ./internal/tools/autopaginated && go run github.com/99designs/gqlgen generate"
     inputs:
