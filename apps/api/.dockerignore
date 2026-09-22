@@ -1,0 +1,11 @@
+.git
+.gitignore
+node_modules
+bin
+tmp
+__debug_bin*
+*.db
+*.db-shm
+*.db-wal
+coverage.out
+coverage.html
