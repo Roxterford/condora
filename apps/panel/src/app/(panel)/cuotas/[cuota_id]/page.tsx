@@ -3,6 +3,7 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import styles from "./page.module.css";
 import {
+  Building2,
   CalendarDays,
   CircleAlert,
   CircleCheckBig,
@@ -38,7 +39,6 @@ const PageQuery = graphql(/* GraphQL */ `
         id
         mes
         anio
-        monto
         registro
         recaudacion {
           moneda
@@ -158,10 +158,19 @@ function StatsSection({ cuota }: { cuota: Cuota }) {
       <li>
         <StatCard
           title={"Monto por villa"}
-          value={money(cuota.monto)}
+          value={money(montoPorVilla(recaudacion), recaudacion.moneda)}
           subtitle={"Estrategia lineal"}
           icon={<Home className="text-indigo-600" />}
           color="bg-indigo-100"
+        />
+      </li>
+      <li>
+        <StatCard
+          title={"Unidades con deuda"}
+          value={recaudacion.unidades_aplicadas}
+          subtitle={`${recaudacion.unidades_solventes} solventes · ${recaudacion.unidades_pendientes} pendientes`}
+          icon={<Building2 className="text-violet-600" />}
+          color="bg-violet-100"
         />
       </li>
       <li>
@@ -252,8 +261,8 @@ function ProyectoSection({ cuota }: { cuota: Cuota }) {
   const esEspecial = cuota.__typename === "CuotaEspecial";
 
   return (
-    <section className="mt-10 grid gap-8 lg:grid-cols-2">
-      <section>
+    <>
+      <section className="mt-10">
         <h2>Detalles del Proyecto</h2>
         <p className="page-description">
           Información del proyecto asociado, si la cuota lo posee
@@ -265,9 +274,7 @@ function ProyectoSection({ cuota }: { cuota: Cuota }) {
               <div>
                 <h3>Descripción</h3>
                 {cuota.detalles.descripcion ? (
-                  <p className="mt-1">
-                    {cuota.detalles.descripcion}
-                  </p>
+                  <p className="mt-1">{cuota.detalles.descripcion}</p>
                 ) : (
                   <div className="mt-1 rounded-lg border border-dashed px-4 py-3 text-sm text-muted-foreground">
                     Esta cuota no incluye una descripción del proyecto
@@ -277,9 +284,7 @@ function ProyectoSection({ cuota }: { cuota: Cuota }) {
               <div>
                 <h3>Justificación</h3>
                 {cuota.detalles.justificacion ? (
-                  <p className="mt-1">
-                    {cuota.detalles.justificacion}
-                  </p>
+                  <p className="mt-1">{cuota.detalles.justificacion}</p>
                 ) : (
                   <div className="mt-1 rounded-lg border border-dashed px-4 py-3 text-sm text-muted-foreground">
                     Esta cuota no incluye una justificación
@@ -319,13 +324,13 @@ function ProyectoSection({ cuota }: { cuota: Cuota }) {
         </div>
       </section>
 
-      <section>
-        <h2>Información Adicional</h2>
+      <section className="mt-10">
+        <h2>Desglose de gastos</h2>
         <p className="page-description">
           Desglose de gastos asociados a esta cuota
         </p>
-        <section className="mt-6">
-          <h3>Desglose de gastos</h3>
+
+        <div className="mt-6">
           <GastosDesglose
             gastos={cuota.gastos.reduce<DesgloseDeGastoItem[]>(
               (acc, it) =>
@@ -333,15 +338,20 @@ function ProyectoSection({ cuota }: { cuota: Cuota }) {
               [],
             )}
           />
-        </section>
+        </div>
       </section>
-    </section>
+    </>
   );
 }
 
 function porcentajeRecaudacion(recaudacion: Cuota["recaudacion"]): number {
   if (!recaudacion.monto_estimado) return 0;
   return (recaudacion.monto_recaudado / recaudacion.monto_estimado) * 100;
+}
+
+function montoPorVilla(recaudacion: Cuota["recaudacion"]): number {
+  if (!recaudacion.unidades_aplicadas) return 0;
+  return recaudacion.monto_estimado / recaudacion.unidades_aplicadas;
 }
 
 function estadoRecaudacion(porcentaje: number): {

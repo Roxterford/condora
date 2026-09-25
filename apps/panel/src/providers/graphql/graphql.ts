@@ -792,15 +792,15 @@ export type CuotaPageQueryVariables = Exact<{
 
 
 export type CuotaPageQuery = { __typename?: 'Query', cuota?:
-    | { __typename: 'CuotaEspecial', id: string, mes: Mes, anio: number, monto: number, registro: Date, recaudacion: { __typename?: 'Recaudacion', moneda: Moneda, monto_estimado: number, monto_recaudado: number, monto_pendiente: number, unidades_aplicadas: number, unidades_solventes: number, unidades_pendientes: number }, gastos: Array<
+    | { __typename: 'CuotaEspecial', id: string, mes: Mes, anio: number, registro: Date, recaudacion: { __typename?: 'Recaudacion', moneda: Moneda, monto_estimado: number, monto_recaudado: number, monto_pendiente: number, unidades_aplicadas: number, unidades_solventes: number, unidades_pendientes: number }, gastos: Array<
         | { __typename: 'GastoACondominio', operacion: string, concepto: string, moneda: Moneda, monto: number, fecha: Date, tasa: number, total: number }
         | { __typename: 'GastoAProveedor', operacion: string, concepto: string, moneda: Moneda, monto: number, fecha: Date, tasa: number, total: number, proveedor: { __typename?: 'Proveedor', id: string, nombre: string, rif: string, telefono?: string | null, email?: string | null } }
       >, detalles: { __typename?: 'Proyecto', titulo: string, descripcion: string, justificacion: string, fecha_limite: Date, estado: EstadoDeProyecto } }
-    | { __typename: 'CuotaRegular', id: string, mes: Mes, anio: number, monto: number, registro: Date, recaudacion: { __typename?: 'Recaudacion', moneda: Moneda, monto_estimado: number, monto_recaudado: number, monto_pendiente: number, unidades_aplicadas: number, unidades_solventes: number, unidades_pendientes: number }, gastos: Array<
+    | { __typename: 'CuotaRegular', id: string, mes: Mes, anio: number, registro: Date, recaudacion: { __typename?: 'Recaudacion', moneda: Moneda, monto_estimado: number, monto_recaudado: number, monto_pendiente: number, unidades_aplicadas: number, unidades_solventes: number, unidades_pendientes: number }, gastos: Array<
         | { __typename: 'GastoACondominio', operacion: string, concepto: string, moneda: Moneda, monto: number, fecha: Date, tasa: number, total: number }
         | { __typename: 'GastoAProveedor', operacion: string, concepto: string, moneda: Moneda, monto: number, fecha: Date, tasa: number, total: number, proveedor: { __typename?: 'Proveedor', id: string, nombre: string, rif: string, telefono?: string | null, email?: string | null } }
       > }
-    | { __typename: 'CuotaSemilla', id: string, mes: Mes, anio: number, monto: number, registro: Date, recaudacion: { __typename?: 'Recaudacion', moneda: Moneda, monto_estimado: number, monto_recaudado: number, monto_pendiente: number, unidades_aplicadas: number, unidades_solventes: number, unidades_pendientes: number }, gastos: Array<
+    | { __typename: 'CuotaSemilla', id: string, mes: Mes, anio: number, registro: Date, recaudacion: { __typename?: 'Recaudacion', moneda: Moneda, monto_estimado: number, monto_recaudado: number, monto_pendiente: number, unidades_aplicadas: number, unidades_solventes: number, unidades_pendientes: number }, gastos: Array<
         | { __typename: 'GastoACondominio', operacion: string, concepto: string, moneda: Moneda, monto: number, fecha: Date, tasa: number, total: number }
         | { __typename: 'GastoAProveedor', operacion: string, concepto: string, moneda: Moneda, monto: number, fecha: Date, tasa: number, total: number, proveedor: { __typename?: 'Proveedor', id: string, nombre: string, rif: string, telefono?: string | null, email?: string | null } }
       > }
@@ -1070,7 +1070,6 @@ export const CuotaPageDocument = new TypedDocumentString(`
       id
       mes
       anio
-      monto
       registro
       recaudacion {
         moneda
