@@ -21,6 +21,11 @@ import {
 } from "@/providers/graphql/graphql";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EstadoDeudaTag } from "@/components/estado-deuda-tag";
 import {
@@ -91,6 +96,12 @@ const ESTADOS: { value: EstadoTab; label: string; estado?: EstadoDeDeuda }[] = [
   { value: "pendiente", label: "Pendientes", estado: EstadoDeDeuda.Pendiente },
   { value: "abonada", label: "Abonadas", estado: EstadoDeDeuda.Abonada },
 ];
+
+const ACCION_REGISTRAR_PAGO = "Registrar pago";
+const ACCION_VER_DETALLES = "Ver detalles";
+const ACCION_LABEL = "sr-only @xl:not-sr-only";
+const ACCION_BUTTON =
+  "transition-opacity [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover/row:opacity-100 [@media(hover:hover)]:group-focus-within/row:opacity-100 @max-xl:size-8 @max-xl:px-0";
 
 const ConteoQuery = graphql(/* GraphQL */ `
   query ConteoDeudasPorEstado($filtro: DeudaFilter, $paginador: Paginator) {
@@ -246,7 +257,7 @@ export function EstadoPagosVilla({ cuota_id }: { cuota_id: string }) {
           ))}
         </TabsList>
 
-        <TabsContent value={tab} className="space-y-5">
+        <TabsContent value={tab} className="@container space-y-5">
           <div className="flex">
             <form>
               <InputGroup>
@@ -316,7 +327,7 @@ export function EstadoPagosVilla({ cuota_id }: { cuota_id: string }) {
                   <TableRow
                     key={deuda.id}
                     onClick={(e) => onClickFila(deuda, e)}
-                    className="cursor-pointer"
+                    className="group/row cursor-pointer"
                   >
                     <TableCell className="font-medium">
                       {deuda.unidad.codigo}
@@ -345,30 +356,53 @@ export function EstadoPagosVilla({ cuota_id }: { cuota_id: string }) {
                     </TableCell>
                     <TableCell className="text-right">
                       {deuda.estado === EstadoDeDeuda.Pendiente ? (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            abrirRegistrarPago(deuda);
-                          }}
-                        >
-                          Registrar pago
-                        </Button>
+                        <Tooltip>
+                          <TooltipTrigger
+                            render={
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className={ACCION_BUTTON}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  abrirRegistrarPago(deuda);
+                                }}
+                              >
+                                <CreditCardPlus />
+                                <span className={ACCION_LABEL}>
+                                  {ACCION_REGISTRAR_PAGO}
+                                </span>
+                              </Button>
+                            }
+                          />
+                          <TooltipContent>
+                            {ACCION_REGISTRAR_PAGO}
+                          </TooltipContent>
+                        </Tooltip>
                       ) : (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          nativeButton={false}
-                          render={
-                            <Link
-                              href={`/villas/${deuda.unidad.codigo}`}
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              Ver detalles
-                            </Link>
-                          }
-                        />
+                        <Tooltip>
+                          <TooltipTrigger
+                            render={
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className={ACCION_BUTTON}
+                                nativeButton={false}
+                                render={
+                                  <Link
+                                    href={`/villas/${deuda.unidad.codigo}`}
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    <span className={ACCION_LABEL}>
+                                      {ACCION_VER_DETALLES}
+                                    </span>
+                                  </Link>
+                                }
+                              />
+                            }
+                          />
+                          <TooltipContent>{ACCION_VER_DETALLES}</TooltipContent>
+                        </Tooltip>
                       )}
                     </TableCell>
                   </TableRow>
@@ -400,7 +434,7 @@ export function EstadoPagosVilla({ cuota_id }: { cuota_id: string }) {
       <RegistrarPagoOverlay
         {...registrarPago.overlayProps}
         unidad={unidadPago}
-        initialFocus="unidad"
+        initialFocus="monto"
       />
     </>
   );
