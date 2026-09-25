@@ -1,17 +1,27 @@
 "use client";
 
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { Box, CreditCardPlus, ReceiptText, Search, SearchX } from "lucide-react";
+import {
+  Box,
+  CreditCardPlus,
+  FilterX,
+  ReceiptText,
+  Search,
+  SearchX,
+} from "lucide-react";
 import Link from "next/link";
 import { graphql } from "@/providers/graphql";
 import { execute } from "@/providers/graphql/execute";
 import {
+  DeudaFilter,
   EstadoDeDeuda,
   EstadoPagosVillaQuery,
 } from "@/providers/graphql/graphql";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EstadoDeudaTag } from "@/components/estado-deuda-tag";
 import {
   Table,
@@ -28,7 +38,11 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
-import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import { Paginacion } from "@/components/paginacion/paginacion";
 import { PaginacionFooter } from "@/components/paginacion/pagination-footer";
 import { RESULTADOS_POR_PAGINA } from "@/components/paginacion/resultados-por-pagina";
@@ -69,10 +83,27 @@ const PageQuery = graphql(/* GraphQL */ `
 
 type Deuda = EstadoPagosVillaQuery["deudas"]["data"][number];
 type UnidadPago = { id: string; codigo: string; wallet: number; deuda: number };
+type EstadoTab = "todas" | "saldada" | "pendiente" | "abonada";
+
+const ESTADOS: { value: EstadoTab; label: string; estado?: EstadoDeDeuda }[] = [
+  { value: "todas", label: "Todas" },
+  { value: "saldada", label: "Solventes", estado: EstadoDeDeuda.Saldada },
+  { value: "pendiente", label: "Pendientes", estado: EstadoDeDeuda.Pendiente },
+  { value: "abonada", label: "Abonadas", estado: EstadoDeDeuda.Abonada },
+];
+
+const ConteoQuery = graphql(/* GraphQL */ `
+  query ConteoDeudasPorEstado($filtro: DeudaFilter, $paginador: Paginator) {
+    deudas: obtenerDeudas(filtro: $filtro, paginador: $paginador) {
+      total
+    }
+  }
+`);
 
 export function EstadoPagosVilla({ cuota_id }: { cuota_id: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
   const currentPage = Math.max(1, Number(searchParams.get("page")) || 1);
   const limitParam = Number(searchParams.get("limit"));
   const limit = RESULTADOS_POR_PAGINA.includes(
@@ -81,27 +112,68 @@ export function EstadoPagosVilla({ cuota_id }: { cuota_id: string }) {
     ? limitParam
     : RESULTADOS_POR_PAGINA[1];
   const [busqueda, setBusqueda] = useState("%%");
+  const [tab, setTab] = useState<EstadoTab>("todas");
   const onDebounceBusqueda = useDebounce(setBusqueda);
   const scrollToTop = useSmoothScrollToTop();
   const { open: abrirDrawer, close: cerrarDrawer } = useDrawer();
 
-  const { data, isFetching, refetch } = useQuery({
-    queryKey: ["cuota.pagos-villa", cuota_id, busqueda, currentPage, limit],
+  const estadoActivo = ESTADOS.find((t) => t.value === tab)?.estado;
+
+  const filtro: DeudaFilter = {
+    and: [
+      { cuota: { eq: cuota_id } },
+      { unidad: { like: busqueda } },
+      ...(estadoActivo ? [{ estado: { eq: estadoActivo } }] : []),
+    ],
+  };
+
+  const { data, isFetching } = useQuery({
+    queryKey: [
+      "cuota.pagos-villa",
+      cuota_id,
+      tab,
+      busqueda,
+      currentPage,
+      limit,
+    ],
     queryFn: async () => {
       const result = await execute(PageQuery, {
-        filtro: { cuota: { eq: cuota_id }, unidad: { like: busqueda } },
+        filtro,
         paginador: { page: currentPage, limit },
       });
       return result.data;
     },
-    placeholderData: keepPreviousData,
+    placeholderData: (previousData, previousQuery) =>
+      previousQuery?.queryKey[2] === tab ? previousData : undefined,
   });
+
+  const conteos = useQueries({
+    queries: ESTADOS.map((t) => ({
+      queryKey: ["cuota.pagos-villa", cuota_id, "conteo", t.value],
+      queryFn: async () => {
+        const result = await execute(ConteoQuery, {
+          filtro: {
+            cuota: { eq: cuota_id },
+            ...(t.estado ? { estado: { eq: t.estado } } : {}),
+          },
+          paginador: { page: 1, limit: 1 },
+        });
+        return result.data?.deudas.total ?? 0;
+      },
+    })),
+  });
+
+  const conteoPorTab = new Map(
+    ESTADOS.map((t, i) => [t.value, conteos[i]?.data]),
+  );
 
   const [unidadPago, setUnidadPago] = useState<UnidadPago | null>(null);
   const registrarPago = useOverlay({
     closeOnDone: true,
     onDone: () => {
-      refetch();
+      queryClient.invalidateQueries({
+        queryKey: ["cuota.pagos-villa", cuota_id],
+      });
     },
   });
 
@@ -117,6 +189,11 @@ export function EstadoPagosVilla({ cuota_id }: { cuota_id: string }) {
 
   const setLimit = (nuevoLimit: number) => {
     router.push(`/cuotas/${cuota_id}?limit=${nuevoLimit}`);
+  };
+
+  const onTabChange = (value: string) => {
+    setTab(value as EstadoTab);
+    router.push(`/cuotas/${cuota_id}?limit=${limit}`, { scroll: false });
   };
 
   const abrirRegistrarPago = (deuda: Deuda) => {
@@ -154,142 +231,172 @@ export function EstadoPagosVilla({ cuota_id }: { cuota_id: string }) {
 
   return (
     <>
-      <div className="flex">
-        <form>
-          <InputGroup>
-            <InputGroupInput
-              placeholder="Buscar por código"
-              className="md:min-w-68"
-              onChange={(e) => onDebounceBusqueda(`%${e.target.value}%`)}
-            />
-            <InputGroupAddon>
-              <Search />
-            </InputGroupAddon>
-          </InputGroup>
-        </form>
-        <Paginacion
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setPage}
-          className="justify-end"
-        />
-      </div>
-
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="table__head">Villa</TableHead>
-            <TableHead className="table__head">Propietario</TableHead>
-            <TableHead className="table__head">Estado</TableHead>
-            <TableHead className="table__head">Cuenta</TableHead>
-            <TableHead className="table__head">Debe</TableHead>
-            <TableHead className="table__head text-right">Acciones</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {isFetching ? (
-            <TableSkeleton
-              rows={limit}
-              columns={6}
-              cell={(col) => {
-                switch (col) {
-                  case 0:
-                    return <Skeleton className="h-4 w-14" />;
-                  case 1:
-                    return <Skeleton className="h-4 w-28" />;
-                  case 2:
-                    return <Skeleton className="h-5 w-16 rounded-full" />;
-                  case 3:
-                    return (
-                      <div className="flex items-center gap-1.5">
-                        <Skeleton className="h-4 w-16" />
-                        <Skeleton className="h-3 w-4" />
-                        <Skeleton className="h-4 w-10" />
-                      </div>
-                    );
-                  case 4:
-                    return <Skeleton className="h-4 w-16" />;
-                  default:
-                    return <Skeleton className="ml-auto h-7 w-28 rounded-md" />;
-                }
-              }}
-            />
-          ) : deudas?.data.length ? (
-            deudas.data.map((deuda) => (
-              <TableRow
-                key={deuda.id}
-                onClick={(e) => onClickFila(deuda, e)}
-                className="cursor-pointer"
+      <Tabs value={tab} onValueChange={onTabChange}>
+        <TabsList variant="line">
+          {ESTADOS.map((t) => (
+            <TabsTrigger key={t.value} value={t.value}>
+              {t.label}
+              <Badge
+                variant={t.value === tab ? "secondary" : "outline"}
+                className="ml-1 tabular-nums"
               >
-                <TableCell className="font-medium">
-                  {deuda.unidad.codigo}
-                </TableCell>
-                <TableCell>
-                  {deuda.titular?.display_name ?? "Sin titular"}
-                </TableCell>
-                <TableCell>
-                  <EstadoDeudaTag state={deuda.estado} />
-                </TableCell>
-                <TableCell className="tabular-nums">
-                  {money(deuda.monto - deuda.deuda)}{" "}
-                  <span className="text-muted-foreground">
-                    / {money(deuda.monto)}
-                  </span>
-                </TableCell>
+                {conteoPorTab.get(t.value) ?? "-"}
+              </Badge>
+            </TabsTrigger>
+          ))}
+        </TabsList>
 
-                <TableCell className="tabular-nums">
-                  {deuda.deuda ? (
-                    <span className="text-red-600">{money(deuda.deuda)}</span>
-                  ) : (
-                    <span className="text-muted-foreground">-</span>
-                  )}
-                </TableCell>
-                <TableCell className="text-right">
-                  {deuda.estado === EstadoDeDeuda.Pendiente ? (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        abrirRegistrarPago(deuda);
-                      }}
-                    >
-                      Registrar pago
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      nativeButton={false}
-                      render={
-                        <Link
-                          href={`/villas/${deuda.unidad.codigo}`}
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          Ver detalles
-                        </Link>
-                      }
-                    />
-                  )}
-                </TableCell>
+        <TabsContent value={tab} className="space-y-5">
+          <div className="flex">
+            <form>
+              <InputGroup>
+                <InputGroupInput
+                  placeholder="Buscar por código"
+                  className="md:min-w-68"
+                  onChange={(e) => onDebounceBusqueda(`%${e.target.value}%`)}
+                />
+                <InputGroupAddon>
+                  <Search />
+                </InputGroupAddon>
+              </InputGroup>
+            </form>
+            <Paginacion
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setPage}
+              className="justify-end"
+            />
+          </div>
+
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="table__head">Villa</TableHead>
+                <TableHead className="table__head">Propietario</TableHead>
+                <TableHead className="table__head">Estado</TableHead>
+                <TableHead className="table__head">Cuenta</TableHead>
+                <TableHead className="table__head">Debe</TableHead>
+                <TableHead className="table__head text-right">
+                  Acciones
+                </TableHead>
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={5}>
-                {busqueda !== "%%" ? <NotFoundState /> : <EmptyState />}
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-      <PaginacionFooter
-        currentPage={currentPage}
-        totalPages={totalPages}
-        limit={limit}
-        onLimitChange={setLimit}
-        onPageChange={setPage}
-      />
+            </TableHeader>
+            <TableBody>
+              {isFetching ? (
+                <TableSkeleton
+                  rows={limit}
+                  columns={6}
+                  cell={(col) => {
+                    switch (col) {
+                      case 0:
+                        return <Skeleton className="h-4 w-14" />;
+                      case 1:
+                        return <Skeleton className="h-4 w-28" />;
+                      case 2:
+                        return <Skeleton className="h-5 w-16 rounded-full" />;
+                      case 3:
+                        return (
+                          <div className="flex items-center gap-1.5">
+                            <Skeleton className="h-4 w-16" />
+                            <Skeleton className="h-3 w-4" />
+                            <Skeleton className="h-4 w-10" />
+                          </div>
+                        );
+                      case 4:
+                        return <Skeleton className="h-4 w-16" />;
+                      default:
+                        return (
+                          <Skeleton className="ml-auto h-7 w-28 rounded-md" />
+                        );
+                    }
+                  }}
+                />
+              ) : deudas?.data.length ? (
+                deudas.data.map((deuda) => (
+                  <TableRow
+                    key={deuda.id}
+                    onClick={(e) => onClickFila(deuda, e)}
+                    className="cursor-pointer"
+                  >
+                    <TableCell className="font-medium">
+                      {deuda.unidad.codigo}
+                    </TableCell>
+                    <TableCell>
+                      {deuda.titular?.display_name ?? "Sin titular"}
+                    </TableCell>
+                    <TableCell>
+                      <EstadoDeudaTag state={deuda.estado} />
+                    </TableCell>
+                    <TableCell className="tabular-nums">
+                      {money(deuda.monto - deuda.deuda)}{" "}
+                      <span className="text-muted-foreground">
+                        / {money(deuda.monto)}
+                      </span>
+                    </TableCell>
+
+                    <TableCell className="tabular-nums">
+                      {deuda.deuda ? (
+                        <span className="text-red-600">
+                          {money(deuda.deuda)}
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground">-</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {deuda.estado === EstadoDeDeuda.Pendiente ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            abrirRegistrarPago(deuda);
+                          }}
+                        >
+                          Registrar pago
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          nativeButton={false}
+                          render={
+                            <Link
+                              href={`/villas/${deuda.unidad.codigo}`}
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              Ver detalles
+                            </Link>
+                          }
+                        />
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={5}>
+                    {busqueda !== "%%" ? (
+                      <NotFoundState />
+                    ) : tab !== "todas" ? (
+                      <EmptyStateFiltro />
+                    ) : (
+                      <EmptyState />
+                    )}
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+          <PaginacionFooter
+            currentPage={currentPage}
+            totalPages={totalPages}
+            limit={limit}
+            onLimitChange={setLimit}
+            onPageChange={setPage}
+          />
+        </TabsContent>
+      </Tabs>
       <RegistrarPagoOverlay
         {...registrarPago.overlayProps}
         unidad={unidadPago}
@@ -362,6 +469,22 @@ function EmptyState() {
         <EmptyTitle>Sin pagos registrados</EmptyTitle>
         <EmptyDescription>
           Esta cuota no tiene pagos registrados todavía
+        </EmptyDescription>
+      </EmptyHeader>
+    </Empty>
+  );
+}
+
+function EmptyStateFiltro() {
+  return (
+    <Empty>
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <FilterX />
+        </EmptyMedia>
+        <EmptyTitle>Sin villas en este estado</EmptyTitle>
+        <EmptyDescription>
+          Ninguna villa de esta cuota se encuentra en el estado seleccionado
         </EmptyDescription>
       </EmptyHeader>
     </Empty>

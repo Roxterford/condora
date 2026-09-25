@@ -786,6 +786,14 @@ export type EstadoPagosVillaQueryVariables = Exact<{
 
 export type EstadoPagosVillaQuery = { __typename?: 'Query', deudas: { __typename?: 'PaginatedDeuda', limit: number, page: number, pages: number, total: number, data: Array<{ __typename?: 'Deuda', id: string, monto: number, deuda: number, estado: EstadoDeDeuda, unidad: { __typename?: 'UnidadIdentifiers', id: string, codigo: string }, titular?: { __typename?: 'Deuda__Titular', id: string, display_name: string } | null }> } };
 
+export type ConteoDeudasPorEstadoQueryVariables = Exact<{
+  filtro?: InputMaybe<DeudaFilter>;
+  paginador?: InputMaybe<Paginator>;
+}>;
+
+
+export type ConteoDeudasPorEstadoQuery = { __typename?: 'Query', deudas: { __typename?: 'PaginatedDeuda', total: number } };
+
 export type CuotaPageQueryVariables = Exact<{
   cuota_id: Scalars['String']['input'];
 }>;
@@ -1062,6 +1070,13 @@ export const EstadoPagosVillaDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<EstadoPagosVillaQuery, EstadoPagosVillaQueryVariables>;
+export const ConteoDeudasPorEstadoDocument = new TypedDocumentString(`
+    query ConteoDeudasPorEstado($filtro: DeudaFilter, $paginador: Paginator) {
+  deudas: obtenerDeudas(filtro: $filtro, paginador: $paginador) {
+    total
+  }
+}
+    `) as unknown as TypedDocumentString<ConteoDeudasPorEstadoQuery, ConteoDeudasPorEstadoQueryVariables>;
 export const CuotaPageDocument = new TypedDocumentString(`
     query CuotaPage($cuota_id: String!) {
   cuota: obtenerCuota(id: $cuota_id) {
