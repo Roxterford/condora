@@ -32,6 +32,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { TableSkeleton } from "@/components/table-skeleton/table-skeleton";
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 
 const NOMBRE_DE_MES: Record<Mes, string> = {
   [Mes.Enero]: "Enero",
@@ -302,6 +303,7 @@ export function CuotasTable({
                       }}
                     >
                       Ver detalles
+                      <ChevronRight size={16} />
                     </Link>
                   }
                 />

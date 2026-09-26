@@ -40,7 +40,7 @@ import {
   TipoDeCuota,
   VillaDeudasQuery,
 } from "@/providers/graphql/graphql";
-import { ReceiptText } from "lucide-react";
+import { ReceiptText, ChevronRight } from "lucide-react";
 import Link from "next/link";
 
 const DeudasQuery = graphql(/* GraphQL */ `
@@ -228,6 +228,7 @@ export function DeudasTable({ codigo }: { codigo: string }) {
                       }}
                     >
                       Ver detalles
+                      <ChevronRight size={16} />
                     </Button>
                   </Link>
                 </TableCell>

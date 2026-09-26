@@ -7,7 +7,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Home, SearchX, Ellipsis } from "lucide-react";
+import { Home, SearchX, Ellipsis, ChevronRight } from "lucide-react";
 import {
   Empty,
   EmptyDescription,
@@ -164,6 +164,7 @@ export function VillasTable({
                     render={
                       <Link href={["/villas", villa.codigo].join("/")}>
                         Ver detalles
+                        <ChevronRight size={16} />
                       </Link>
                     }
                   />

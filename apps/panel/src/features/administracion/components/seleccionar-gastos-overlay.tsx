@@ -14,7 +14,14 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
-import { Check, Plus, ReceiptText, SearchX, X } from "lucide-react";
+import {
+  Check,
+  ChevronRight,
+  Plus,
+  ReceiptText,
+  SearchX,
+  X,
+} from "lucide-react";
 import {
   InputGroup,
   InputGroupAddon,
@@ -132,6 +139,7 @@ export function SeleccionarGastosOverlay(props: SeleccionarGastosOverlayProps) {
                     onClick={() => handleVerDetalles(g)}
                   >
                     Ver Detalles
+                    <ChevronRight size={16} />
                   </Button>
                   <Button
                     variant={"outline"}
@@ -321,6 +329,7 @@ function Busqueda({ onAdd, onVerDetalles, omitIDs }: BusquedaProps) {
                     }}
                   >
                     Ver Detalles
+                    <ChevronRight size={16} />
                   </Button>
                   <Button
                     onClick={() => {

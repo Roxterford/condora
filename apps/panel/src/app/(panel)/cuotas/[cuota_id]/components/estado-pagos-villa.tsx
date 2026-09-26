@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import {
   Box,
+  ChevronRight,
   CreditCardPlus,
   FilterX,
   ReceiptText,
@@ -396,6 +397,7 @@ export function EstadoPagosVilla({ cuota_id }: { cuota_id: string }) {
                                     <span className={ACCION_LABEL}>
                                       {ACCION_VER_DETALLES}
                                     </span>
+                                    <ChevronRight size={16} />
                                   </Link>
                                 }
                               />
@@ -485,7 +487,10 @@ function UnidadDrawerContent({
           className="w-full"
           nativeButton={false}
           render={
-            <Link href={`/villas/${deuda.unidad.codigo}`}>Ver detalles</Link>
+            <Link href={`/villas/${deuda.unidad.codigo}`}>
+              Ver detalles
+              <ChevronRight size={16} />
+            </Link>
           }
         />
       </div>
