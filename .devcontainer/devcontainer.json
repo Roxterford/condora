@@ -3,7 +3,7 @@
   "dockerComposeFile": "docker-compose.yml",
   "service": "app",
   "workspaceFolder": "/workspaces/condominio",
-  "forwardPorts": [4000, 3001, 8081],
+  "forwardPorts": [4000, 3001, 5432, 8081],
   "postCreateCommand": "bash .devcontainer/scripts/post-create.sh",
   "remoteUser": "devuser",
   "customizations": {
@@ -16,7 +16,8 @@
         "GraphQL.vscode-graphql",
         "formulahendry.auto-rename-tag",
         "kuscamara.remove-unused-imports",
-        "keyshout.sqlite-db-viewer",
+        "mtxr.sqltools",
+        "ckolkman.vscode-postgres",
         "Prisma.prisma",
         "pucelle.run-on-save"
       ]

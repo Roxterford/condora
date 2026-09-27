@@ -1,4 +1,4 @@
-DROP VIEW IF EXISTS deudas;
+DROP VIEW IF EXISTS deudas CASCADE;
 CREATE VIEW deudas AS
 SELECT
   d.id,
@@ -6,7 +6,7 @@ SELECT
   u.codigo AS unidad_codigo,
   d.cuota,
   d.monto,
-  d.monto - COALESCE(SUM(dp.destinado), 0) AS deuda,
+  (d.monto - COALESCE(SUM(dp.destinado), 0))::int AS deuda,
   CASE
     WHEN COALESCE(SUM(dp.destinado), 0) = d.monto THEN 'SALDADA'
     WHEN COALESCE(SUM(dp.destinado), 0) = 0 THEN 'PENDIENTE'
@@ -21,4 +21,6 @@ FROM
   LEFT JOIN unidades u ON u.codigo = d.unidad
 GROUP BY
   d.id,
-  d.monto;
+  d.monto,
+  u.id,
+  u.codigo;

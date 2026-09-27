@@ -22,6 +22,10 @@ bun install
 echo "Generando cliente Prisma..."
 bun prisma generate
 
+# Set up the PostgreSQL schema (idempotent, only seeds if the DB is empty)
+echo "Preparando la base de datos..."
+bash .devcontainer/scripts/bootstrap-db.sh
+
 # Setup git hooks
 echo "Configurando git hooks..."
 bunx lefthook install
@@ -42,3 +46,5 @@ echo "Para iniciar desarrollo:"
 echo "  bun dev              # Todos los servicios"
 echo "  moon run panel:dev   # Solo frontend"
 echo "  moon run api:serve   # Solo backend"
+echo ""
+echo "API en http://localhost:8081 · panel en http://localhost:4000 · PostgreSQL en localhost:5432"

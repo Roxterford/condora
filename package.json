@@ -28,7 +28,6 @@
     "@graphql-codegen/schema-ast": "^5.0.2",
     "@moonrepo/cli": "^2.5.5",
     "@parcel/watcher": "^2.6.0",
-    "@prisma/adapter-libsql": "^7.10.0",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/commander": "^2.12.5",
     "@types/dotenv": "^8.2.3",
@@ -46,6 +45,7 @@
   },
   "dependencies": {
     "@graphql-typed-document-node/core": "^3.2.0",
+    "@prisma/adapter-pg": "^7.10.0",
     "@prisma/client": "^7.10.0",
     "@tanstack/react-devtools": "^0.10.12",
     "@tanstack/react-form-devtools": "^0.2.34",
@@ -60,6 +60,7 @@
     "inquirer": "^13.4.3",
     "lucide-react": "^1.42.0",
     "next": "16.3.0",
+    "pg": "^8.23.0",
     "react": "19.2.8",
     "shadcn": "^4.20.1",
     "tailwind-merge": "^3.6.0",

@@ -744,7 +744,6 @@ export function generarSQL(): string {
   out.push('-- 520 unidades · 24 cuotas (semilla + 18 meses + 5 especiales)')
   out.push('-- Generado por prisma/seeds/mocks/generador_mock_grande.ts')
   out.push('-- =============================================================')
-  out.push('PRAGMA foreign_keys=OFF;')
   out.push('BEGIN;')
 
   // Limpieza (idempotente)
@@ -927,7 +926,6 @@ export function generarSQL(): string {
   out.push(proyRows.join(',\n') + ';')
 
   out.push('COMMIT;')
-  out.push('PRAGMA foreign_keys=ON;')
 
   return out.join('\n')
 }

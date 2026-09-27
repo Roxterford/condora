@@ -1,4 +1,4 @@
-DROP VIEW IF EXISTS gastos;
+DROP VIEW IF EXISTS gastos CASCADE;
 CREATE VIEW gastos AS
 SELECT
   o.id AS operacion,

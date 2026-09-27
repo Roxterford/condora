@@ -1,4 +1,4 @@
-DROP VIEW IF EXISTS operaciones;
+DROP VIEW IF EXISTS operaciones CASCADE;
 CREATE VIEW operaciones AS
 SELECT
   o.*,

@@ -12,7 +12,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 //////////////////////////////////////////////////
@@ -100,6 +100,10 @@ model Unidad {
   Titulares Titularidad[]
 
   @@unique([id, codigo])
+  @@index([deuda_total])
+  @@index([estado_cuenta])
+  @@index([cuotas_pendientes])
+  @@map("unidades")
 }
 
 enum TipoDeSujeto {
@@ -274,8 +278,8 @@ model DestinoDePago {
   fecha     DateTime @default(now())
 
   IOperacion IOperacion @relation(fields: [operacion], references: [id])
-  IDeuda     IDeuda     @relation(fields: [deuda], references: [id])
-  Deuda      Deuda      @relation(fields: [deuda], references: [id])
+  IDeuda     IDeuda     @relation(fields: [deuda], references: [id], map: "destino_de_pagos_deuda_interna_fkey")
+  Deuda      Deuda      @relation(fields: [deuda], references: [id], map: "destino_de_pagos_deuda_vista_fkey")
 
   @@map("destino_de_pagos")
 }

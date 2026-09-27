@@ -20,7 +20,7 @@ deudas, pagos, gastos y recaudación, con montos exactos en múltiples monedas.
 ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
 ![TailwindCSS](https://img.shields.io/badge/tailwindcss-0F172A.svg?style=for-the-badge&logo=tailwindcss&logoColor=38bdf8)
 ![Prisma](https://img.shields.io/badge/prisma-2D3748.svg?style=for-the-badge&logo=prisma&logoColor=white)
-![SQLite](https://img.shields.io/badge/sqlite-003B57.svg?style=for-the-badge&logo=sqlite&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/postgresql-4169E1.svg?style=for-the-badge&logo=postgresql&logoColor=white)
 
 </div>
 
@@ -87,15 +87,20 @@ Requisitos: [Bun](https://bun.sh) ≥ 1.x y [moonrepo](https://moonrepo.dev) (CL
 
 ### Base de datos
 
-La base de datos es **SQLite** compartida. El esquema principal vive en Prisma y, junto
-con las seeds, es la fuente de verdad; Drizzle expone el acceso a las tablas desde el
-frontend.
+La base de datos es **PostgreSQL 17** y corre en Docker (servicio `postgres` del
+devcontainer). El esquema principal vive en Prisma y, junto con las seeds, es la fuente
+de verdad; Drizzle expone el acceso a las tablas desde el frontend.
 
 ```bash
-bun run prisma generate && bun run prisma db push   # Esquema + migraciones
+bun run prisma generate && bun run prisma db push   # Esquema + seeds
 moon run panel:db-push                              # Drizzle push
 moon run panel:db-studio                            # Studio (inspección visual)
 ```
+
+La URL de conexión es `postgresql://condominio:condominio@postgres:5432/condominio`.
+No se usan migraciones: el esquema se sincroniza con `prisma db push` y las vistas se
+crean desde `prisma/seeds/views.seed.ts` (en orden topológico, porque PostgreSQL valida
+las vistas al crearlas).
 
 ### 🧪 Flujo de trabajo
 
@@ -166,7 +171,7 @@ El mismo valor lo usa `apps/panel/codegen.ts` para descargar el schema, así que
 | ----------------------------- | ---------------------------------------------------------------------- |
 | **Frontend**                  | Next.js 16, React 19, TypeScript, TailwindCSS 4, shadcn/ui, TanStack Query |
 | **Backend**                   | Go 1.25, GraphQL (gqlgen), GORM, JWT                                   |
-| **Base de datos**             | SQLite, Prisma 7 (esquema + seeds), Drizzle (auth + tabla lateral)     |
+| **Base de datos**             | PostgreSQL 17, Prisma 7 (esquema + seeds), Drizzle (auth + tabla lateral) |
 | **Calidad**                   | Vitest (unit), Playwright (e2e), Storybook, ESLint + Prettier          |
 | **Monorepo**                  | moonrepo, Bun, Lefthook, Commitlint, Commitizen                        |
 
@@ -196,7 +201,7 @@ condominio/
 
 ### 🐌 Rendimiento
 
-Auditoría del 2026-09-21 sobre `dev.db` (520 unidades, 24 cuotas, 11.160 deudas, 8.754 destinos).
+Auditoría del 2026-09-21 sobre el mock (520 unidades, 24 cuotas, 11.160 deudas, 8.754 destinos).
 
 | Problema                                | Ubicación                                    | Estado                                                        |
 | --------------------------------------- | -------------------------------------------- | ------------------------------------------------------------- |

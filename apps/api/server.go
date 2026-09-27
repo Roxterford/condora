@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"path/filepath"
-	"strings"
 	"syscall"
 	"time"
 
@@ -15,9 +13,9 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler/lru"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/doganarif/govisual"
-	"github.com/glebarez/sqlite"
 	"github.com/joho/godotenv"
 	"github.com/vektah/gqlparser/v2/ast"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	gormLogger "gorm.io/gorm/logger"
 
@@ -248,34 +246,13 @@ func main() {
 	appLogger.Info("server exited gracefully")
 }
 
-func findProjectRoot() string {
-	cwd, _ := os.Getwd()
-	dir := cwd
-	for i := 0; i < 10; i++ {
-		if _, err := os.Stat(filepath.Join(dir, ".env")); err == nil {
-			return dir
-		}
-		parent := filepath.Dir(dir)
-		if parent == dir {
-			break
-		}
-		dir = parent
-	}
-	return cwd
-}
-
 func setupDB() *gorm.DB {
 	dsn := envirotment.Get(envirotment.DATABASE_URL)
 	if dsn == "" {
 		panic("DATABASE_URL is not set")
 	}
 
-	// Resolve relative SQLite paths against project root (where .env lives)
-	if strings.HasPrefix(dsn, "file:./") {
-		dsn = "file:" + filepath.Join(findProjectRoot(), dsn[6:])
-	}
-
-	db, err := gorm.Open(sqlite.Open(dsn), &gorm.Config{
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger:         gormLogger.Default.LogMode(gormLogger.Info),
 		TranslateError: true,
 	})

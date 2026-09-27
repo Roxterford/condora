@@ -1,12 +1,12 @@
-DROP VIEW IF EXISTS tasas_de_cambio;
+DROP VIEW IF EXISTS tasas_de_cambio CASCADE;
 CREATE VIEW tasas_de_cambio AS
 SELECT
-  DATE(fecha) AS fecha,
+  CAST(fecha AS date) AS fecha,
   tasa,
   'VED' AS moneda,
-  COUNT(*) AS cantidad_operaciones
+  COUNT(*)::int AS cantidad_operaciones
 FROM
   operaciones
 WHERE tasa > 0
-GROUP BY DATE(fecha), tasa
+GROUP BY CAST(fecha AS date), tasa
 ORDER BY fecha DESC;

@@ -7,7 +7,7 @@ export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
-    seed: "tsx prisma/seeds/index.ts -s views",
+    seed: "tsx prisma/seeds/index.ts -s views mocks/mock_grande denormalizar_unidades",
   },
   datasource: {
     url: env("DATABASE_URL"),

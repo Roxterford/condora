@@ -3,7 +3,6 @@
 -- 520 unidades · 24 cuotas (semilla + 18 meses + 5 especiales)
 -- Generado por prisma/seeds/mocks/generador_mock_grande.ts
 -- =============================================================
-PRAGMA foreign_keys=OFF;
 BEGIN;
 DELETE FROM destino_de_pagos;
 DELETE FROM transaccion_operaciones;
@@ -25946,4 +25945,3 @@ INSERT INTO proyectos (titulo, cuota, estado, descripcion, justificacion, fecha_
   ('Reparación mayor de ascensores', 'c-2026-05-esp', 'ACTIVO', 'Reemplazo de cables de tracción, guías y modernización del tablero de control de los dos ascensores.', 'Los ascensores presentan paradas frecuentes y el diagnóstico técnico recomienda intervención mayor antes del vencimiento de la garantía.', '2026-10-31 18:00:00', 1, '2026-05-01 08:00:00', 'tester', '2026-05-01 08:00:00', 'tester'),
   ('Pavimentación de la placa de estacionamiento', 'c-2026-08-esp', 'ACTIVO', 'Pavimentación, demarcación y señalización de la placa de estacionamiento del condominio.', 'La placa presenta hundimientos y grietas que acumulan agua; la reparación evita daños estructurales mayores.', '2026-11-30 18:00:00', 1, '2026-08-01 08:00:00', 'tester', '2026-08-01 08:00:00', 'tester');
 COMMIT;
-PRAGMA foreign_keys=ON;
