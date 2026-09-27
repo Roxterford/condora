@@ -3,6 +3,7 @@ package envirotment
 import (
 	"fmt"
 	"os"
+	"strings"
 )
 
 type AppEnv string
@@ -53,7 +54,49 @@ const (
 
 	// EMISION DE CUOTAS
 	MAX_MESES_FUTURO_CUOTA = "MAX_MESES_FUTURO_CUOTA"
+
+	// CORS
+	CORS_ALLOWED_ORIGINS = "CORS_ALLOWED_ORIGINS"
 )
+
+// corsOriginsSeparator delimita los origins permitidos en CORS_ALLOWED_ORIGINS.
+const corsOriginsSeparator = ";"
+
+// defaultCorsAllowedOrigins son los origins usados cuando CORS_ALLOWED_ORIGINS no esta definida.
+var defaultCorsAllowedOrigins = []string{
+	"http://localhost:3000",
+	"http://localhost:3001",
+	"http://127.0.0.1:3000",
+	"http://127.0.0.1:3001",
+	"http://localhost:4000",
+	"http://localhost:4001",
+	"http://127.0.0.1:4000",
+	"http://127.0.0.1:4001",
+}
+
+// GetCorsAllowedOrigins devuelve los origins permitidos por CORS, separados por ';'
+// en la variable de entorno. Si no hay valor configurado, devuelve los origins de desarrollo.
+func GetCorsAllowedOrigins() []string {
+	raw := os.Getenv(CORS_ALLOWED_ORIGINS)
+	if strings.TrimSpace(raw) == "" {
+		return defaultCorsAllowedOrigins
+	}
+
+	parts := strings.Split(raw, corsOriginsSeparator)
+	origins := make([]string, 0, len(parts))
+	for _, part := range parts {
+		origin := strings.TrimSpace(part)
+		if origin != "" {
+			origins = append(origins, origin)
+		}
+	}
+
+	if len(origins) == 0 {
+		return defaultCorsAllowedOrigins
+	}
+
+	return origins
+}
 
 const DefaultMaxMesesFuturoCuota = 1
 

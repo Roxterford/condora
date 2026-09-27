@@ -58,7 +58,7 @@ func (s *Server) Handler() http.Handler {
 	mux.Handle(
 		"/query",
 		correlationMiddleware(
-			corsMiddleware(
+			CORSMiddleware(
 				authMiddleware(
 					loaders.Middleware(s.db, s.qf, s.graphQL),
 				),
@@ -70,5 +70,5 @@ func (s *Server) Handler() http.Handler {
 
 // chain aplica correlation, cors y auth en orden a un handler.
 func (s *Server) chain(h http.HandlerFunc) http.Handler {
-	return correlationMiddleware(corsMiddleware(authMiddleware(h)))
+	return correlationMiddleware(CORSMiddleware(authMiddleware(h)))
 }

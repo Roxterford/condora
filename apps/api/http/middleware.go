@@ -2,7 +2,6 @@ package httprouter
 
 import (
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -12,30 +11,19 @@ import (
 	"github.com/Sanaruca/condominio/internal/core/session"
 )
 
-func corsMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Obtener hosts permitidos desde variables de entorno o usar defaults
-		allowedHosts := strings.Split(os.Getenv("CORS_ALLOWED_HOSTS"), ",")
-		if len(allowedHosts) == 1 && allowedHosts[0] == "" {
-			// Si no hay configuración, usar hosts de desarrollo por defecto
-			allowedHosts = []string{
-				"http://localhost:3000",
-				"http://localhost:3001",
-				"http://127.0.0.1:3000",
-				"http://127.0.0.1:3001",
-				"http://localhost:4000",
-				"http://localhost:4001",
-				"http://127.0.0.1:4000",
-				"http://127.0.0.1:4001",
-			}
-		}
+// CORSMiddleware permite los origins configurados en CORS_ALLOWED_ORIGINS
+// (separados por ';') y responde los preflight requests.
+func CORSMiddleware(next http.Handler) http.Handler {
+	// Los origins permitidos vienen de CORS_ALLOWED_ORIGINS, separados por ';'.
+	allowedOrigins := envirotment.GetCorsAllowedOrigins()
 
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		origin := r.Header.Get("Origin")
 
 		// Verificar si el origin está en la lista de permitidos
 		allowed := false
-		for _, host := range allowedHosts {
-			if strings.TrimSpace(host) == origin {
+		for _, allowedOrigin := range allowedOrigins {
+			if allowedOrigin == origin {
 				allowed = true
 				break
 			}
