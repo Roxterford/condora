@@ -50,13 +50,19 @@ func (r *queryResolver) ObtenerDeudas(ctx context.Context, filtro *model.DeudaFi
 		return nil, core.WrapError(err)
 	}
 
+	tabla := new(database.Deuda).TableName()
+
+	// "cuota" se resuelve contra la columna FK de la deuda, no contra el alias del
+	// JOIN: un alias del SELECT no es referenciable desde el WHERE en PostgreSQL.
+	aliases := map[string][]string{
+		"cuota":  {fmt.Sprintf("%s.cuota", tabla)},
+		"unidad": {"unidad_id", "unidad_codigo"},
+		"estado": {fmt.Sprintf("%s.estado", tabla)},
+	}
+
 	rows, err := gorm.G[database.Deuda](r.db).
 		Scopes(
-			gormAdapter.GFilter(ftr, map[string][]string{
-				"cuota":  {"Cuota__id"},
-				"unidad": {"unidad_id", "unidad_codigo"},
-				"estado": {fmt.Sprintf("%s.estado", new(database.Deuda).TableName())},
-			}),
+			gormAdapter.GFilter(ftr, aliases),
 			gormAdapter.GPaginate(paginator),
 		).
 		Joins(
@@ -78,10 +84,8 @@ func (r *queryResolver) ObtenerDeudas(ctx context.Context, filtro *model.DeudaFi
 	}
 
 	total, err := gorm.G[database.Deuda](r.db).
-		Scopes(gormAdapter.GFilter(ftr, map[string][]string{
-			"unidad": {"unidad_id", "unidad_codigo"},
-		})).
-		Count(ctx, "id")
+		Scopes(gormAdapter.GFilter(ftr, aliases)).
+		Count(ctx, tabla+".id")
 
 	if err != nil {
 		return nil, core.WrapError(err)

@@ -258,75 +258,66 @@ func (r *GORMUnidadRepository) Obtener(
 }
 
 // Recalcular implementa [unidad.UnidadRepository].
-// Ejecuta la misma lógica que la migración para recalcular los campos
-// denormalizados de una unidad: deuda_total, estado_cuenta, cuotas_pendientes, cuenta.
-// Usa subconsultas correlacionadas de dos niveles (compatible con SQLite) para
-// evitar el error de "misuse of aggregate function" al anidar SUM.
+// Ejecuta la misma lógica que sql/denormalizar_unidades.sql pero para una sola
+// unidad. En PostgreSQL ni los CTE, ni las subconsultas del SET, ni las
+// subconsultas LATERAL del FROM pueden referenciar el alias de la tabla destino
+// de un UPDATE (42P01/42P10), así que el código se resuelve primero y los
+// agregados se calculan con subconsultas planas parametrizadas por ese código.
 func (r *GORMUnidadRepository) Recalcular(
 	ctx context.Context,
 	unidadID unidad.UnidadID,
 ) core.Error {
+	var codigo string
+	err := r.db.WithContext(ctx).
+		Raw("SELECT codigo FROM unidades WHERE id = ?", unidadID.String()).
+		Scan(&codigo).Error
+	if err != nil {
+		return core.WrapError(err)
+	}
+	if codigo == "" {
+		return nil
+	}
+
 	const sql = `
-		UPDATE unidades
+		UPDATE unidades u
 		SET
-			deuda_total = COALESCE((
-				SELECT SUM(dd.deuda)
-				FROM (
-					SELECT d.unidad, d.monto - COALESCE(SUM(dp.destinado), 0) AS deuda
-					FROM internal_deudas d
-					JOIN cuotas c ON c.id = d.cuota
-					LEFT JOIN destino_de_pagos dp ON dp.deuda = d.id
-					WHERE d.unidad = unidades.codigo
-					GROUP BY d.id, d.monto, d.unidad
-				) dd
-			), 0),
+			deuda_total = COALESCE(d.deuda, 0),
 			estado_cuenta = CASE
-				WHEN COALESCE((
-					SELECT SUM(dd.deuda)
-					FROM (
-						SELECT d.unidad, d.monto - COALESCE(SUM(dp.destinado), 0) AS deuda
-						FROM internal_deudas d
-						JOIN cuotas c ON c.id = d.cuota
-						LEFT JOIN destino_de_pagos dp ON dp.deuda = d.id
-						WHERE d.unidad = unidades.codigo
-						GROUP BY d.id, d.monto, d.unidad
-					) dd
-				), 0) = 0 THEN 'SOLVENTE'
-				WHEN COALESCE((
-					SELECT SUM(dd.deuda)
-					FROM (
-						SELECT d.unidad, d.monto - COALESCE(SUM(dp.destinado), 0) AS deuda
-						FROM internal_deudas d
-						JOIN cuotas c ON c.id = d.cuota
-						LEFT JOIN destino_de_pagos dp ON dp.deuda = d.id
-						WHERE d.unidad = unidades.codigo
-						GROUP BY d.id, d.monto, d.unidad
-					) dd
-				), 0) < (
-					SELECT SUM(c.monto)
-					FROM internal_deudas id JOIN cuotas c ON id.cuota = c.id
-					WHERE id.unidad = unidades.codigo
-				) THEN 'ABONADA'
+				WHEN COALESCE(d.deuda, 0) = 0 THEN 'SOLVENTE'
+				WHEN COALESCE(d.deuda, 0) < COALESCE(a.monto_asignado, 0) THEN 'ABONADA'
 				ELSE 'PENDIENTE'
 			END,
-			cuotas_pendientes = (
-				SELECT COUNT(*)
-				FROM internal_deudas d
-				JOIN cuotas c ON c.id = d.cuota
-				WHERE d.unidad = unidades.codigo
-			),
-			cuenta = (
-				SELECT COALESCE(SUM(op.monto), 0)
-				FROM operaciones op
-				WHERE op.unidad_codigo = unidades.codigo AND op.tipo = 'CREDITO' AND op.rol = 'UNIDAD'
-			) - (
-				SELECT COALESCE(SUM(dp.destinado), 0)
-				FROM destino_de_pagos dp JOIN operaciones op ON dp.operacion = op.id
-				WHERE op.unidad_codigo = unidades.codigo AND op.tipo = 'CREDITO' AND op.rol = 'UNIDAD'
-			)
-		WHERE id = ?
+			cuotas_pendientes = COALESCE(a.cuotas, 0),
+			cuenta = COALESCE(p.pagado, 0) - COALESCE(ds.destinado, 0)
+		FROM (
+			SELECT SUM(d.monto - COALESCE(dp.destinado, 0))::int AS deuda
+			FROM internal_deudas d
+			JOIN cuotas c ON c.id = d.cuota
+			LEFT JOIN destino_de_pagos dp ON dp.deuda = d.id
+			WHERE d.unidad = ?
+		) d,
+		(
+			SELECT SUM(c.monto)::int AS monto_asignado, COUNT(*)::int AS cuotas
+			FROM internal_deudas d
+			JOIN cuotas c ON c.id = d.cuota
+			WHERE d.unidad = ?
+		) a,
+		(
+			SELECT COALESCE(SUM(op.monto), 0)::int AS pagado
+			FROM operaciones op
+			WHERE op.unidad_codigo = ? AND op.tipo = 'CREDITO' AND op.rol = 'UNIDAD'
+		) p,
+		(
+			SELECT COALESCE(SUM(dp.destinado), 0)::int AS destinado
+			FROM destino_de_pagos dp
+			JOIN operaciones op ON dp.operacion = op.id
+			WHERE op.unidad_codigo = ? AND op.tipo = 'CREDITO' AND op.rol = 'UNIDAD'
+		) ds
+		WHERE u.id = ?
 	`
-	if err := r.db.WithContext(ctx).Exec(sql, unidadID.String()).Error; err != nil {
+	if err := r.db.WithContext(ctx).Exec(
+		sql, codigo, codigo, codigo, codigo, unidadID.String(),
+	).Error; err != nil {
 		return core.WrapError(err)
 	}
 	return nil

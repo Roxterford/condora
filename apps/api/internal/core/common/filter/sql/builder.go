@@ -146,9 +146,24 @@ func (b *SQLBuilder) writePredicate(field string, cond filter.Condition, value a
 	return nil
 }
 
+// quoteIdentifier entrecomilla cada parte de un identificador o de una ruta
+// "tabla.columna". PostgreSQL pliega los identificadores sin comillas a
+// minúsculas, así que los alias que genera GORM (ej. "Cuota__id", que en el
+// SELECT se emiten como "Cuota__id") hay que citarlos explícitamente. SQLite era
+// insensible a mayúsculas y por eso nunca hizo falta.
+func quoteIdentifier(name string) string {
+	parts := strings.Split(name, ".")
+	for i, part := range parts {
+		parts[i] = `"` + strings.ReplaceAll(part, `"`, `""`) + `"`
+	}
+	return strings.Join(parts, ".")
+}
+
 // writeColumnPredicate escribe un predicado sobre una única columna. Separado para
-// ser reutilizado por la expansión OR y la optimización de De Morgan.
+// ser reutilizable por la expansión OR y la optimización de De Morgan.
 func (b *SQLBuilder) writeColumnPredicate(col string, cond filter.Condition, value any) error {
+	col = quoteIdentifier(col)
+
 	switch cond {
 	case filter.CONDITON_EQ:
 		if value == nil {
@@ -214,6 +229,8 @@ func (b *SQLBuilder) handleDeMorgan(child filter.Clause) error {
 	return fmt.Errorf("tipo de cláusula no soportado en De Morgan")
 }
 
+// handleInCondition escribe el predicado IN. No vuelve a citar la columna porque
+// writeColumnPredicate ya lo hizo antes de delegar aquí.
 func (b *SQLBuilder) handleInCondition(col string, value any) error {
 	var placeholders []string
 

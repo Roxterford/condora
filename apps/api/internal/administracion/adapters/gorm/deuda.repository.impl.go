@@ -102,7 +102,8 @@ func (r GORMDeudaRepository) ObtenerDeudasDeUnidadPorCodigo(
 	unidadCodigo unidad.UnidadCodigo,
 	paginator common.Paginator,
 ) (*common.Paginated[deuda.Deuda], core.Error) {
-	return r.obtenerDeudasPor(ctx, "Unidad.codigo", string(unidadCodigo), paginator)
+	// El alias va sin comillas: las cita SQLBuilder.quoteIdentifier.
+	return r.obtenerDeudasPor(ctx, `Unidad.codigo`, string(unidadCodigo), paginator)
 }
 
 // ObtenerDeudasDeUnidadPorID implements [deuda.DeudaRepository].
@@ -111,7 +112,8 @@ func (r GORMDeudaRepository) ObtenerDeudasDeUnidadPorID(
 	unidadID unidad.UnidadID,
 	paginator common.Paginator,
 ) (*common.Paginated[deuda.Deuda], core.Error) {
-	return r.obtenerDeudasPor(ctx, "Unidad.id", unidadID.String(), paginator)
+	// El alias va sin comillas: las cita SQLBuilder.quoteIdentifier.
+	return r.obtenerDeudasPor(ctx, `Unidad.id`, unidadID.String(), paginator)
 }
 
 func (r GORMDeudaRepository) obtenerDeudasPor(
