@@ -38,6 +38,7 @@ tasks:
     env:
       PORT: "${NEXT_PORT:-4000}"
     options:
+      envFile: true
       persistent: true
     description: "Inicia el servidor de desarrollo"
 
@@ -48,6 +49,7 @@ tasks:
       - "codegen.ts"
     options:
       runInCI: false
+      envFile: true
     inputs:
       - "codegen.ts"
       - "src/**/*.{ts,tsx}"
@@ -64,6 +66,7 @@ tasks:
       - "--watch"
     options:
       runInCI: false
+      envFile: true
       persistent: true
     inputs:
       - "codegen.ts"
@@ -75,6 +78,8 @@ tasks:
 
   build:
     command: "bun next build"
+    options:
+      envFile: true
     description: "Build de producción"
     inputs:
       - "@group(next)"
@@ -94,6 +99,7 @@ tasks:
     deps:
       - "build"
     options:
+      envFile: true
       persistent: true
     description: "Inicia el servidor de producción"
 

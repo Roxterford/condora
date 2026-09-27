@@ -1,3 +1,5 @@
+import { getApiOrigin } from "@/lib/env";
+
 export interface OutboxStats {
   pending: number;
   dlq_count: number;
@@ -41,10 +43,6 @@ export interface OutboxRetryResponse {
   timestamp: string;
 }
 
-const API_ENDPOINT =
-  process.env.GRAPHQL_ENDPOINT || "http://localhost:8081/query";
-const API_ORIGIN = API_ENDPOINT.replace(/\/query\/?$/, "");
-
 async function getToken(): Promise<string | undefined> {
   if (typeof window === "undefined") {
     const { cookies } = await import("next/headers");
@@ -59,7 +57,7 @@ async function getToken(): Promise<string | undefined> {
 
 async function adminFetch(path: string, init?: RequestInit): Promise<Response> {
   const token = await getToken();
-  return fetch(`${API_ORIGIN}${path}`, {
+  return fetch(`${getApiOrigin()}${path}`, {
     ...init,
     headers: {
       "Content-Type": "application/json",

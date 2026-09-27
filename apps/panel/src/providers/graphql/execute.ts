@@ -1,3 +1,4 @@
+import { getGraphqlEndpoint } from "@/lib/env";
 import type { TypedDocumentString } from "./graphql";
 
 interface Error {
@@ -96,8 +97,7 @@ export async function execute<TResult, TVariables>(
         : TVariables)
     : (optionsOrVariables as TVariables);
 
-  const endpoint =
-    process.env.GRAPHQL_ENDPOINT || "http://localhost:8081/query";
+  const endpoint = getGraphqlEndpoint();
 
   let token: string | undefined;
 

@@ -1,7 +1,12 @@
 import type { CodegenConfig } from "@graphql-codegen/cli";
 
+const schemaEndpoint =
+  process.env.GRAPHQL_ENDPOINT ||
+  process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT ||
+  "http://localhost:8081/query";
+
 const config: CodegenConfig = {
-  schema: "http://localhost:8081/query",
+  schema: schemaEndpoint,
   documents: ["src/**/*.{ts,tsx}"],
   ignoreNoDocuments: true,
   verbose: true,

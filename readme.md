@@ -123,12 +123,34 @@ git commit
 
 ### Variables de entorno
 
-| Variable              | Descripción                     |
-| --------------------- | ------------------------------- |
-| `SECRET_KEY`          | Clave de firma de la API        |
-| `DATABASE_URL`        | URL de la base de datos SQLite  |
-| `ORIGIN`              | URL base del frontend           |
-| `BETTER_AUTH_SECRET`  | Secreto de Better Auth          |
+Copiá `.env.example` a `.env` en la raíz del repositorio y ajustá los valores.
+Ese `.env` lo cargan las tasks de moon, por lo que aplica a toda la API y al panel.
+
+| Variable                       | Consumidor   | Descripción                                            |
+| ------------------------------ | ------------ | ------------------------------------------------------ |
+| `SECRET_KEY`                   | API          | Clave de firma de la API                               |
+| `DATABASE_URL`                 | API / Prisma | URL de la base de datos                                |
+| `REDIS_HOST` / `REDIS_PORT`    | API          | Conexión a Redis                                       |
+| `PORT`                         | API          | Puerto de la API (por defecto `8081`)                  |
+| `MAX_MESES_FUTURO_CUOTA`       | API          | Máximo de meses futuros permitidos al emitir una cuota |
+| `NEXT_PORT`                    | Panel        | Puerto del servidor de Next.js (por defecto `4000`)    |
+| `GRAPHQL_ENDPOINT`             | Panel        | Endpoint GraphQL para el servidor (SSR y codegen)      |
+| `NEXT_PUBLIC_GRAPHQL_ENDPOINT` | Panel        | Endpoint GraphQL embebido en el bundle del navegador   |
+
+#### Endpoint de la API desde el panel
+
+El panel resuelve el endpoint de GraphQL en `apps/panel/src/lib/env.ts`, en este orden:
+
+1. `GRAPHQL_ENDPOINT` — solo servidor. Puede apuntar a la URL interna de Docker
+   (ej. `http://api:8081/query`).
+2. `NEXT_PUBLIC_GRAPHQL_ENDPOINT` — se inyecta en el bundle del navegador.
+   **Requerida en producción** si el panel se sirve en un dominio distinto al de la API,
+   ya que el navegador no puede resolver nombres internos de la red.
+3. `http://localhost:8081/query` — fallback **solo en desarrollo**. En producción,
+   si faltan las dos, el panel falla al arrancar en lugar de apuntar en silencio a `localhost`.
+
+El mismo valor lo usa `apps/panel/codegen.ts` para descargar el schema, así que
+`bun dev` regenera los tipos contra la API que tengas configurada.
 
 ### Autenticación
 
