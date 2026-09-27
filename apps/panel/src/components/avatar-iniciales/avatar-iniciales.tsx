@@ -39,7 +39,7 @@ interface AvatarInicialesProps extends React.ComponentProps<typeof Avatar> {
 
 export function AvatarIniciales({
   nombre,
-  shape = "circle",
+  shape = "rounded",
   className,
   ...props
 }: AvatarInicialesProps) {
@@ -50,7 +50,7 @@ export function AvatarIniciales({
       className={cn(
         bg,
         className,
-        "border-none",
+        "border-none after:border-none",
         shape === "rounded" && "rounded-xl after:rounded-xl"
       )}
       size="lg"
