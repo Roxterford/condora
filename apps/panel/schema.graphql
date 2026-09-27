@@ -64,6 +64,7 @@ input CuotaFilter {
   monto: IntCondition
   not: CuotaFilter
   or: [CuotaFilter!]
+  tipo: StringCondition
 }
 
 type CuotaRegular implements Cuota {

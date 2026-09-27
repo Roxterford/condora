@@ -1,15 +1,25 @@
 "use client";
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import { Paginacion } from "@/components/paginacion/paginacion";
 import {
   CuotasTable,
   CuotasTableProps,
-  CuotasTableType,
 } from "@/features/administracion/components/cuotas_table/cuotas_table";
-import { useState } from "react";
+
+export type CuotasPageTab = "todas" | "regulares" | "especiales";
+
+export const CUOTAS_TABS: { value: CuotasPageTab; label: string }[] = [
+  { value: "todas", label: "Todas" },
+  { value: "regulares", label: "Mensualidades" },
+  { value: "especiales", label: "Cuotas Especiales" },
+];
 
 export interface CuotasPageTapsProps {
+  tab: CuotasPageTab;
+  onTabChange: (value: CuotasPageTab) => void;
+  conteoPorTab: Map<CuotasPageTab, number | undefined>;
   cuotas: CuotasTableProps["data"];
   loading?: boolean;
   loadingRows?: number;
@@ -19,6 +29,9 @@ export interface CuotasPageTapsProps {
 }
 
 export function CuotasPageTaps({
+  tab,
+  onTabChange,
+  conteoPorTab,
   cuotas,
   loading,
   loadingRows,
@@ -26,52 +39,30 @@ export function CuotasPageTaps({
   totalPages,
   onPageChange,
 }: CuotasPageTapsProps) {
-  const [tap, setTap] = useState<TapValue>("todas");
-
-  const map_tap_to_show: Record<TapValue, CuotasTableType> = {
-    todas: "default",
-    regulares: "regular",
-    especiales: "especial",
-  };
-
   return (
     <>
-      <Taps onChangeAction={setTap} defaultValue={tap} />
+      <Tabs value={tab} onValueChange={(v) => onTabChange(v as CuotasPageTab)}>
+        <TabsList variant="line">
+          {CUOTAS_TABS.map((t) => (
+            <TabsTrigger key={t.value} value={t.value}>
+              {t.label}
+              <Badge
+                variant={t.value === tab ? "secondary" : "outline"}
+                className="ml-1 tabular-nums"
+              >
+                {conteoPorTab.get(t.value) ?? "-"}
+              </Badge>
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
       <Paginacion
         currentPage={currentPage}
         totalPages={totalPages}
         onPageChange={onPageChange}
         className="justify-end"
       />
-      <CuotasTable
-        data={cuotas}
-        type={map_tap_to_show[tap]}
-        loading={loading}
-        loadingRows={loadingRows}
-      />
+      <CuotasTable data={cuotas} loading={loading} loadingRows={loadingRows} />
     </>
-  );
-}
-
-type TapValue = "todas" | "regulares" | "especiales";
-
-function Taps({
-  onChangeAction,
-  defaultValue = "todas",
-}: {
-  defaultValue?: TapValue;
-  onChangeAction?: (value: TapValue) => void;
-}) {
-  return (
-    <Tabs
-      defaultValue={defaultValue}
-      onValueChange={(v) => onChangeAction?.(v as TapValue)}
-    >
-      <TabsList variant="line">
-        <TabsTrigger value="todas">Todas</TabsTrigger>
-        <TabsTrigger value="regulares">Mensualidades</TabsTrigger>
-        <TabsTrigger value="especiales">Cuotas Especiales</TabsTrigger>
-      </TabsList>
-    </Tabs>
   );
 }

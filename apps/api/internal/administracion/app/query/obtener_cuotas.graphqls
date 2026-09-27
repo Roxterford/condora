@@ -1,6 +1,7 @@
 input CuotaFilter @autofilter {
   id: StringCondition
   monto: IntCondition
+  tipo: StringCondition
 
   # Code injected by tools/autofilter/main.go
   and: [CuotaFilter!] # @autofilter injected

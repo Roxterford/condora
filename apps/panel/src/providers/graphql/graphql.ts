@@ -64,6 +64,7 @@ export type CuotaFilter = {
   monto?: InputMaybe<IntCondition>;
   not?: InputMaybe<CuotaFilter>;
   or?: InputMaybe<Array<CuotaFilter>>;
+  tipo?: InputMaybe<StringCondition>;
 };
 
 export type CuotaRegular = Cuota & {
@@ -817,6 +818,7 @@ export type CuotaPageQuery = { __typename?: 'Query', cuota?:
 export type CuotasPageQueryVariables = Exact<{
   page: Scalars['Int']['input'];
   limit: Scalars['Int']['input'];
+  filter?: InputMaybe<CuotaFilter>;
 }>;
 
 
@@ -825,6 +827,13 @@ export type CuotasPageQuery = { __typename?: 'Query', cuotas: { __typename?: 'Pa
       | { __typename: 'CuotaRegular', id: string, monto: number, mes: Mes, anio: number, registro: Date, recaudacion: { __typename?: 'Recaudacion', unidades_aplicadas: number, pagos_asociados: number, monto_estimado: number, monto_recaudado: number, moneda: Moneda } }
       | { __typename: 'CuotaSemilla', id: string, monto: number, mes: Mes, anio: number, registro: Date, recaudacion: { __typename?: 'Recaudacion', unidades_aplicadas: number, pagos_asociados: number, monto_estimado: number, monto_recaudado: number, moneda: Moneda } }
     > } };
+
+export type ConteoCuotasPorTipoQueryVariables = Exact<{
+  filter?: InputMaybe<CuotaFilter>;
+}>;
+
+
+export type ConteoCuotasPorTipoQuery = { __typename?: 'Query', cuotas: { __typename?: 'PaginatedCuota', total: number } };
 
 export type RegistrarCuotaPageQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -939,6 +948,13 @@ export type VillasPageQuery = { __typename?: 'Query', resumen: { __typename?: 'U
         | { __typename: 'Ente', id: string, cedula: string, display_name: string, razon_social: string }
         | { __typename: 'Persona', id: string, cedula: string, display_name: string, nombres: string, apellidos: string }
        | null }> } | null };
+
+export type ConteoUnidadesPorTabQueryVariables = Exact<{
+  filtro?: InputMaybe<UnidadFilter>;
+}>;
+
+
+export type ConteoUnidadesPorTabQuery = { __typename?: 'Query', villas?: { __typename?: 'PaginatedUnidad', total: number } | null };
 
 export type CuotaDetalleQueryVariables = Exact<{
   cuota_id: Scalars['String']['input'];
@@ -1130,8 +1146,8 @@ export const CuotaPageDocument = new TypedDocumentString(`
 }
     `) as unknown as TypedDocumentString<CuotaPageQuery, CuotaPageQueryVariables>;
 export const CuotasPageDocument = new TypedDocumentString(`
-    query CuotasPage($page: Int!, $limit: Int!) {
-  cuotas: obtenerCuotas(paginator: {limit: $limit, page: $page}) {
+    query CuotasPage($page: Int!, $limit: Int!, $filter: CuotaFilter) {
+  cuotas: obtenerCuotas(filter: $filter, paginator: {limit: $limit, page: $page}) {
     data {
       __typename
       ... on Cuota {
@@ -1169,6 +1185,13 @@ export const CuotasPageDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<CuotasPageQuery, CuotasPageQueryVariables>;
+export const ConteoCuotasPorTipoDocument = new TypedDocumentString(`
+    query ConteoCuotasPorTipo($filter: CuotaFilter) {
+  cuotas: obtenerCuotas(filter: $filter, paginator: {page: 1, limit: 1}) {
+    total
+  }
+}
+    `) as unknown as TypedDocumentString<ConteoCuotasPorTipoQuery, ConteoCuotasPorTipoQueryVariables>;
 export const RegistrarCuotaPageDocument = new TypedDocumentString(`
     query RegistrarCuotaPage {
   obtenerProveedores {
@@ -1449,6 +1472,13 @@ export const VillasPageDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<VillasPageQuery, VillasPageQueryVariables>;
+export const ConteoUnidadesPorTabDocument = new TypedDocumentString(`
+    query ConteoUnidadesPorTab($filtro: UnidadFilter) {
+  villas: obtenerUnidades(filter: $filtro, paginator: {page: 1, limit: 1}) {
+    total
+  }
+}
+    `) as unknown as TypedDocumentString<ConteoUnidadesPorTabQuery, ConteoUnidadesPorTabQueryVariables>;
 export const CuotaDetalleDocument = new TypedDocumentString(`
     query CuotaDetalle($cuota_id: String!) {
   cuota: obtenerCuota(id: $cuota_id) {

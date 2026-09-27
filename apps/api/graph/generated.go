@@ -2202,6 +2202,7 @@ extend type Mutation {
 	{Name: "../internal/administracion/app/query/obtener_cuotas.graphqls", Input: `input CuotaFilter @autofilter {
   id: StringCondition
   monto: IntCondition
+  tipo: StringCondition
 
   # Code injected by tools/autofilter/main.go
   and: [CuotaFilter!] # @autofilter injected
@@ -12392,7 +12393,7 @@ func (ec *executionContext) unmarshalInputCuotaFilter(ctx context.Context, obj a
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "monto", "and", "or", "not"}
+	fieldsInOrder := [...]string{"id", "monto", "tipo", "and", "or", "not"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -12413,6 +12414,13 @@ func (ec *executionContext) unmarshalInputCuotaFilter(ctx context.Context, obj a
 				return it, err
 			}
 			it.Monto = data
+		case "tipo":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tipo"))
+			data, err := ec.unmarshalOStringCondition2ᚖgithubᚗcomᚋSanarucaᚋcondominioᚋgraphᚋmodelᚐStringCondition(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Tipo = data
 		case "and":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
 			data, err := ec.unmarshalOCuotaFilter2ᚕᚖgithubᚗcomᚋSanarucaᚋcondominioᚋgraphᚋmodelᚐCuotaFilterᚄ(ctx, v)

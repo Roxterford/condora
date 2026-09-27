@@ -1,8 +1,9 @@
 "use client";
 
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQueries, useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { useState } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PaginacionFooter } from "@/components/paginacion/pagination-footer";
@@ -10,13 +11,16 @@ import { RESULTADOS_POR_PAGINA } from "@/components/paginacion/resultados-por-pa
 import { useSmoothScrollToTop } from "@/hooks/useSmoothScrollToTop";
 import { graphql } from "@/providers/graphql";
 import { execute } from "@/providers/graphql/execute";
-import { TipoDeCuota } from "@/providers/graphql/graphql";
+import { TipoDeCuota, CuotaFilter } from "@/providers/graphql/graphql";
 import { CuotasTableData } from "@/features/administracion/components/cuotas_table/cuotas_table";
-import { CuotasPageTaps } from "./cuotas-page-taps";
+import { CuotasPageTaps, CuotasPageTab, CUOTAS_TABS } from "./cuotas-page-taps";
 
 const PageQuery = graphql(/* GraphQL */ `
-  query CuotasPage($page: Int!, $limit: Int!) {
-    cuotas: obtenerCuotas(paginator: { limit: $limit, page: $page }) {
+  query CuotasPage($page: Int!, $limit: Int!, $filter: CuotaFilter) {
+    cuotas: obtenerCuotas(
+      filter: $filter
+      paginator: { limit: $limit, page: $page }
+    ) {
       data {
         __typename
         ... on Cuota {
@@ -56,6 +60,25 @@ const PageQuery = graphql(/* GraphQL */ `
   }
 `);
 
+const ConteoQuery = graphql(/* GraphQL */ `
+  query ConteoCuotasPorTipo($filter: CuotaFilter) {
+    cuotas: obtenerCuotas(filter: $filter, paginator: { page: 1, limit: 1 }) {
+      total
+    }
+  }
+`);
+
+// El enum `TipoDeCuota` del schema usa PascalCase, pero la columna `cuotas.tipo`
+// almacena el valor en mayúsculas, que es lo que espera el filtro del backend.
+const TIPO_REGULAR = "REGULAR";
+const TIPO_ESPECIAL = "ESPECIAL";
+
+const FILTROS_POR_TAB: Record<CuotasPageTab, CuotaFilter> = {
+  todas: {},
+  regulares: { tipo: { eq: TIPO_REGULAR } },
+  especiales: { tipo: { eq: TIPO_ESPECIAL } },
+};
+
 export function CuotasPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -66,16 +89,38 @@ export function CuotasPageContent() {
   )
     ? limitParam
     : RESULTADOS_POR_PAGINA[1];
+  const [tab, setTab] = useState<CuotasPageTab>("todas");
   const scrollToTop = useSmoothScrollToTop();
 
   const { data, isFetching } = useQuery({
-    queryKey: ["cuotas", currentPage, limit],
+    queryKey: ["cuotas", tab, currentPage, limit],
     queryFn: async () => {
-      const result = await execute(PageQuery, { page: currentPage, limit });
+      const result = await execute(PageQuery, {
+        page: currentPage,
+        limit,
+        filter: FILTROS_POR_TAB[tab],
+      });
       return result.data;
     },
-    placeholderData: keepPreviousData,
+    placeholderData: (previousData, previousQuery) =>
+      previousQuery?.queryKey[1] === tab ? previousData : undefined,
   });
+
+  const conteos = useQueries({
+    queries: CUOTAS_TABS.map((t) => ({
+      queryKey: ["cuotas", "conteo", t.value],
+      queryFn: async () => {
+        const result = await execute(ConteoQuery, {
+          filter: FILTROS_POR_TAB[t.value],
+        });
+        return result.data?.cuotas.total ?? 0;
+      },
+    })),
+  });
+
+  const conteoPorTab = new Map(
+    CUOTAS_TABS.map((t, i) => [t.value, conteos[i]?.data]),
+  );
 
   const cuotas = data?.cuotas;
   const totalPages = cuotas?.pages ?? 1;
@@ -87,6 +132,11 @@ export function CuotasPageContent() {
 
   const setLimit = (nuevoLimit: number) => {
     router.push(`/cuotas?limit=${nuevoLimit}`);
+  };
+
+  const onTabChange = (value: CuotasPageTab) => {
+    setTab(value);
+    router.push(`/cuotas?limit=${limit}`, { scroll: false });
   };
 
   const cuota_table_data = (cuotas?.data ?? []).map<CuotasTableData>((c) => ({
@@ -132,6 +182,9 @@ export function CuotasPageContent() {
       </header>
       <div className="mt-5 space-y-5">
         <CuotasPageTaps
+          tab={tab}
+          onTabChange={onTabChange}
+          conteoPorTab={conteoPorTab}
           cuotas={cuota_table_data}
           loading={isFetching}
           loadingRows={limit}

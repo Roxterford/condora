@@ -1,6 +1,6 @@
 "use client";
 
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQueries, useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import {
@@ -12,7 +12,9 @@ import {
 } from "lucide-react";
 import { graphql } from "@/providers/graphql";
 import { execute } from "@/providers/graphql/execute";
+import { EstadoDeUnidad, UnidadFilter } from "@/providers/graphql/graphql";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import StatCard from "@/components/ui/StatCard";
 import { money } from "@/lib/money-display";
 import { Paginacion } from "@/components/paginacion/paginacion";
@@ -77,6 +79,61 @@ const PageQuery = graphql(/* GraphQL */ `
   }
 `);
 
+const ConteoQuery = graphql(/* GraphQL */ `
+  query ConteoUnidadesPorTab($filtro: UnidadFilter) {
+    villas: obtenerUnidades(filter: $filtro, paginator: { page: 1, limit: 1 }) {
+      total
+    }
+  }
+`);
+
+type Tab = "todas" | "activas" | "solventes" | "deuda" | "inhabitadas";
+
+const TABS: {
+  value: Tab;
+  label: string;
+  filtro: UnidadFilter;
+  vacio: string;
+}[] = [
+  { value: "todas", label: "Todas", filtro: {}, vacio: "No hay unidades" },
+  {
+    value: "activas",
+    label: "Activas",
+    filtro: { estado: { eq: EstadoDeUnidad.Activa } },
+    vacio: "No hay unidades activas",
+  },
+  {
+    value: "solventes",
+    label: "Solventes",
+    filtro: { deuda: { eq: 0 } },
+    vacio: "No hay unidades solventes",
+  },
+  {
+    value: "deuda",
+    label: "Con deuda pendiente",
+    filtro: { deuda: { gt: 0 } },
+    vacio: "No hay unidades con deuda pendiente",
+  },
+  {
+    value: "inhabitadas",
+    label: "Inhabitadas",
+    filtro: { estado: { eq: EstadoDeUnidad.Inhabitada } },
+    vacio: "No hay unidades inhabitadas",
+  },
+];
+
+// Combina el filtro de la tab con la búsqueda por código. El filtro de la tab
+// se omite cuando está vacío para no generar un `and` con un objeto en blanco.
+const filtroConBusqueda = (
+  filtro: UnidadFilter,
+  busqueda: string,
+): UnidadFilter => ({
+  and: [
+    ...(Object.keys(filtro).length ? [filtro] : []),
+    { codigo: { like: busqueda } },
+  ],
+});
+
 export function VillasPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -89,26 +146,36 @@ export function VillasPageContent() {
     : RESULTADOS_POR_PAGINA[1];
   const [busqueda, setBusqueda] = useState("%%");
   const onDebounceBusqueda = useDebounce(setBusqueda);
-  const [tab, setTab] = useState("todas");
+  const [tab, setTab] = useState<Tab>("todas");
   const scrollToTop = useSmoothScrollToTop();
+
+  const tabActual = TABS.find((t) => t.value === tab) ?? TABS[0];
 
   const { data, isFetching } = useQuery({
     queryKey: ["villas", tab, busqueda, currentPage, limit],
     queryFn: async () => {
       const result = await execute(PageQuery, {
         page: currentPage,
-        filtro:
-          tab === "deuda"
-            ? { deuda: { gt: 0 }, codigo: { like: busqueda } }
-            : tab === "solventes"
-              ? { deuda: { eq: 0 }, codigo: { like: busqueda } }
-              : { codigo: { like: busqueda } },
+        filtro: filtroConBusqueda(tabActual.filtro, busqueda),
         limit,
       });
       return result.data;
     },
-    placeholderData: keepPreviousData,
+    placeholderData: (previousData, previousQuery) =>
+      previousQuery?.queryKey[1] === tab ? previousData : undefined,
   });
+
+  const conteos = useQueries({
+    queries: TABS.map((t) => ({
+      queryKey: ["villas", "conteo", t.value],
+      queryFn: async () => {
+        const result = await execute(ConteoQuery, { filtro: t.filtro });
+        return result.data?.villas?.total ?? 0;
+      },
+    })),
+  });
+
+  const conteoPorTab = new Map(TABS.map((t, i) => [t.value, conteos[i]?.data]));
 
   const villas = data?.villas;
   const totalPages = villas?.pages ?? 1;
@@ -123,8 +190,8 @@ export function VillasPageContent() {
   };
 
   const onTabChange = (value: string) => {
-    setTab(value);
-    router.push("/villas");
+    setTab(value as Tab);
+    router.push(`/villas?limit=${limit}`, { scroll: false });
   };
 
   const villas_table_data: VillasTableData[] = (villas?.data ?? []).map(
@@ -192,59 +259,60 @@ export function VillasPageContent() {
       <section className="mt-5">
         <Tabs value={tab} onValueChange={onTabChange}>
           <TabsList variant="line">
-            <TabsTrigger value="todas">Todas</TabsTrigger>
-            <TabsTrigger value="activas">Activas</TabsTrigger>
-            <TabsTrigger value="solventes">Solventes</TabsTrigger>
-            <TabsTrigger value="deuda">Con deuda pendiente</TabsTrigger>
-            <TabsTrigger value="inhabitadas">Inhabitadas</TabsTrigger>
+            {TABS.map((t) => (
+              <TabsTrigger key={t.value} value={t.value}>
+                {t.label}
+                <Badge
+                  variant={t.value === tab ? "secondary" : "outline"}
+                  className="ml-1 tabular-nums"
+                >
+                  {conteoPorTab.get(t.value) ?? "-"}
+                </Badge>
+              </TabsTrigger>
+            ))}
           </TabsList>
-          {(tab === "todas" || tab === "deuda" || tab === "solventes") && (
-            <TabsContent value={tab} className="space-y-5">
-              <div className="flex">
-                <form>
-                  <InputGroup>
-                    <InputGroupInput
-                      placeholder="Buscar por código"
-                      className="md:min-w-68"
-                      onChange={(e) =>
-                        onDebounceBusqueda(`%${e.target.value}%`)
-                      }
-                    />
-                    <InputGroupAddon>
-                      <Search />
-                    </InputGroupAddon>
-                  </InputGroup>
-                </form>
-                <Paginacion
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={setPage}
-                  className="justify-end"
-                />
-              </div>
-              <VillasTable
-                data={villas_table_data}
-                busqueda={busqueda !== "%%"}
-                loading={isFetching}
-                loadingRows={limit}
-                emptyTitle={
-                  tab === "solventes" ? "No hay unidades solventes" : undefined
-                }
-                emptyDescription={
-                  tab === "solventes"
-                    ? "Todas las unidades tienen deudas pendientes"
-                    : undefined
-                }
-              />
-              <PaginacionFooter
+
+          <TabsContent value={tab} className="space-y-5">
+            <div className="flex">
+              <form>
+                <InputGroup>
+                  <InputGroupInput
+                    placeholder="Buscar por código"
+                    className="md:min-w-68"
+                    onChange={(e) => onDebounceBusqueda(`%${e.target.value}%`)}
+                  />
+                  <InputGroupAddon>
+                    <Search />
+                  </InputGroupAddon>
+                </InputGroup>
+              </form>
+              <Paginacion
                 currentPage={currentPage}
                 totalPages={totalPages}
-                limit={limit}
-                onLimitChange={setLimit}
                 onPageChange={setPage}
+                className="justify-end"
               />
-            </TabsContent>
-          )}
+            </div>
+            <VillasTable
+              data={villas_table_data}
+              busqueda={busqueda !== "%%"}
+              loading={isFetching}
+              loadingRows={limit}
+              emptyTitle={tab === "todas" ? undefined : tabActual.vacio}
+              emptyDescription={
+                tab === "todas"
+                  ? undefined
+                  : "Ninguna unidad coincide con los filtros seleccionados"
+              }
+            />
+            <PaginacionFooter
+              currentPage={currentPage}
+              totalPages={totalPages}
+              limit={limit}
+              onLimitChange={setLimit}
+              onPageChange={setPage}
+            />
+          </TabsContent>
         </Tabs>
       </section>
     </>

@@ -150,6 +150,7 @@ func (CuotaEspecial) IsCuotaType() {}
 type CuotaFilter struct {
 	ID    *StringCondition `json:"id,omitempty"`
 	Monto *IntCondition    `json:"monto,omitempty"`
+	Tipo  *StringCondition `json:"tipo,omitempty"`
 	And   []*CuotaFilter   `json:"and,omitempty"`
 	Or    []*CuotaFilter   `json:"or,omitempty"`
 	Not   *CuotaFilter     `json:"not,omitempty"`

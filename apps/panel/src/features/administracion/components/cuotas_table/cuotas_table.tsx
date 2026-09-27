@@ -1,4 +1,4 @@
-"use client";;
+"use client";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -70,7 +70,6 @@ export interface CuotasTableData<
 }
 
 export interface CuotasTableProps {
-  type?: CuotasTableType;
   data: CuotasTableData[];
   loading?: boolean;
   loadingRows?: number;
@@ -183,18 +182,11 @@ function tipoDeCuota(cuota: CuotasTableData): TipoDeCuota {
 
 export function CuotasTable({
   data: cuotas,
-  type = "default",
   loading,
   loadingRows = 5,
 }: CuotasTableProps) {
   const { open } = useDrawer();
   const router = useRouter();
-
-  const filteredCuotas = cuotas.filter((cuota) => {
-    if (type === "default") return true;
-    if (type === "regular") return cuota.__typename === "CuotaRegular";
-    return cuota.__typename === "CuotaEspecial";
-  });
 
   const verDetalles = (cuota: CuotasTableData) => {
     open({
@@ -279,7 +271,7 @@ export function CuotasTable({
             }}
           />
         ) : (
-          filteredCuotas.map((cuota) => (
+          cuotas.map((cuota) => (
             <TableRow
               key={cuota.id}
               onClick={(e) => onClickFila(cuota, e)}
