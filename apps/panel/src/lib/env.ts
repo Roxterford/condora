@@ -1,9 +1,9 @@
 const DEV_GRAPHQL_ENDPOINT = "http://localhost:8081/query";
 
 const MISSING_ENDPOINT_MESSAGE =
-	"Endpoint de GraphQL no configurado. Definí GRAPHQL_ENDPOINT (servidor) y/o " +
+	"Endpoint de GraphQL no configurado. Define GRAPHQL_ENDPOINT (servidor) y/o " +
 	"NEXT_PUBLIC_GRAPHQL_ENDPOINT (navegador) en el archivo .env de la raíz del monorepo. " +
-	"Consultá apps/panel/.env.example.";
+	"Consulta apps/panel/.env.example.";
 
 function assertConfigured(): string {
 	if (process.env.NODE_ENV === "production") {
