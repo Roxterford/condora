@@ -779,6 +779,14 @@ export type UnidadesResumen = {
   unidades_suspendidas: Scalars['Int']['output'];
 };
 
+export type LoginMutationVariables = Exact<{
+  email: Scalars['String']['input'];
+  pass: Scalars['String']['input'];
+}>;
+
+
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'LoginCredentialsDTO', token: string } };
+
 export type EstadoPagosVillaQueryVariables = Exact<{
   filtro?: InputMaybe<DeudaFilter>;
   paginador?: InputMaybe<Paginator>;
@@ -867,14 +875,6 @@ export type UnidadTitularQuery = { __typename?: 'Query', unidad?: { __typename?:
       | { __typename: 'Ente', id: string, display_name: string, cedula: string, email: string, telefono: string }
       | { __typename: 'Persona', id: string, display_name: string, cedula: string, email: string, telefono: string }
      | null } | null };
-
-export type LoginMutationVariables = Exact<{
-  email: Scalars['String']['input'];
-  pass: Scalars['String']['input'];
-}>;
-
-
-export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'LoginCredentialsDTO', token: string } };
 
 export type RegistrarPagoPageQueryVariables = Exact<{
   codigo_like: Scalars['String']['input'];
@@ -1062,6 +1062,13 @@ export class TypedDocumentString<TResult, TVariables>
   }
 }
 
+export const LoginDocument = new TypedDocumentString(`
+    mutation Login($email: String!, $pass: String!) {
+  login(email: $email, password: $pass) {
+    token
+  }
+}
+    `) as unknown as TypedDocumentString<LoginMutation, LoginMutationVariables>;
 export const EstadoPagosVillaDocument = new TypedDocumentString(`
     query EstadoPagosVilla($filtro: DeudaFilter, $paginador: Paginator) {
   deudas: obtenerDeudas(filtro: $filtro, paginador: $paginador) {
@@ -1270,13 +1277,6 @@ export const UnidadTitularDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<UnidadTitularQuery, UnidadTitularQueryVariables>;
-export const LoginDocument = new TypedDocumentString(`
-    mutation Login($email: String!, $pass: String!) {
-  login(email: $email, password: $pass) {
-    token
-  }
-}
-    `) as unknown as TypedDocumentString<LoginMutation, LoginMutationVariables>;
 export const RegistrarPagoPageDocument = new TypedDocumentString(`
     query RegistrarPagoPage($codigo_like: String!) {
   unidades: obtenerUnidades(
