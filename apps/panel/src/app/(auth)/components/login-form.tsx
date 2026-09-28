@@ -4,8 +4,9 @@ import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
+import { cn } from "cn";
 
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   InputGroup,
@@ -101,14 +102,15 @@ export function LoginForm() {
         <div className="space-y-2">
           <div className="flex items-center justify-between gap-4">
             <Label htmlFor="password">Contraseña</Label>
-            <Button
-              variant="link"
-              size="sm"
-              className="h-auto px-0 text-sm"
-              render={<a href={FORGOT_PASSWORD_HREF} />}
+            <a
+              href={FORGOT_PASSWORD_HREF}
+              className={cn(
+                buttonVariants({ variant: "link", size: "sm" }),
+                "h-auto px-0 text-sm",
+              )}
             >
               ¿Olvidaste tu contraseña?
-            </Button>
+            </a>
           </div>
           <InputGroup className="h-11">
             <InputGroupAddon>
