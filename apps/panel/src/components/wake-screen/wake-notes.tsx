@@ -71,15 +71,23 @@ export function WakeNotes() {
 
   return (
     <div className="relative w-full">
-      <div className="flex items-baseline justify-center gap-3">
+      <div className="flex items-center justify-center gap-2.5">
         <p className="font-mono text-[10px] tracking-[0.2em] text-teal-400/80 uppercase">
           Por qué tarda
         </p>
-        {/* Solo se anuncia el bloqueo, no el hover: el hover es reversible
-            solo y no cambia nada que el usuario haya pedido. */}
+        {/* Indicador de congelado, sin texto: un glyph de pausa dentro de una
+            pastilla verde ya dice "detenido" sin ocupar ancho ni traducirse.
+            Deliberadamente no usa `wake-dot`, que late: latir implicaría que
+            algo sigue en marcha, y aquí justamente se ha parado. */}
         {locked ? (
-          <span className="font-mono text-[10px] tracking-[0.2em] text-white/40 uppercase">
-            · fijo
+          <span
+            aria-hidden
+            className="wake-badge inline-flex size-[18px] shrink-0 items-center justify-center rounded-full bg-teal-400/15 ring-1 ring-teal-400/70"
+          >
+            <span className="flex items-center gap-[2px]">
+              <span className="block h-[7px] w-[2px] rounded-[1px] bg-teal-400" />
+              <span className="block h-[7px] w-[2px] rounded-[1px] bg-teal-400" />
+            </span>
           </span>
         ) : null}
       </div>
