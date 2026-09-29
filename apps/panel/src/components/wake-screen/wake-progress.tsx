@@ -48,33 +48,30 @@ export function WakeProgress({ elapsedMs, finished, failed, className }: WakePro
 
   return (
     <div className={cn("w-full", className)}>
+      {/*
+        Sin `overflow-hidden` en la pista: recorta el box-shadow del relleno y el
+        halo no se veía nunca. El recorte va en el relleno, que además se
+        redondea por su cuenta, así que no hace falta aquí.
+      */}
       <div
         role="progressbar"
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={Math.round(width)}
         aria-label="Progreso del arranque de los servidores"
-        className="relative h-[3px] w-full overflow-hidden rounded-full bg-white/10"
+        className="relative h-1.5 w-full rounded-full bg-white/10"
       >
         <div
           className={cn(
-            "absolute left-0 top-0 h-full overflow-hidden rounded-r-full transition-[width] duration-500 ease-out",
+            "absolute left-0 top-0 h-full overflow-hidden rounded-full transition-[width] duration-500 ease-out",
             failed
-              ? "bg-destructive shadow-[0_0_12px_rgba(239,68,68,0.6)]"
-              : "bg-gradient-to-r from-teal-600 via-teal-400 to-cyan-400 shadow-[0_0_12px_rgba(20,184,166,0.7)]",
+              ? "bg-destructive shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_0_14px_rgba(239,68,68,0.55)]"
+              : "bg-gradient-to-r from-teal-600 via-teal-400 to-cyan-400 shadow-[inset_0_1px_0_rgba(255,255,255,0.28),0_0_14px_rgba(20,184,166,0.6)]",
           )}
           style={{ width: `${width}%` }}
         >
           <span className="top-progress-sheen" />
         </div>
-        <div
-          aria-hidden
-          className={cn(
-            "absolute left-0 top-0 h-full rounded-full blur-[6px]",
-            failed ? "bg-destructive/50" : "bg-teal-400/50",
-          )}
-          style={{ width: `${width}%` }}
-        />
       </div>
     </div>
   );
