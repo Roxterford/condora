@@ -39,16 +39,24 @@ export function WakeNotes() {
   const note = NOTES[index];
 
   return (
-    <div className="relative min-h-[6.5rem] w-full pb-5">
+    <div className="relative w-full">
+      <p className="font-mono text-[10px] tracking-[0.2em] text-teal-400/80 uppercase">
+        Por qué tarda
+      </p>
+
       {/* Las notas rotativas están fuera del árbol de accesibilidad: un lector
           de pantalla anunciaría el cambio cada 4,5 s y eso es ruido. El texto
           completo queda disponible de forma estática en el resumen. */}
-      <div aria-hidden className="w-full">
+      <div aria-hidden className="mt-3 min-h-[4.75rem]">
         {/* `key` cambia con el índice, así que React remonta la nota y la
             animación de entrada vuelve a dispararse en cada rotación. */}
         <div key={note.title} className="wake-note">
-          <p className="text-sm font-medium text-white/90">{note.title}</p>
-          <p className="mt-1.5 text-[13px] leading-relaxed text-white/55">{note.body}</p>
+          <p className="text-[0.9375rem] font-medium text-white/90 drop-shadow-[0_1px_10px_rgba(0,0,0,0.7)]">
+            {note.title}
+          </p>
+          <p className="mx-auto mt-1.5 max-w-md text-pretty text-[13px] leading-relaxed text-white/55 drop-shadow-[0_1px_10px_rgba(0,0,0,0.7)]">
+            {note.body}
+          </p>
         </div>
       </div>
 
@@ -56,7 +64,7 @@ export function WakeNotes() {
         {NOTES.map((item) => `${item.title}. ${item.body}`).join(" ")}
       </p>
 
-      <div className="absolute inset-x-0 bottom-0 flex justify-center gap-1.5">
+      <div className="mt-4 flex justify-center gap-1.5">
         {NOTES.map((item, itemIndex) => (
           <span
             key={item.title}

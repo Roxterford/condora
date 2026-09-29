@@ -80,7 +80,7 @@ export function WakeBackdrop({ className }: WakeBackdropProps) {
           }}
         />
 
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(5,7,10,0.75)_100%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(5,7,10,0.8)_100%)]" />
       </div>
 
       {/* Capa 2 — poster. `unoptimized` evita el round-trip por el Image
@@ -118,10 +118,11 @@ export function WakeBackdrop({ className }: WakeBackdropProps) {
         <source src={VIDEO_MP4_SRC} type="video/mp4" />
       </video>
 
-      {/* Velo para legibilidad del texto sobre cualquier fotograma */}
+      {/* Velo para legibilidad del texto sobre cualquier fotograma. Sin card
+          detrás, esto es lo único que separa el texto del video. */}
       <div
         aria-hidden
-        className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(5,7,10,0.55)_0%,rgba(5,7,10,0.86)_70%)]"
+        className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(5,7,10,0.62)_0%,rgba(5,7,10,0.88)_72%)]"
       />
     </div>
   );

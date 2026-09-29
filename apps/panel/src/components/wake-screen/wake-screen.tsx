@@ -149,13 +149,56 @@ export function WakeScreen({ onDismiss }: WakeScreenProps) {
     >
       <WakeBackdrop />
 
-      <div className="relative flex h-full w-full items-center justify-center px-5 py-10">
+      {/* Sin card, el texto va directo sobre el video. Estos dos velos dan el
+          contraste en los bordes contra un fotograma que cambia en bucle. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-[#05070a]/90 via-[#05070a]/40 to-transparent"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-[#05070a]/90 via-[#05070a]/40 to-transparent"
+      />
+
+      <header className="absolute inset-x-0 top-0 z-10 mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-6 sm:px-10 sm:py-8">
+        <Image
+          src="/condora_blanco.svg"
+          alt="Condora"
+          width={132}
+          height={26}
+          priority
+          className="h-6 w-auto drop-shadow-[0_1px_10px_rgba(0,0,0,0.7)] sm:h-7"
+        />
+
+        <span
+          className={cn(
+            "inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 font-mono text-[10px] tracking-[0.14em] uppercase backdrop-blur-md",
+            isFailed
+              ? "border-destructive/40 bg-destructive/10 text-destructive"
+              : isReady
+                ? "border-teal-400/40 bg-teal-400/10 text-teal-300"
+                : "border-white/15 bg-black/25 text-white/70",
+          )}
+        >
+          <span className="relative flex size-1.5">
+            <span
+              className={cn(
+                "wake-dot absolute inline-flex size-full rounded-full",
+                isFailed ? "bg-destructive" : "bg-teal-400",
+              )}
+            />
+          </span>
+          {statusLabel}
+        </span>
+      </header>
+
+      <div className="relative flex h-full w-full items-center justify-center px-6 py-28 sm:px-10">
         <div
           ref={panelRef}
           tabIndex={-1}
           role="region"
           aria-label="Estado del arranque de los servidores"
-          className="wake-panel w-full max-w-md rounded-2xl border border-white/10 bg-white/[0.04] p-7 shadow-2xl shadow-black/50 backdrop-blur-xl outline-none sm:p-9"
+          className="w-full max-w-2xl text-center outline-none"
         >
           {/* Región viva aparte y solo con el mensaje de fase. Si el panel
               entero fuera `role="status"`, el reloj y la barra —que cambian
@@ -168,86 +211,56 @@ export function WakeScreen({ onDismiss }: WakeScreenProps) {
                 : "Encendiendo los servidores."}
           </p>
 
-          <div className="flex items-center justify-between gap-4">
-            <Image
-              src="/condora_blanco.svg"
-              alt="Condora"
-              width={132}
-              height={26}
-              priority
-              className="h-6 w-auto opacity-95"
-            />
-
-            <span
-              className={cn(
-                "inline-flex shrink-0 items-center gap-2 rounded-full border px-2.5 py-1 font-mono text-[10px] tracking-[0.14em] uppercase",
-                isFailed
-                  ? "border-destructive/40 bg-destructive/10 text-destructive"
-                  : isReady
-                    ? "border-teal-400/40 bg-teal-400/10 text-teal-300"
-                    : "border-white/15 bg-white/5 text-white/70",
-              )}
-            >
-              <span className="relative flex size-1.5">
-                <span
-                  className={cn(
-                    "wake-dot absolute inline-flex size-full rounded-full",
-                    isFailed ? "bg-destructive" : "bg-teal-400",
-                  )}
-                />
-              </span>
-              {statusLabel}
-            </span>
-          </div>
-
-          <h1 className="mt-8 text-2xl font-semibold tracking-[-0.01em] text-white sm:text-[1.75rem]">
+          <h1 className="text-balance text-[2.125rem] font-semibold tracking-[-0.025em] text-white drop-shadow-[0_2px_20px_rgba(0,0,0,0.75)] sm:text-5xl">
             {isFailed ? "No pudimos encender los servidores" : "Encendiendo los servidores"}
           </h1>
 
-          <p className="mt-2.5 text-sm leading-relaxed text-white/60">
+          <p className="mx-auto mt-4 max-w-md text-pretty text-[0.9375rem] leading-relaxed text-white/65 drop-shadow-[0_1px_10px_rgba(0,0,0,0.7)]">
             {isFailed
               ? "El arranque está tardando más de lo previsto. Puede ser una caída del servicio o una conexión inestable entre tu dispositivo y nuestros servidores."
               : "Estamos despertando la infraestructura de Condora. Es el paso previo a cargar tu panel."}
           </p>
 
-          <div className="mt-7">
-            <WakeProgress
-              elapsedMs={elapsedMs}
-              finished={isReady}
-              failed={isFailed}
-            />
+          <div className="mx-auto mt-10 max-w-md">
+            <WakeProgress elapsedMs={elapsedMs} finished={isReady} failed={isFailed} />
           </div>
 
           {isFailed ? (
-            <div className="mt-7 flex flex-col gap-2.5 sm:flex-row">
-              <Button ref={retryButtonRef} onClick={retry} className="sm:flex-1">
+            <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <Button ref={retryButtonRef} onClick={retry} className="sm:min-w-36">
                 Reintentar
               </Button>
-              <Button variant="ghost" onClick={finish} className="sm:flex-1 text-white/70 hover:text-white">
+              <Button
+                variant="ghost"
+                onClick={finish}
+                className="text-white/65 hover:bg-white/10 hover:text-white sm:min-w-36"
+              >
                 Continuar de todos modos
               </Button>
             </div>
           ) : (
-            <div className="mt-7">
+            <div className="mx-auto mt-9 max-w-lg">
               <WakeNotes />
             </div>
           )}
-
-          <div
-            aria-hidden
-            className="mt-7 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-t border-white/8 pt-4 font-mono text-[10.5px] tracking-wide text-white/35"
-          >
-            <span className="tabular-nums">{formatElapsed(elapsedMs)}</span>
-            <span className="truncate">
-              {isReady
-                ? `GET /health/live → ${probe?.detail ?? "en línea"}`
-                : isFailed
-                  ? "GET /health/live → agotado"
-                  : `GET /health/live → ${REASON_TEXT[probe?.reason ?? ""] ?? "esperando"}`}
-            </span>
-          </div>
         </div>
       </div>
+
+      <footer
+        aria-hidden
+        className="absolute inset-x-0 bottom-0 z-10 mx-auto flex max-w-6xl items-center justify-between gap-4 border-t border-white/10 px-6 py-4 font-mono text-[10.5px] tracking-wide text-white/40 sm:px-10"
+      >
+        <span className="hidden sm:inline">CONDORA · GESTIÓN DE CONDOMINIOS</span>
+        <span className="tabular-nums sm:hidden">{formatElapsed(elapsedMs)}</span>
+        <span className="truncate">
+          {isReady
+            ? `GET /health/live → ${probe?.detail ?? "en línea"}`
+            : isFailed
+              ? "GET /health/live → agotado"
+              : `GET /health/live → ${REASON_TEXT[probe?.reason ?? ""] ?? "esperando"}`}
+        </span>
+        <span className="hidden tabular-nums sm:inline">{formatElapsed(elapsedMs)}</span>
+      </footer>
     </div>
   );
 }

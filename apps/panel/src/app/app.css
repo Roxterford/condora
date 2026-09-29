@@ -270,36 +270,6 @@
   animation: wake-note-in 0.55s ease-out both;
 }
 
-/* Tarjeta de cristal: el degradado de fondo va en el elemento y el borde
-   iluminado se dibuja con un pseudo-elemento enmascarado, para poder tener
-   un borde que se desvanece hacia abajo y un fondo independiente. */
-.wake-panel {
-  background-image: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.07),
-    rgba(255, 255, 255, 0.02)
-  );
-}
-
-.wake-panel::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.22),
-    rgba(255, 255, 255, 0) 45%
-  );
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .wake-veil,
   .wake-note,
