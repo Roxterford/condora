@@ -26,3 +26,25 @@ export function getGraphqlEndpoint(): string {
 export function getApiOrigin(): string {
 	return getGraphqlEndpoint().replace(/\/query\/?$/, "");
 }
+
+const FALSY_VALUES = new Set(["false", "0", "no", "off"]);
+
+/**
+ * Indica si debe mostrarse la pantalla de encendido de la API.
+ *
+ * Solo se evalúa en el servidor (layout raíz). La variable es deliberadamente
+ * server-only: al ser el SSR quien decide si arma la pantalla, no hace falta
+ * exponerla en el bundle del navegador.
+ *
+ * Sin definir, el comportamiento depende del entorno: activada en producción
+ * (donde la API duerme) y desactivada en desarrollo (donde el API local está
+ * siempre de pie y solo añadiría un sondeo inútil).
+ */
+export function isWakeScreenEnabled(): boolean {
+	const raw = process.env.WAKE_SCREEN_ENABLED?.trim().toLowerCase();
+
+	if (raw === undefined || raw === "") {
+		return process.env.NODE_ENV === "production";
+	}
+	return !FALSY_VALUES.has(raw);
+}
