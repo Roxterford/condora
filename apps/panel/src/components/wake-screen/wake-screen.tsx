@@ -6,11 +6,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { WakeBackdrop } from "@/components/wake-screen/wake-backdrop";
 import { WakeNotes } from "@/components/wake-screen/wake-notes";
-import { WakeProgress, formatElapsed } from "@/components/wake-screen/wake-progress";
+import { WakeProgress, formatElapsed, MAX_WAIT_MS } from "@/components/wake-screen/wake-progress";
 import { cn } from "@/lib/utils";
 
 const POLL_INTERVAL_MS = 3_000;
-const MAX_WAIT_MS = 90_000;
 const TICK_MS = 250;
 const READY_HOLD_MS = 400;
 const EXIT_MS = 500;
@@ -43,6 +42,9 @@ export function WakeScreen({ onDismiss }: WakeScreenProps) {
   const [probe, setProbe] = useState<ProbeResult | null>(null);
 
   const startedAtRef = useRef(0);
+  // El reloj se detiene en cuanto el arranque se resuelve, para que ni la
+  // barra ni el contador sigan avanzando en los estados ya decididos.
+  const settledRef = useRef(false);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const retryButtonRef = useRef<HTMLButtonElement | null>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
@@ -86,6 +88,7 @@ export function WakeScreen({ onDismiss }: WakeScreenProps) {
         if (cancelled) return;
         setProbe(body);
         if (body.awake) {
+          settledRef.current = true;
           setPhase("ready");
           return;
         }
@@ -109,9 +112,11 @@ export function WakeScreen({ onDismiss }: WakeScreenProps) {
     startedAtRef.current = performance.now();
 
     const timer = setInterval(() => {
+      if (settledRef.current) return;
       const elapsed = performance.now() - startedAtRef.current;
       setElapsedMs(elapsed);
       if (elapsed >= MAX_WAIT_MS) {
+        settledRef.current = true;
         setPhase((current) => (current === "connecting" ? "failed" : current));
       }
     }, TICK_MS);
@@ -133,6 +138,7 @@ export function WakeScreen({ onDismiss }: WakeScreenProps) {
 
   const retry = useCallback(() => {
     startedAtRef.current = performance.now();
+    settledRef.current = false;
     setElapsedMs(0);
     setProbe(null);
     setPhase("connecting");
