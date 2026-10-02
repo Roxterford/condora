@@ -13,6 +13,8 @@ const POLL_INTERVAL_MS = 3_000;
 const TICK_MS = 250;
 const READY_HOLD_MS = 400;
 const EXIT_MS = 500;
+/** A partir de aquí la espera deja de ser "un instante" y se pide paciencia. */
+const SLOW_AFTER_MS = 12_000;
 
 type Phase = "connecting" | "ready" | "failed" | "exiting";
 
@@ -25,11 +27,25 @@ type ProbeResult = {
 };
 
 const REASON_TEXT: Record<string, string> = {
-  timeout: "sin respuesta",
-  network: "conexión rechazada",
-  unconfigured: "endpoint sin configurar",
-  http: "respuesta inesperada",
-  ok: "en línea",
+  timeout: "sin conexión todavía",
+  network: "conexión no disponible",
+  unconfigured: "sin conexión",
+  http: "conexión interrumpida",
+  ok: "todo listo",
+};
+
+const TITLE = {
+  connecting: "Conectando con tu condominio…",
+  slow: "Conectando con tu condominio…",
+  ready: "Todo listo",
+  failed: "No pudimos conectar con tu condominio en este momento.",
+};
+
+const SUBTITLE = {
+  connecting: "Estamos preparando la información y los avisos más recientes de tu comunidad.",
+  slow: "Primera conexión del día: estamos asegurando tus datos, solo tomará unos segundos más.",
+  ready: "Ya entrando a tu condominio.",
+  failed: "Por favor, intenta actualizar la página.",
 };
 
 type WakeScreenProps = {
@@ -52,6 +68,8 @@ export function WakeScreen({ onDismiss }: WakeScreenProps) {
   const isExiting = phase === "exiting";
   const isFailed = phase === "failed";
   const isReady = phase === "ready";
+  const isSlow = !isFailed && !isReady && elapsedMs >= SLOW_AFTER_MS;
+  const copyKey = isFailed ? "failed" : isReady ? "ready" : isSlow ? "slow" : "connecting";
 
   // El foco se devuelve al elemento que lo tenía antes de la pantalla, en el
   // cleanup del efecto que lo captura (o sea, al desmontar).
@@ -144,7 +162,7 @@ export function WakeScreen({ onDismiss }: WakeScreenProps) {
     setPhase("connecting");
   }, []);
 
-  const statusLabel = isFailed ? "SIN RESPUESTA" : isReady ? "EN LÍNEA" : "CONECTANDO";
+  const statusLabel = isFailed ? "SIN CONEXIÓN" : isReady ? "LISTO" : "CONECTANDO";
 
   return (
     <div
@@ -203,28 +221,22 @@ export function WakeScreen({ onDismiss }: WakeScreenProps) {
           ref={panelRef}
           tabIndex={-1}
           role="region"
-          aria-label="Estado del arranque de los servidores"
+          aria-label="Estado de la conexión con tu condominio"
           className="w-full max-w-2xl text-center outline-none"
         >
           {/* Región viva aparte y solo con el mensaje de fase. Si el panel
               entero fuera `role="status"`, el reloj y la barra —que cambian
               cuatro veces por segundo— se anunciarían sin parar. */}
           <p role="status" aria-live="polite" className="sr-only">
-            {isFailed
-              ? "No se pudo encender los servidores."
-              : isReady
-                ? "Servidores encendidos. Cargando el panel."
-                : "Encendiendo los servidores."}
+            {TITLE[copyKey]}. {SUBTITLE[copyKey]}
           </p>
 
           <h1 className="text-balance text-[2.125rem] font-semibold tracking-[-0.025em] text-white drop-shadow-[0_2px_20px_rgba(0,0,0,0.75)] sm:text-5xl">
-            {isFailed ? "No pudimos encender los servidores" : "Encendiendo los servidores"}
+            {TITLE[copyKey]}
           </h1>
 
           <p className="mx-auto mt-4 max-w-md text-pretty text-[0.9375rem] leading-relaxed text-white/65 drop-shadow-[0_1px_10px_rgba(0,0,0,0.7)]">
-            {isFailed
-              ? "El arranque está tardando más de lo previsto. Puede ser una caída del servicio o una conexión inestable entre tu dispositivo y nuestros servidores."
-              : "Estamos despertando la infraestructura de Condora. Es el paso previo a cargar tu panel."}
+            {SUBTITLE[copyKey]}
           </p>
 
           <div className="mx-auto mt-10 max-w-md">
@@ -260,10 +272,10 @@ export function WakeScreen({ onDismiss }: WakeScreenProps) {
         <span className="tabular-nums sm:hidden">{formatElapsed(elapsedMs)}</span>
         <span className="truncate">
           {isReady
-            ? `GET /health/live → ${probe?.detail ?? "en línea"}`
+            ? `CONEXIÓN · ${REASON_TEXT[probe?.reason ?? ""] ?? "todo listo"}`
             : isFailed
-              ? "GET /health/live → agotado"
-              : `GET /health/live → ${REASON_TEXT[probe?.reason ?? ""] ?? "esperando"}`}
+              ? "CONEXIÓN · sin conexión"
+              : `CONEXIÓN · ${REASON_TEXT[probe?.reason ?? ""] ?? "conectando"}`}
         </span>
         <span className="hidden tabular-nums sm:inline">{formatElapsed(elapsedMs)}</span>
       </footer>

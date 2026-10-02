@@ -28,10 +28,17 @@ export default function Loading() {
       </div>
 
       <p className="font-mono text-[11px] tracking-[0.18em] text-white/35 uppercase">
-        Cargando
+        Conectando con tu condominio
       </p>
 
-      <span className="sr-only">Cargando contenido</span>
+      <p className="max-w-sm text-pretty text-center text-[0.9375rem] leading-relaxed text-white/60">
+        Estamos preparando la información y los avisos más recientes de tu comunidad.
+      </p>
+
+      <span className="sr-only">
+        Conectando con tu condominio. Estamos preparando la información y los avisos más
+        recientes de tu comunidad.
+      </span>
     </div>
   );
 }

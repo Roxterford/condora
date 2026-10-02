@@ -58,7 +58,7 @@ export function WakeProgress({ elapsedMs, finished, failed, className }: WakePro
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={Math.round(width)}
-        aria-label="Progreso del arranque de los servidores"
+        aria-label="Progreso de la conexión con tu condominio"
         className="relative h-1.5 w-full rounded-full bg-white/10"
       >
         <div

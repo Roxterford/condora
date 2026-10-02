@@ -5,22 +5,22 @@ import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * Por qué el arranque tarda. Es la parte que evita que el usuario piense que
- * la aplicación está rota: sin contexto, 40 segundos de espera se leen como un
- * cuelgue.
+ * Por qué la primera conexión tarda. Es la parte que evita que el usuario
+ * piense que la aplicación está rota: sin contexto, 40 segundos de espera se
+ * leen como un cuelgue.
  */
 const NOTES = [
   {
-    title: "El servidor se apaga solo",
-    body: "Nuestro hosting lo suspende tras 15 minutos sin actividad para no pagar recursos que nadie está usando.",
+    title: "Tu condominio descansa cuando no lo usas",
+    body: "Para ahorrar recursos, Condora se pausa tras un rato sin actividad. En cuanto vuelves, se despierta solo.",
   },
   {
-    title: "Levantarlo lleva tiempo",
-    body: "Encender el servidor, la base de datos y la caché suele tomar entre 20 y 60 segundos la primera vez del día.",
+    title: "La primera conexión del día es la más lenta",
+    body: "Estamos verificando que todo esté al día antes de mostrarlo: cuotas, pagos y avisos de tu comunidad.",
   },
   {
     title: "Ya casi",
-    body: "No cierres esta pestaña. En cuanto la API responda, te llevamos directo a la pantalla desde la que entraste.",
+    body: "No cierres esta pestaña. Al terminar te llevamos directo a la pantalla desde la que entraste.",
   },
 ] as const;
 
@@ -73,7 +73,7 @@ export function WakeNotes() {
     <div className="relative w-full">
       <div className="flex items-center justify-center gap-2.5">
         <p className="font-mono text-[10px] tracking-[0.2em] text-teal-400/80 uppercase">
-          Por qué tarda
+          Mientras tanto
         </p>
         {/* Indicador de congelado, sin texto: un glyph de pausa dentro de una
             pastilla verde ya dice "detenido" sin ocupar ancho ni traducirse.
@@ -101,8 +101,8 @@ export function WakeNotes() {
         aria-pressed={locked}
         aria-label={
           locked
-            ? "Reanudar la rotación de las explicaciones"
-            : "Fijar la explicación para poder leerla"
+            ? "Volver a cambiar las explicaciones automáticamente"
+            : "Fijar esta explicación para poder leerla"
         }
         onPointerEnter={() => setHovered(true)}
         onPointerLeave={() => setHovered(false)}
