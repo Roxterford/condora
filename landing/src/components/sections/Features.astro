@@ -197,4 +197,44 @@ const screenCount = new Intl.NumberFormat('es-ES').format(modules.length)
 			chevron?.classList.toggle('rotate-180', !open);
 		});
 	}
+
+	/**
+	 * Auto-abrir tarjetas al hacer scroll (una por una con stagger).
+	 * Respeta prefers-reduced-motion.
+	 */
+	const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+	if (!REDUCED_MOTION.matches) {
+		const cards = document.querySelectorAll<HTMLElement>('[data-module]');
+
+		const observer = new IntersectionObserver(
+			(entries) => {
+				for (const entry of entries) {
+					if (!entry.isIntersecting) continue;
+
+					const card = entry.target;
+					const index = Array.from(cards).indexOf(card);
+
+					// Stagger: cada tarjeta abre con 150ms de diferencia
+					setTimeout(() => {
+						const toggle = card.querySelector<HTMLButtonElement>('[data-module-toggle]');
+						const panel = card.querySelector('[data-module-panel]');
+						const chevron = card.querySelector('[data-module-chevron]');
+
+						if (toggle && panel && toggle.getAttribute('aria-expanded') === 'false') {
+							toggle.setAttribute('aria-expanded', 'true');
+							panel.style.gridTemplateRows = '1fr';
+							panel.removeAttribute('inert');
+							chevron?.classList.add('rotate-180');
+						}
+					}, index * 150);
+
+					observer.unobserve(card);
+				}
+			},
+			{ rootMargin: '0px 0px -20% 0px', threshold: 0.15 }
+		);
+
+		cards.forEach((card) => observer.observe(card));
+	}
 </script>
