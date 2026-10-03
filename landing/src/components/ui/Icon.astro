@@ -25,6 +25,7 @@ interface Props {
 		| 'alert-triangle'
 		| 'help-circle'
 		| 'rocket'
+		| 'clipboard-list'
 	class?: string
 	/** Grosor del trazo. El panel usa 2 por defecto. */
 	weight?: number
@@ -77,6 +78,10 @@ const paths: Record<Props['name'], string[]> = {
 	'help-circle': [
 		'M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z',
 		'M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3', 'M12 17h.01',
+	],
+	'clipboard-list': [
+		'M9 11l3 3L22 4', 'M3 10h18', 'M3 14h18', 'M3 18h18',
+		'M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z',
 	],
 	rocket: [
 		'M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c1.26-1.5 5-2 5-2',
