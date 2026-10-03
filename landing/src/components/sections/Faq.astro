@@ -48,7 +48,7 @@ import Icon from '../ui/Icon.astro'
 				{
 					faqs.map((faq, index) => (
 						<details
-							class="group rounded-lg border border-zinc-200 bg-white px-5 py-4 transition-[border-color,box-shadow] duration-500 ease-brand hover:border-brand-600/25 open:shadow-xs sm:px-6 sm:py-5 animate-on-scroll animate-slide-up duration-700 ease-out"
+							class="faq-item group rounded-lg border border-zinc-200 bg-white px-5 py-4 transition-[border-color,box-shadow] duration-500 ease-brand hover:border-brand-600/25 open:shadow-xs sm:px-6 sm:py-5 animate-on-scroll animate-slide-up duration-700 ease-out"
 							name="faq"
 							style={`transition-delay: ${index * 60}ms`}
 						>
@@ -71,9 +71,11 @@ import Icon from '../ui/Icon.astro'
 									</svg>
 								</span>
 							</summary>
-							<p class="mt-3 max-w-prose text-[0.92rem] leading-relaxed text-zinc-600">
-								{faq.answer}
-							</p>
+							<div class="faq-content">
+								<p class="mt-3 max-w-prose text-[0.92rem] leading-relaxed text-zinc-600">
+									{faq.answer}
+								</p>
+							</div>
 						</details>
 					))
 				}

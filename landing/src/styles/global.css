@@ -714,3 +714,60 @@ html.js [data-animate-draw]:not(.animate-active) {
 html.js [data-animate-draw].animate-active {
   transform: scaleX(1) !important;
 }
+
+/* ==========================================================================
+   Acordeón FAQ — animación suave de apertura/cierre
+   ========================================================================== */
+
+details.faq-item > summary {
+  list-style: none;
+}
+
+details.faq-item > summary::-webkit-details-marker {
+  display: none;
+}
+
+details.faq-item[open] > .faq-content {
+  animation: faq-open 400ms cubic-bezier(0.22, 1, 0.36, 1) ease-out forwards;
+}
+
+details.faq-item:not([open]) > .faq-content {
+  animation: faq-close 300ms cubic-bezier(0.22, 1, 0.36, 1) ease-in forwards;
+}
+
+@keyframes faq-open {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    max-height: 500px;
+  }
+}
+
+@keyframes faq-close {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+    max-height: 500px;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+    max-height: 0;
+  }
+}
+
+.faq-content {
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  details.faq-item > .faq-content {
+    animation: none;
+    max-height: none;
+  }
+}
