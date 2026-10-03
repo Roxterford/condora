@@ -1,0 +1,204 @@
+---
+/**
+ * Fondo del hero en video.
+ *
+ * El material es una toma en escala de grises de 44 s. Medida con
+ * `signalstats`, su luminancia media oscila entre 105 y 175 sobre 255: hay
+ * tramos casi negros y otros casi blancos. Eso descarta dos salidas extremas:
+ * no se puede dejar el video tal cual —el titular perdería contraste en los
+ * tramos claros— ni oscurecerlo de negro —el tramo de 175 se vería como un
+ * fogonazo cada vez que el loop pasa por él—. La opción estable es un velo
+ * del color del papel que acompaña al video en toda la superficie, más fuerte
+ * justo detrás del bloque de texto y más flojo en los bordes, donde el
+ * movimiento se lee sin estorbar.
+ *
+ * Como es escala de grises, no compite con el teal de la marca: el color lo
+ * aportan los halos de `Hero.astro`, que van por encima. `saturate(0)` lo
+ * fija de todos modos para que el póster y cualquier conversión futura
+ * mantengan el mismo tono.
+ *
+ * Reglas de reproducción:
+ *
+ * 1. El video **no aparece hasta que puede reproducirse**. Arranca en
+ *    `opacity: 0` y solo se revela al disparar `canplay`. Antes de eso se ve
+ *    el papel, no un rectángulo negro.
+ *
+ * 2. El `src` se asigna desde el script, no en el HTML. Quien navega sin
+ *    JavaScript, y quien tenga `prefers-reduced-motion`, no descargan 3.8 MB
+ *    que no van a ver: se quedan con el póster.
+ *
+ * 3. Se pausa al salir de pantalla y al ocultarse la pestaña. Un video en
+ *    loop en una pestaña de fondo es batería regalada.
+ */
+const src = '/video/condora-hero.mp4'
+const poster = '/video/condora-hero-poster.jpg'
+---
+
+<div class="hero-video" data-hero-video>
+	<video
+		class="hero-video__media"
+		data-hero-video-media
+		data-src={src}
+		poster={poster}
+		muted
+		loop
+		playsinline
+		preload="metadata"
+		disablepictureinpicture
+		disableRemotePlayback
+		tabindex="-1"
+		aria-hidden="true"
+	></video>
+
+	<div class="hero-video__veil" data-hero-video-veil></div>
+</div>
+
+<style>
+	.hero-video {
+		position: absolute;
+		inset: 0;
+		overflow: hidden;
+
+		/**
+		 * Sintonía del velo, en un solo lugar para poder corregirla sin
+		 * tocar la composición:
+		 *
+		 * - `62%` es el suelo: se ve el movimiento en los bordes.
+		 * - `93%` es lo que hay detrás del titular. Con el tramo más claro
+		 *   del video (175) bajo un 93% de papel, el fondo efectivo queda
+		 *   cerca de 240 y el `zinc-950` del titular mantiene su contraste
+		 *   holgado.
+		 */
+		--veil-base: 62%;
+		--veil-text: 93%;
+	}
+
+	.hero-video__media {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: center;
+
+		/**
+		 * Un por ciento de sobreescala permanente. Sin ella, el `object-fit`
+		 * deja el borde del video a la vista en cuanto el contenedor cambia
+		 * de alto con el scroll, y una franja de 1 px se lee como un error de
+		 * maquetación, no como una imagen.
+		 */
+		transform: scale(1.04);
+
+		/* La toma ya viene en gris; se fija para que el póster siga el tono. */
+		filter: saturate(0) contrast(1.02);
+
+		opacity: 0;
+		transition: opacity 1200ms var(--ease-brand);
+	}
+
+	/**
+	 * `loaded` = reproducción real. `static` = `prefers-reduced-motion`, donde
+	 * lo que se ve es el póster. En los dos casos el fondo está; solo cambia
+	 * si se mueve.
+	 */
+	.hero-video[data-state='loaded'] .hero-video__media,
+	.hero-video[data-state='static'] .hero-video__media {
+		opacity: 1;
+	}
+
+	.hero-video__veil {
+		position: absolute;
+		inset: 0;
+
+		--tint: color-mix(in srgb, var(--color-background) var(--veil-base), transparent);
+		--tint-text: color-mix(in srgb, var(--color-background) var(--veil-text), transparent);
+
+		background-image:
+			/**
+			 * 1. Fundido al papel en el borde inferior. El hero descansa
+			 *    sobre `ProblemSolution`, que no tiene fondo propio y por
+			 *    tanto muestra el del documento: si el video cortara en seco
+			 *    se vería una línea.
+			 */
+			linear-gradient(
+				to bottom,
+				transparent 0%,
+				color-mix(in srgb, var(--tint) 50%, transparent) 68%,
+				var(--color-background) 100%
+			),
+			/**
+			 * 2. Velo radial. Centrado donde cae el titular, no en el centro
+			 *    geométrico: el bloque de texto vive algo por encima del medio
+			 *    porque el padding superior compensa la altura del encabezado.
+			 */
+			radial-gradient(118% 82% at 50% 44%, var(--tint-text) 0%, var(--tint) 100%);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.hero-video__media {
+			transform: none;
+			transition: none;
+		}
+	}
+</style>
+
+<script>
+	/**
+	 * Ciclo de vida del video.
+	 *
+	 * La secuencia importa: primero se revela, después se anima. Si el estado
+	 * se pusiera antes de que haya datos, el navegador pinta el primer frame
+	 * al vuelo —y a veces negro— y el fundido se ve como un parpadeo en lugar
+	 * de una entrada.
+	 */
+	const root = document.querySelector<HTMLElement>('[data-hero-video]')
+	const media = root?.querySelector<HTMLVideoElement>('[data-hero-video-media]')
+
+	if (root && media) {
+		const reduced = window.matchMedia('(prefers-reduced-motion: reduce)')
+		// `Promise.resolve` envuelve el retorno por si el host no devuelve una
+		// promesa: `play()` puede lanzar o no promise en entornos sin soporte
+		// real de medios (pruebas, neuromusculares) y en ambos casos el
+		// comportamiento deseado es el mismo: seguir, sin video, sin ruido.
+		const play = () => Promise.resolve(media.play()).catch(() => {})
+
+		if (reduced.matches) {
+			// El póster está puesto en el HTML: no hay nada más que hacer, y
+			// el `src` se queda sin asignar para no gastar la descarga.
+			root.dataset.state = 'static'
+		} else {
+			media.src = media.dataset.src ?? ''
+
+			const reveal = () => {
+				root.dataset.state = 'loaded'
+			}
+
+			if (media.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
+				reveal()
+			} else {
+				media.addEventListener('canplay', reveal, { once: true })
+			}
+
+			play()
+
+			/**
+			 * Pausa fuera de pantalla. `threshold: 0` en lugar de `0.05` para
+			 * que basta con que asome un píxel: mientras se ve un borde, la
+			 * seguem viendo.
+			 */
+			const observer = new IntersectionObserver(
+				([entry]) => {
+					if (entry?.isIntersecting && !document.hidden) play()
+					else media.pause()
+				},
+				{ threshold: 0 }
+			)
+			observer.observe(root)
+
+			document.addEventListener('visibilitychange', () => {
+				if (document.hidden) media.pause()
+				else if (root.dataset.state === 'loaded') play()
+			})
+		}
+	}
+</script>

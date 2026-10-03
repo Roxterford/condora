@@ -5,6 +5,20 @@ import Icon from '../ui/Icon.astro'
 ---
 
 <section id="faq" aria-labelledby="faq-title" class="relative scroll-mt-24 py-24 sm:py-32">
+		{/*
+			Decorado con paralaje. Se mueve a una velocidad distinta del texto, y
+			por eso el scroll se siente como profundidad y no como una lista que
+			se desplaza. Va en un `aria-hidden` porque no aporta nada al lector: es
+			mancha de color, no información.
+		*/}
+		<span
+			class="pointer-events-none absolute -top-24 left-1/2 size-[34rem] rounded-full bg-brand-200/25 blur-[110px]"
+			style="--parallax-x:-50%"
+			data-parallax="0.7"
+			
+			aria-hidden="true"
+		></span>
+
 	<div class="container-page">
 		<div class="grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
 			<div class="lg:sticky lg:top-32 lg:self-start">

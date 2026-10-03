@@ -23,3 +23,5 @@ pnpm-debug.log*
 .vscode/*
 !.vscode/extensions.json
 .idea/
+# fuente original del video del hero: 78 MB sin optimizar, nunca se versiona
+video-src/

@@ -102,13 +102,6 @@
 	--animate-rise: rise 0.85s var(--ease-brand) both;
 	--animate-sheen: sheen 1.4s ease-in-out infinite;
 
-	/* Derivas del campo del hero. Alternan en vaivén en vez de subir en bucle:
-	   no hay empalme que cerrar, así que no dependen de la altura del hero. */
-	--animate-float-a: field-float-a 19s ease-in-out infinite alternate;
-	--animate-float-b: field-float-b 27s ease-in-out infinite alternate;
-	--animate-drift-a: field-drift-a 38s ease-in-out infinite;
-	--animate-drift-b: field-drift-b 47s ease-in-out infinite;
-
 	@keyframes rise {
 		from {
 			opacity: 0;
@@ -130,42 +123,31 @@
 		}
 	}
 
-	/* --- Campo del hero ---------------------------------------------------
+	/* --- Fondo del hero ---------------------------------------------------
 	   Los `keyframe` viven aquí y no en el componente: un bloque `<style>` de
 	   Astro va scopepeado con un atributo, y un nombre de animación definido
-	   dentro no quedaría disponible para la utilidad `animate-*`. */
-	@keyframes field-float-a {
-		from {
-			transform: translateY(-1.25rem);
-		}
-		to {
-			transform: translateY(1.25rem);
-		}
-	}
+	   dentro no quedaría disponible para la utilidad `animate-*`.
 
-	@keyframes field-float-b {
-		from {
-			transform: translateY(1.5rem);
-		}
-		to {
-			transform: translateY(-1.5rem);
-		}
-	}
+	   Periodos largos y primos entre sí: una composición con un ciclo evidente
+	   se nota en treinta segundos, que es justo cuando el usuario acaba de
+	   decidirse a leer la página. */
+	--animate-halo-a: halo-a 46s ease-in-out infinite;
+	--animate-halo-b: halo-b 61s ease-in-out infinite;
 
-	@keyframes field-drift-a {
+	@keyframes halo-a {
 		0%,
 		100% {
-			transform: translate(0, 0) scale(1);
+			transform: translate(-50%, 0) scale(1);
 		}
 		50% {
-			transform: translate(-3rem, 2.5rem) scale(1.08);
+			transform: translate(-42%, 2.5rem) scale(1.1);
 		}
 	}
 
-	@keyframes field-drift-b {
+	@keyframes halo-b {
 		0%,
 		100% {
-			transform: translate(0, 0) scale(1.05);
+			transform: translate(0, 0) scale(1.08);
 		}
 		50% {
 			transform: translate(3rem, -2rem) scale(1);
@@ -388,12 +370,6 @@
 				animation-timeline: view();
 				animation-range: entry 0% entry 100%;
 			}
-
-			[data-parallax] {
-				animation: parallax-shift 1ms linear both;
-				animation-timeline: view();
-				animation-range: cover;
-			}
 		}
 	}
 
@@ -430,6 +406,30 @@
 		animation-delay: calc(min(var(--i, 0), 6) * 55ms);
 	}
 
+	/*
+	 * Paralaje.
+	 *
+	 * `--parallax-y` lo escribe `scripts/scroll.ts`; aquí solo se consume con
+	 * un `translate`. La propiedad empieza en 0 para que sin JS el decorado
+	 * quede exactamente donde está en el HTML, que es el diseño bueno: el
+	 * paralaje es una capa encima, nunca la base.
+	 *
+	 * `will-change` se limita al decorado puntual. Ponerlo en todo el
+	 * documento fuerza capas de composición para cientos de elementos y es la
+	 * forma habitual de subir el uso de memoria sin motivo.
+	 */
+	[data-parallax] {
+		--parallax-x: 0px;
+		--parallax-y: 0px;
+		transform: translate3d(var(--parallax-x), var(--parallax-y), 0);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		[data-parallax] {
+			transform: none;
+		}
+	}
+
 	@keyframes reveal-up {
 		from {
 			opacity: 0;
@@ -461,15 +461,6 @@
 			transform: scaleX(1);
 		}
 	}
-
-	@keyframes parallax-shift {
-		from {
-			transform: translate3d(0, 1.25rem, 0);
-		}
-		to {
-			transform: translate3d(0, -1.25rem, 0);
-		}
-	}
 }
 
 /* ==========================================================================
@@ -497,17 +488,5 @@
 
 	.stagger > * {
 		animation: none !important;
-	}
-
-	/* El campo del hero se queda quieto: la información que acompaña a las
-	   columnas está íntegra en la sección de Módulos, así que no se pierde
-	   nada por no moverlas. */
-	.hero-field__column {
-		transform: none !important;
-		animation: none !important;
-	}
-
-	.hero-field__glow {
-		opacity: 0 !important;
 	}
 }

@@ -44,6 +44,13 @@ const Tag = level
 		align === 'center' && 'items-center text-center',
 		className,
 	]}
+	/*
+	 * El bloque entra como una sola pieza. Vive aquí y no en cada sección
+	 * porque todos los encabezados deberían comportarse igual; si se deja en
+	 * el marcado de cada uno, basta un forgotten para que uno se quede quieto
+	 * mientras los demás entran.
+	 */
+	data-reveal="up"
 >
 	{
 		kicker && (

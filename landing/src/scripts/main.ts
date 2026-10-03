@@ -1,3 +1,5 @@
+import { initParallax } from './scroll'
+
 /**
  * Interacciones de la landing. JS vanilla, sin dependencias.
  *
@@ -154,6 +156,10 @@ function boot() {
 	initHeader();
 	initMobileMenu();
 	initFaq();
+
+	// Transiciones ligadas al scroll. Estas tres cosas comparten los mismos
+	// listeners de scroll, así que se registran juntas y de una vez.
+	initParallax();
 }
 
 if (document.readyState === 'loading') {

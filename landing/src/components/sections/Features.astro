@@ -24,6 +24,20 @@ const screenCount = new Intl.NumberFormat('es-ES').format(modules.length)
 ---
 
 <section id="modulos" aria-labelledby="modulos-title" class="relative bg-canvas py-24 sm:py-32">
+		{/*
+			Decorado con paralaje. Se mueve a una velocidad distinta del texto, y
+			por eso el scroll se siente como profundidad y no como una lista que
+			se desplaza. Va en un `aria-hidden` porque no aporta nada al lector: es
+			mancha de color, no información.
+		*/}
+		<span
+			class="pointer-events-none absolute -top-24 left-1/2 size-[34rem] rounded-full bg-brand-200/25 blur-[110px]"
+			style="--parallax-x:-50%"
+			data-parallax="-0.5"
+			data-parallax-dir="reverse"
+			aria-hidden="true"
+		></span>
+
 	<div class="container-page">
 		<SectionHeading
 			id="modulos-title"
