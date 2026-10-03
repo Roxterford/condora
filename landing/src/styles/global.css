@@ -619,3 +619,98 @@
 		transform: none !important;
 	}
 }
+/* ==========================================================================
+   Animaciones de entrada progresivas (scroll-triggered)
+   ==========================================================================
+   
+   Efectos para elementos animados al entrar al viewport.
+   Estado inicial: opacity: 0 y translateY(20px) (o 40px)
+   Estado activo: opacity: 1 y translateY(0)
+   Transición: duration-700 / 500ms con ease-out
+   ==========================================================================
+*/
+
+@layer utilities {
+  .animate-on-scroll,
+  .animate-fade,
+  .animate-slide-up,
+  .animate-slide-up-lg,
+  .animate-slide-down,
+  .animate-slide-left,
+  .animate-slide-right {
+    will-change: transform, opacity;
+    transition-property: transform, opacity;
+    transition-duration: 700ms;
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1); /* ease-out suave */
+  }
+
+  /* Estado inicial (solo cuando JS está activo) */
+  html.js .animate-fade:not(.animate-active),
+  html.js .animate-on-scroll:not(.animate-active) {
+    opacity: 0;
+  }
+
+  html.js .animate-slide-up:not(.animate-active) {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  html.js .animate-slide-up-lg:not(.animate-active) {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+
+  html.js .animate-slide-down:not(.animate-active) {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  html.js .animate-slide-left:not(.animate-active) {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+
+  html.js .animate-slide-right:not(.animate-active) {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+
+  /* Estado activo al entrar al viewport */
+  html.js .animate-active,
+  html.js .animate-fade.animate-active,
+  html.js .animate-slide-up.animate-active,
+  html.js .animate-slide-up-lg.animate-active,
+  html.js .animate-slide-down.animate-active,
+  html.js .animate-slide-left.animate-active,
+  html.js .animate-slide-right.animate-active {
+    opacity: 1 !important;
+    transform: translate(0, 0) !important;
+  }
+
+  /* Duración y easing */
+  .duration-700 {
+    transition-duration: 700ms !important;
+  }
+
+  .duration-500 {
+    transition-duration: 500ms !important;
+  }
+
+  .ease-out {
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+}
+
+/* Animación de dibujado para subrayado */
+html.js [data-animate-draw]:not(.animate-active) {
+  transform: scaleX(0);
+}
+
+[data-animate-draw] {
+  transform-origin: left;
+  transition: transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html.js [data-animate-draw].animate-active {
+  transform: scaleX(1) !important;
+}

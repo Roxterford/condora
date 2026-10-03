@@ -63,13 +63,12 @@ const screenCount = new Intl.NumberFormat('es-ES').format(modules.length)
 					return (
 						<li
 							class:list={[
-								'group relative flex flex-col rounded-xl border border-zinc-200 bg-white shadow-xs transition-[border-color,box-shadow] duration-500 ease-brand',
+								'group relative flex flex-col rounded-xl border border-zinc-200 bg-white shadow-xs transition-[border-color,box-shadow] duration-500 ease-brand animate-on-scroll animate-slide-up duration-700 ease-out',
 								'hover:border-brand-600/25 hover:shadow-lift',
 								'focus-within:border-brand-600/40 focus-within:shadow-lift',
 								index === 0 && 'lg:col-span-2',
 							]}
-							data-reveal="scale"
-							style={`--i:${index}`}
+							style={`transition-delay: ${index * 60}ms`}
 							data-module
 						>
 							{/* Halo superior al enfocar o al abrir */}

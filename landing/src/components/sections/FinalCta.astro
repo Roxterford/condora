@@ -38,32 +38,29 @@ import { site } from '../../data/site'
 			hacia abajo, que es como se lee el bloque.
 		*/}
 		<div class="relative">
-			<div class="flex justify-center" data-reveal="scale" style="--i:0">
+			<div class="flex justify-center animate-on-scroll animate-slide-up duration-700 ease-out" style="transition-delay: 0ms">
 				<BrandLockup variant="blanco" size={2.1} class="opacity-95" />
 			</div>
 
 			<h2
 				id="cta-title"
-				class="mx-auto mt-8 max-w-[22ch] text-[clamp(2rem,4.8vw,3.25rem)] leading-[1.06] font-light tracking-[-0.025em] text-zinc-50"
-				data-reveal="up"
-				style="--i:1"
+				class="mx-auto mt-8 max-w-[22ch] text-[clamp(2rem,4.8vw,3.25rem)] leading-[1.06] font-light tracking-[-0.025em] text-zinc-50 animate-on-scroll animate-slide-up duration-700 ease-out"
+				style="transition-delay: 100ms"
 			>
 				Empieza por ver <strong class="font-extrabold">tu condominio</strong> funcionando
 			</h2>
 
 			<p
-				class="mx-auto mt-5 max-w-[52ch] text-[1.05rem] leading-relaxed text-zinc-300/75"
-				data-reveal="fade"
-				style="--i:2"
+				class="mx-auto mt-5 max-w-[52ch] text-[1.05rem] leading-relaxed text-zinc-300/75 animate-on-scroll animate-fade duration-700 ease-out"
+				style="transition-delay: 200ms"
 			>
 				Escríbenos y te preparamos una demo con los datos de una propiedad de ejemplo.
 				Te mostramos qué ya funciona y qué está en camino, sin adornos.
 			</p>
 
 			<div
-				class="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row"
-				data-reveal="up"
-				style="--i:3"
+				class="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row animate-on-scroll animate-slide-up duration-700 ease-out"
+				style="transition-delay: 300ms"
 			>
 				<Button href={site.requestDemoHref} variant="inverse" size="lg">
 					Solicita una demo
@@ -82,7 +79,7 @@ import { site } from '../../data/site'
 				}
 			</div>
 
-			<p class="mt-8 text-[0.8125rem] text-zinc-400" data-reveal="fade" style="--i:4">
+			<p class="mt-8 text-[0.8125rem] text-zinc-400 animate-on-scroll animate-fade duration-700 ease-out" style="transition-delay: 350ms">
 				Respondemos por correo a{' '}
 				<a
 					href={site.supportHref}
@@ -93,17 +90,15 @@ import { site } from '../../data/site'
 			</p>
 
 			<ul
-				class="mx-auto mt-10 flex max-w-2xl flex-wrap items-center justify-center gap-x-6 gap-y-3"
-				data-reveal="up"
-				style="--i:5"
+				class="mx-auto mt-10 flex max-w-2xl flex-wrap items-center justify-center gap-x-6 gap-y-3 animate-on-scroll animate-slide-up duration-700 ease-out"
+				style="transition-delay: 400ms"
 			>
 				{
 					['Dashboard, cuotas y pagos', 'Cuotas ordinarias y especiales', 'Sin tarjeta de crédito'].map(
 						(item, index) => (
 							<li
-								class="inline-flex items-center gap-2 text-[0.84rem] text-zinc-400"
-								data-reveal="fade"
-								style={`--i:${5 + index}`}
+								class="inline-flex items-center gap-2 text-[0.84rem] text-zinc-400 animate-on-scroll animate-fade duration-700 ease-out"
+								style={`transition-delay: ${400 + (index + 1) * 50}ms`}
 							>
 								<Icon name="check" class="size-4 shrink-0 text-brand-400" weight={2.25} />
 								{item}

@@ -33,7 +33,8 @@ import Icon from '../ui/Icon.astro'
 
 				<a
 					href={site.supportHref}
-					class="mt-6 inline-flex items-center gap-2 rounded-md px-2.5 py-1.5 text-[0.85rem] font-medium text-brand-800 ring-1 ring-brand-600/20 ring-inset transition-colors duration-500 ease-brand hover:bg-brand-50"
+					class="mt-6 inline-flex items-center gap-2 rounded-md px-2.5 py-1.5 text-[0.85rem] font-medium text-brand-800 ring-1 ring-brand-600/20 ring-inset transition-colors duration-500 ease-brand hover:bg-brand-50 animate-on-scroll animate-fade duration-700 ease-out"
+					style="transition-delay: 200ms"
 				>
 					<Icon name="arrow-right" class="size-3.5" weight={2} />
 					Escribir a soporte
@@ -46,10 +47,9 @@ import Icon from '../ui/Icon.astro'
 				{
 					faqs.map((faq, index) => (
 						<details
-							class="group rounded-lg border border-zinc-200 bg-white px-5 py-4 transition-[border-color,box-shadow] duration-500 ease-brand hover:border-brand-600/25 open:shadow-xs sm:px-6 sm:py-5"
+							class="group rounded-lg border border-zinc-200 bg-white px-5 py-4 transition-[border-color,box-shadow] duration-500 ease-brand hover:border-brand-600/25 open:shadow-xs sm:px-6 sm:py-5 animate-on-scroll animate-slide-up duration-700 ease-out"
 							name="faq"
-							data-reveal="up"
-							style={`--i:${index}`}
+							style={`transition-delay: ${index * 60}ms`}
 						>
 							<summary
 								class="flex cursor-pointer list-none items-center justify-between gap-4 text-[0.98rem] font-semibold text-zinc-950 marker:content-none"

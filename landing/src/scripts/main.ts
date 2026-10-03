@@ -1,4 +1,5 @@
 import { initParallax } from './scroll'
+import { initAnimateOnScroll } from './animate'
 
 /**
  * Interacciones de la landing. JS vanilla, sin dependencias.
@@ -159,7 +160,8 @@ function boot() {
 
 	// Transiciones ligadas al scroll. Estas tres cosas comparten los mismos
 	// listeners de scroll, así que se registran juntas y de una vez.
-	initParallax();
+  initParallax();
+  initAnimateOnScroll();
 }
 
 if (document.readyState === 'loading') {
