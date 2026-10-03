@@ -1,0 +1,33 @@
+---
+import Icon from './Icon.astro'
+
+/**
+ * Etiqueta pequeña. El panel usa `rounded-md` y anillos de 1px en lugar de
+ * píldoras muy redondeadas, así que aquí también: `rounded-md` + `ring-1`.
+ */
+interface Props {
+	label: string
+	accent?: 'brand' | 'neutral' | 'accent'
+	icon?: 'sparkle' | 'shield' | 'clock' | 'check'
+	class?: string
+}
+
+const { label, accent = 'brand', icon, class: className = '' } = Astro.props
+
+const accents = {
+	brand: 'bg-brand-50 text-brand-800 ring-brand-600/20',
+	accent: 'bg-zinc-100 text-zinc-700 ring-zinc-950/10',
+	neutral: 'bg-white text-zinc-700 ring-zinc-300',
+} as const
+---
+
+<span
+	class:list={[
+		'inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[0.7rem] font-medium ring-1 ring-inset',
+		accents[accent],
+		className,
+	]}
+>
+	{icon && <Icon name={icon} class="size-3.5" weight={2} />}
+	{label}
+</span>

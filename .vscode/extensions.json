@@ -4,6 +4,7 @@
         "formulahendry.auto-rename-tag",
         "kuscamara.remove-unused-imports",
         "prisma.prisma",
-        "pucelle.run-on-save"
+        "pucelle.run-on-save",
+        "astro-build.astro-vscode"
     ]
 }

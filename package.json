@@ -4,6 +4,7 @@
     "seed": "bun run prisma/seeds/index.ts",
     "seed:cli": "bun run prisma/seeds/index.ts --",
     "dev": "moon run :dev",
+    "dev:landing": "moon run landing:dev",
     "storybook": "moon run panel:storybook",
     "serve": "moon run panel:serve",
     "test": "moon run :test-all",
@@ -14,11 +15,13 @@
     "format": "moon run :format-all",
     "build": "moon run :build-all",
     "build:panel": "moon run panel:build",
+    "build:landing": "moon run landing:build",
     "build:sb": "moon run panel:build-storybook",
     "db": "moon run :db-all"
   },
   "workspaces": [
-    "apps/panel"
+    "apps/panel",
+    "landing"
   ],
   "devDependencies": {
     "@0no-co/graphqlsp": "^1.17.5",

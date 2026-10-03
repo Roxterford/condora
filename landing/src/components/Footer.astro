@@ -1,0 +1,102 @@
+---
+import BrandLockup from './brand/BrandLockup.astro'
+import Button from './ui/Button.astro'
+import Icon from './ui/Icon.astro'
+import { footerNav, legalNote, site } from '../data/site'
+
+const year = new Date().getFullYear()
+---
+
+<footer id="legal" class="relative scroll-mt-24 border-t border-zinc-200 bg-zinc-950 text-zinc-50">
+	<div
+		class="pointer-events-none absolute -top-24 left-1/4 size-[24rem] rounded-full bg-brand-500/12 blur-[120px]"
+		aria-hidden="true"
+	>
+	</div>
+
+	<div class="container-page relative py-16 sm:py-20">
+		<div class="grid gap-12 lg:grid-cols-[1.4fr_2fr]">
+			<div class="flex flex-col gap-6">
+				<BrandLockup href="/" size={2.2} variant="blanco" />
+
+				<p class="max-w-sm text-[0.92rem] leading-relaxed text-zinc-400">
+					{site.tagline}. Centraliza el padrón, las cuotas, los pagos y los
+					indicadores de cobranza de tu condominio.
+				</p>
+
+				<ul class="flex flex-col gap-2.5 text-[0.9rem]">
+					<li>
+						<a
+							href={site.supportHref}
+							class="group inline-flex items-center gap-2 text-zinc-300 transition-colors duration-300 ease-brand hover:text-brand-300"
+						>
+							<Icon
+								name="arrow-right"
+								class="size-4 shrink-0 text-brand-400 transition-transform duration-300 ease-brand group-hover:translate-x-0.5"
+								weight={2}
+							/>
+							{site.email}
+						</a>
+					</li>
+					{
+						site.panelUrl && (
+							<li>
+								<a
+									href={site.panelUrl}
+									target="_blank"
+									rel="noopener noreferrer"
+									class="group inline-flex items-center gap-2 text-zinc-300 transition-colors duration-300 ease-brand hover:text-brand-300"
+								>
+									<Icon
+										name="arrow-right"
+										class="size-4 shrink-0 text-brand-400 transition-transform duration-300 ease-brand group-hover:translate-x-0.5"
+										weight={2}
+									/>
+									Ir al panel
+								</a>
+							</li>
+						)
+					}
+				</ul>
+
+				<div>
+					<Button href={site.requestDemoHref} variant="inverse" size="md">
+						Solicita una demo
+					</Button>
+				</div>
+			</div>
+
+			<nav aria-label="Navegación del pie de página" class="grid grid-cols-2 gap-8">
+				{
+					footerNav.map((group) => (
+						<div>
+							<h2 class="text-[0.75rem] font-semibold tracking-[0.12em] text-zinc-500 uppercase">
+								{group.title}
+							</h2>
+							<ul class="mt-4 space-y-2.5">
+								{group.links.map((link) => (
+									<li>
+										<a
+											href={link.href}
+											class="group inline-flex items-center gap-1.5 text-[0.92rem] text-zinc-300 transition-colors duration-300 ease-brand hover:text-brand-300"
+										>
+											<span class="h-px w-0 bg-brand-400 transition-all duration-300 ease-brand group-hover:w-3" />
+											{link.label}
+										</a>
+									</li>
+								))}
+							</ul>
+						</div>
+					))
+				}
+			</nav>
+		</div>
+
+		<div
+			class="mt-14 flex flex-col gap-3 border-t border-zinc-50/10 pt-7 sm:flex-row sm:items-start sm:justify-between"
+		>
+			<p class="text-[0.8rem] text-zinc-400">© {year} {site.name}. Todos los derechos reservados.</p>
+			<p class="max-w-md text-[0.8rem] text-zinc-400">{legalNote}</p>
+		</div>
+	</div>
+</footer>

@@ -1,0 +1,57 @@
+---
+/**
+ * Lockup de marca. Usa el SVG oficial del panel tal cual
+ * (`apps/panel/public/condora.svg`), igual que hacen el sidebar y el login,
+ * para que la marca se vea idéntica en los dos productos.
+ *
+ * El nombre visible viene del texto alternativo, no de una capa de texto
+ * encima: así el buscador indexa "Condora" y el logo es decorativo.
+ */
+interface Props {
+	href?: string
+	/** Altura en rem. El lockup mide 517:100. */
+	size?: number
+	/** `blanco` carga la variante monocroma para fondos oscuros. */
+	variant?: 'color' | 'blanco'
+	class?: string
+}
+
+const { href = '/', size = 1.75, variant = 'color', class: className = '' } = Astro.props
+const src = variant === 'blanco' ? '/condora_blanco.svg' : '/condora.svg'
+---
+
+<a
+	href={href}
+	class:list={[
+		'brand-lockup inline-flex items-center rounded-md no-underline',
+		className,
+	]}
+	aria-label="Condora, ir al inicio"
+>
+	<img
+		src={src}
+		alt="Condora"
+		width="517"
+		height="100"
+		loading="eager"
+		decoding="sync"
+		style={`height:${size}rem;width:auto`}
+	/>
+</a>
+
+<style>
+	.brand-lockup {
+		transition: opacity 0.3s var(--ease-brand);
+	}
+
+	.brand-lockup:hover,
+	.brand-lockup:focus-visible {
+		opacity: 0.75;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.brand-lockup {
+			transition: none;
+		}
+	}
+</style>

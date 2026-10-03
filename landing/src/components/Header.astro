@@ -1,0 +1,110 @@
+---
+import BrandLockup from './brand/BrandLockup.astro'
+import Button from './ui/Button.astro'
+import Icon from './ui/Icon.astro'
+import { navigation, site } from '../data/site'
+---
+
+<header
+	data-header
+	class="fixed inset-x-0 top-0 z-50 border-b border-transparent transition-[background-color,box-shadow,border-color] duration-500 ease-brand data-[scrolled=true]:border-zinc-200 data-[scrolled=true]:bg-white/85 data-[scrolled=true]:shadow-xs data-[scrolled=true]:backdrop-blur-xl"
+>
+	<div class="container-page">
+		<div class="flex h-[var(--header-height)] items-center justify-between gap-6">
+			<BrandLockup href="/" size={1.9} />
+
+			<nav aria-label="Principal" class="hidden lg:block">
+				<ul class="flex items-center gap-1">
+					{
+						navigation.map((item) => (
+							<li>
+								<a
+									href={item.href}
+									class="nav-link relative rounded-md px-3.5 py-2 text-[0.875rem] font-medium text-zinc-600 transition-colors duration-300 ease-brand hover:bg-zinc-100 hover:text-zinc-950 data-[active]:text-zinc-950"
+								>
+									{item.label}
+									<span
+										aria-hidden="true"
+										class="absolute inset-x-3.5 bottom-1 h-px origin-left scale-x-0 bg-brand-600 transition-transform duration-500 ease-brand data-[active]:scale-x-100"
+									/>
+								</a>
+							</li>
+						))
+					}
+				</ul>
+			</nav>
+
+			<div class="flex items-center gap-2.5">
+				<Button href={site.requestDemoHref} variant="primary" size="md" class="hidden sm:inline-flex">
+					Solicita una demo
+				</Button>
+
+				<button
+					type="button"
+					data-menu-toggle
+					aria-expanded="false"
+					aria-controls="menu-movil"
+					aria-label="Abrir menú de navegación"
+					class="inline-flex size-9 items-center justify-center rounded-md border border-zinc-300 text-zinc-900 transition-colors duration-300 ease-brand hover:bg-zinc-100 lg:hidden"
+				>
+					<svg
+						class="size-5"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="1.8"
+						stroke-linecap="round"
+						aria-hidden="true"
+						focusable="false"
+					>
+						<path d="M4 7h16M4 12h16M4 17h16"></path>
+					</svg>
+				</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- Panel móvil -->
+	<div
+		id="menu-movil"
+		data-menu-panel
+		hidden
+		class="border-t border-zinc-200 bg-white/97 backdrop-blur-xl lg:hidden"
+	>
+		<nav aria-label="Navegación móvil" class="container-page py-6">
+			<ul class="flex flex-col gap-1">
+				{
+					navigation.map((item) => (
+						<li>
+							<a
+								href={item.href}
+								class="flex items-center justify-between rounded-md px-3 py-3 text-[0.95rem] font-medium text-zinc-900 transition-colors duration-300 ease-brand hover:bg-zinc-100"
+							>
+								{item.label}
+								<Icon name="arrow-right" class="size-4 text-zinc-400" weight={2} />
+							</a>
+						</li>
+					))
+				}
+			</ul>
+			<div class="mt-5">
+				<Button href={site.requestDemoHref} variant="primary" size="lg" class="w-full">
+					Solicita una demo
+				</Button>
+			</div>
+		</nav>
+	</div>
+</header>
+
+<style>
+	/* El subrayado crece desde la izquierda: el mismo gesto de la tarjeta de
+	   módulo, para que la navegación se sienta parte del mismo sistema. */
+	.nav-link::after {
+		transform: scaleX(0);
+	}
+
+	.nav-link:hover::after,
+	.nav-link[data-active]::after {
+		transform: scaleX(1);
+	}
+</style>

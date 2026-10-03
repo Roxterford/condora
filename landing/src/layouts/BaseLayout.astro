@@ -1,0 +1,144 @@
+---
+import '@fontsource-variable/noto-sans';
+import '@fontsource-variable/geist-mono';
+import '../styles/global.css';
+
+import { modules, site } from '../data/site';
+
+interface Props {
+	title?: string
+	description?: string
+	/** Ruta canónica relativa, p. ej. "/". Se usa para canonical y sitemap. */
+	path?: string
+	/** Imagen OG absoluta o relativa a /public. */
+	ogImage?: string
+	ogImageAlt?: string
+	/** Evita que un draft se indexe. */
+	noindex?: boolean
+	/** Tipo de contenido para Open Graph. */
+	type?: 'website' | 'article'
+	jsonLd?: Record<string, unknown>[]
+}
+
+const {
+	title = 'Condora · Gestión de cuotas y pagos para condominios',
+	description = site.description,
+	path = Astro.url.pathname,
+	ogImage = '/og-image.png',
+	ogImageAlt = 'Condora: panel de control de cuotas, pagos y deudas de una propiedad',
+	noindex = false,
+	type = 'website',
+	jsonLd,
+} = Astro.props;
+
+// Canonical absoluto y sin barra final, coherente con trailingSlash: 'never'.
+const canonical = new URL(path.replace(/\/$/, '') || '/', Astro.site ?? site.url).href;
+const ogImageUrl = new URL(ogImage, Astro.site ?? site.url).href;
+const fullTitle =
+	title === site.name ? `${site.name} · ${site.tagline}` : title;
+
+/**
+ * JSON-LD: SoftwareApplication + Organization.
+ *
+ * No se declara `offers` a propósito: no hay precios publicados para este
+ * producto, y un `AggregateOffer` inventado sería exactamente el tipo de dato
+ * falso que esta landing evita. El precio se negocia por correo, así que la
+ * vía de contacto declarada es la que corresponde.
+ */
+const structuredData = jsonLd ?? [
+	{
+		'@context': 'https://schema.org',
+		'@type': 'SoftwareApplication',
+		name: site.name,
+		applicationCategory: 'BusinessApplication',
+		operatingSystem: 'Web',
+		url: site.url,
+		description: site.description,
+		inLanguage: 'es-LA',
+		featureList: modules.map((module) => `${module.title}: ${module.body}`),
+	},
+	{
+		'@context': 'https://schema.org',
+		'@type': 'Organization',
+		name: site.name,
+		url: site.url,
+		logo: new URL('/favicon.svg', Astro.site ?? site.url).href,
+		contactPoint: [
+			{
+				'@type': 'ContactPoint',
+				contactType: 'customer support',
+				email: site.email,
+				availableLanguage: ['es'],
+			},
+		],
+	},
+];
+---
+
+<!doctype html>
+<html lang="es">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="generator" content={Astro.generator} />
+
+		<title>{fullTitle}</title>
+		<meta name="description" content={description} />
+		<link rel="canonical" href={canonical} />
+		<meta name="author" content="Condora" />
+		<meta name="keywords" content={site.keywords.join(', ')} />
+		<meta name="theme-color" content="#ffffff" />
+		<meta name="color-scheme" content="light" />
+		{noindex && <meta name="robots" content="noindex, nofollow" />}
+
+		<!-- Open Graph -->
+		<meta property="og:type" content={type} />
+		<meta property="og:site_name" content={site.name} />
+		<meta property="og:locale" content={site.locale} />
+		<meta property="og:title" content={fullTitle} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonical} />
+		<meta property="og:image" content={ogImageUrl} />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta property="og:image:alt" content={ogImageAlt} />
+
+		<!-- Twitter Cards. Sin `twitter:site`: no hay una cuenta verificada
+		     asociada al producto, y declararla sería inventar un enlace. -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={fullTitle} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={ogImageUrl} />
+		<meta name="twitter:image:alt" content={ogImageAlt} />
+
+		<!-- Iconos: SVG dinámico con fallback PNG -->
+		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+		<link rel="alternate icon" href="/favicon.ico" sizes="32x32" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<link rel="manifest" href="/site.webmanifest" />
+
+		<script
+			type="application/ld+json"
+			is:inline
+			set:html={JSON.stringify(structuredData)}
+		/>
+
+		<script is:inline>
+			// Marca de JS activo: habilita el fallback de animaciones por
+			// IntersectionObserver solo cuando hay JS. Evita contenido
+			// invisible si el script falla.
+			document.documentElement.classList.add('js');
+		</script>
+	</head>
+
+	<body class="min-h-screen bg-zinc-50 font-sans text-zinc-900 antialiased">
+		<!-- Primeiro elemento enfocable de la página: debe ir antes del slot. -->
+		<a href="#contenido" class="skip-link">Saltar al contenido principal</a>
+
+		<slot />
+
+		<script>
+			import '../scripts/main.ts';
+		</script>
+	</body>
+</html>

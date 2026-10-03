@@ -1,0 +1,30 @@
+{
+	"name": "Condora · Gestión de cuotas y pagos",
+	"short_name": "Condora",
+	"description": "Software de gestión de cuotas, pagos y operaciones para condominios, edificios y comercios.",
+	"start_url": "/",
+	"scope": "/",
+	"display": "standalone",
+	"background_color": "#fafafa",
+	"theme_color": "#ffffff",
+	"lang": "es",
+	"icons": [
+		{
+			"src": "/favicon.svg",
+			"sizes": "any",
+			"type": "image/svg+xml",
+			"purpose": "any"
+		},
+		{
+			"src": "/favicon.png",
+			"sizes": "256x256",
+			"type": "image/png",
+			"purpose": "any"
+		},
+		{
+			"src": "/apple-touch-icon.png",
+			"sizes": "180x180",
+			"type": "image/png"
+		}
+	]
+}

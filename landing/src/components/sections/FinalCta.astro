@@ -1,0 +1,92 @@
+---
+import Button from '../ui/Button.astro'
+import BrandLockup from '../brand/BrandLockup.astro'
+import Icon from '../ui/Icon.astro'
+import { site } from '../../data/site'
+
+/**
+ * CTA final.
+ *
+ * Un solo objetivo: abrir el canal de soporte que el panel ya usa. Por eso
+ * aquí no hay formulario propio —sería un formulario que no llega a ningún
+ * backend— ni promesas de cupo, tiempos de entrega o guarantees que no estén
+ * respaldadas. El texto dice exactamente qué pasa al escribir.
+ */
+---
+
+<section id="cta" aria-labelledby="cta-title" class="relative scroll-mt-24 px-4 pb-24 sm:px-6 sm:pb-32">
+	<div
+		class="relative mx-auto max-w-4xl overflow-hidden rounded-2xl bg-zinc-950 px-6 py-16 text-center text-zinc-50 sm:px-12 sm:py-20"
+	>
+		<div class="pointer-events-none absolute inset-0 bg-grid opacity-[0.18]" aria-hidden="true"></div>
+		<div
+			class="pointer-events-none absolute -top-40 left-1/2 size-[32rem] -translate-x-1/2 rounded-full bg-brand-500/25 blur-[120px]"
+			aria-hidden="true"
+			data-parallax
+		></div>
+		<div
+			class="pointer-events-none absolute -bottom-40 -left-24 size-[26rem] rounded-full bg-brand-400/15 blur-[120px]"
+			aria-hidden="true"
+			data-parallax
+		></div>
+
+		<div class="relative" data-reveal="up">
+			<div class="flex justify-center">
+				<BrandLockup variant="blanco" size={2.1} class="opacity-95" />
+			</div>
+
+			<h2
+				id="cta-title"
+				class="mx-auto mt-8 max-w-[22ch] text-[clamp(2rem,4.8vw,3.25rem)] leading-[1.06] font-light tracking-[-0.025em] text-zinc-50"
+			>
+				Empieza por ver <strong class="font-extrabold">tu condominio</strong> funcionando
+			</h2>
+
+			<p class="mx-auto mt-5 max-w-[52ch] text-[1.05rem] leading-relaxed text-zinc-300/75">
+				Escríbenos y te preparamos una demo con los datos de una propiedad de ejemplo.
+				Te mostramos qué ya funciona y qué está en camino, sin adornos.
+			</p>
+
+			<div class="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+				<Button href={site.requestDemoHref} variant="inverse" size="lg">
+					Solicita una demo
+				</Button>
+				{
+					site.panelUrl && (
+						<Button
+							href={site.panelUrl}
+							variant="ghost"
+							size="lg"
+							class="border border-zinc-50/20 text-zinc-100 hover:bg-zinc-50/10 hover:text-zinc-50"
+						>
+							Ir al panel
+						</Button>
+					)
+				}
+			</div>
+
+			<p class="mt-8 text-[0.8125rem] text-zinc-400">
+				Respondemos por correo a{' '}
+				<a
+					href={site.supportHref}
+					class="font-medium text-brand-300 underline decoration-brand-300/40 underline-offset-4 transition-colors duration-500 ease-brand hover:text-brand-200"
+				>
+					{site.email}
+				</a>
+			</p>
+
+			<ul class="mx-auto mt-10 flex max-w-2xl flex-wrap items-center justify-center gap-x-6 gap-y-3">
+				{
+					['Dashboard, cuotas y pagos', 'Cuotas ordinarias y especiales', 'Sin tarjeta de crédito'].map(
+						(item) => (
+							<li class="inline-flex items-center gap-2 text-[0.84rem] text-zinc-400">
+								<Icon name="check" class="size-4 shrink-0 text-brand-400" weight={2.25} />
+								{item}
+							</li>
+						)
+					)
+				}
+			</ul>
+		</div>
+	</div>
+</section>

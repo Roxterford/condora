@@ -1,0 +1,68 @@
+---
+import { faqs, site } from '../../data/site'
+import SectionHeading from '../ui/SectionHeading.astro'
+import Icon from '../ui/Icon.astro'
+---
+
+<section id="faq" aria-labelledby="faq-title" class="relative scroll-mt-24 py-24 sm:py-32">
+	<div class="container-page">
+		<div class="grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
+			<div class="lg:sticky lg:top-32 lg:self-start">
+				<SectionHeading
+					id="faq-title"
+					kicker="Preguntas frecuentes"
+					title="Lo que suelen"
+					highlight="preguntar las juntas"
+					description="Respuestas sobre el producto que existe hoy. Si tu caso no está aquí, escríbenos y lo vemos en la demo."
+					measure={30}
+				/>
+
+				<a
+					href={site.supportHref}
+					class="mt-6 inline-flex items-center gap-2 rounded-md px-2.5 py-1.5 text-[0.85rem] font-medium text-brand-800 ring-1 ring-brand-600/20 ring-inset transition-colors duration-500 ease-brand hover:bg-brand-50"
+				>
+					<Icon name="arrow-right" class="size-3.5" weight={2} />
+					Escribir a soporte
+				</a>
+			</div>
+
+			<!-- details/summary nativo: funciona sin JS y es accesible por teclado.
+			     `name` agrupa los acordeones para que solo uno quede abierto. -->
+			<div class="flex flex-col gap-3">
+				{
+					faqs.map((faq, index) => (
+						<details
+							class="group rounded-lg border border-zinc-200 bg-white px-5 py-4 transition-[border-color,box-shadow] duration-500 ease-brand hover:border-brand-600/25 open:shadow-xs sm:px-6 sm:py-5"
+							name="faq"
+							data-reveal="up"
+							style={`--reveal-delay:${index * 80}ms`}
+						>
+							<summary
+								class="flex cursor-pointer list-none items-center justify-between gap-4 text-[0.98rem] font-semibold text-zinc-950 marker:content-none"
+							>
+								{faq.question}
+								<span class="flex size-7 shrink-0 items-center justify-center rounded-md bg-zinc-100 text-zinc-600 transition-all duration-500 ease-brand group-open:rotate-45 group-open:bg-brand-600 group-open:text-white">
+									<svg
+										class="size-3.5"
+										viewBox="0 0 16 16"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										aria-hidden="true"
+										focusable="false"
+									>
+										<path d="M8 3.5v9M3.5 8h9" />
+									</svg>
+								</span>
+							</summary>
+							<p class="mt-3 max-w-prose text-[0.92rem] leading-relaxed text-zinc-600">
+								{faq.answer}
+							</p>
+						</details>
+					))
+				}
+			</div>
+		</div>
+	</div>
+</section>

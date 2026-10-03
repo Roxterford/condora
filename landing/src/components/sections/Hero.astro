@@ -1,0 +1,222 @@
+---
+import HeroField from '../HeroField.astro'
+import Badge from '../ui/Badge.astro'
+import Button from '../ui/Button.astro'
+import Icon from '../ui/Icon.astro'
+import { heroWords, site } from '../../data/site'
+
+/**
+ * Hero.
+ *
+ * Tres decisiones que vienen del panel, no de gusto propio:
+ *
+ * 1. El titular usa el contraste de peso del `login-showcase`, pero **atenuado**
+ *    a `font-normal` ↔ `font-semibold`. El panel puede permitirse
+ *    `font-light` ↔ `font-extrabold` porque su titular va en mayúsculas y
+ *    ocupa dos líneas cortas; con ese salto de peso a un titular en minúsculas
+ *    y tres líneas, el resultado se lee como dos tipografías distintas pegadas.
+ *    El recurso se conserva, la distancia se recorta.
+ *
+ * 2. La última línea del titular rota entre términos que el propio panel usa
+ *    (`condominios` es su descripción; las otras tres son módulos reales). Es
+ *    lo que quita la rigidez de la primera pantalla: algo se mueve solo, muy
+ *    despacio, y para cuando el usuario termina de leer ya ha cambiado. La
+ *    versión estática completa se expone a lectores de pantalla con `sr-only`.
+ *
+ * 3. Los CTA apuntan al canal que ya usa el panel (`support-links.ts`). El
+ *    acceso al panel solo se renderiza si `PUBLIC_PANEL_URL` está definido en
+ *    el build: es preferible que falte un enlace a apuntar a un sitio
+ *    equivocado.
+ *
+ * El lateral derecho lo ocupa `HeroField`, no un mockup del panel. Ese hueco
+ * queda libre para el futuro video hero sin tener que tocar este copy.
+ */
+---
+
+<section
+	aria-labelledby="hero-title"
+	class="relative isolate overflow-hidden bg-canvas pt-[calc(var(--header-height)+3.5rem)] pb-20 sm:pb-28 lg:pt-[calc(var(--header-height)+5rem)]"
+	data-hero
+>
+	<HeroField />
+
+	<div class="container-page relative z-10">
+		<div class="grid items-center gap-14 lg:grid-cols-[1.15fr_0.85fr]">
+			<div class="flex flex-col items-start gap-7">
+				<div class="animate-rise">
+					<Badge label="Producto en construcción activa" icon="sparkle" />
+				</div>
+
+				<h1
+					id="hero-title"
+					class="text-[clamp(2.4rem,6vw,4.25rem)] leading-[1.06] font-normal tracking-[-0.028em] text-zinc-950"
+				>
+					<!-- La distancia entre pesos es de un solo paso (400 → 600).
+					     Suficiente para que la palabra que rota se lea como el
+					     foco, sin que el titular se rompa en dos tipografías. -->
+					<span class="block animate-rise">Gestión moderna</span>
+					<span class="block animate-rise" style="animation-delay:70ms"> de</span>
+
+					<!-- La línea rotativa reserva su alto con `min-height`: sin
+					     él, el salto de altura al cambiar de palabra movería todo
+					     el bloque de abajo. -->
+					<span
+						class="mt-1 block min-h-[1.06em] animate-rise font-semibold"
+						style="animation-delay:140ms"
+						data-hero-rotator
+						data-words={heroWords.join('|')}
+					>
+						{/*
+							Contenedor accesible con la frase completa y estática.
+							Lo animado es `aria-hidden`: rotar un titular con un
+							`aria-live` dispararía el lector en cada cambio.
+						*/}
+						<span class="sr-only">
+							Gestión moderna de {heroWords.join(', ')} y más.
+						</span>
+						<span aria-hidden="true" data-hero-word class="block">
+							{heroWords[0]}
+						</span>
+					</span>
+				</h1>
+
+				<p
+					class="max-w-[46ch] text-[1.0625rem] leading-relaxed text-zinc-600"
+					data-reveal="up"
+					style="--reveal-delay:120ms"
+				>
+					Condora organiza el padrón, las cuotas, los pagos y los indicadores de
+					cobranza de tu condominio en un solo lugar. Pagos, reportes y
+					comunicación, sin perseguir a nadie.
+				</p>
+
+				<div
+					class="flex flex-col gap-3 sm:flex-row sm:items-center"
+					data-reveal="up"
+					style="--reveal-delay:200ms"
+				>
+					<Button href={site.requestDemoHref} variant="primary" size="lg">
+						Solicita una demo
+					</Button>
+					{
+						site.panelUrl && (
+							<Button href={site.panelUrl} variant="outline" size="lg">
+								Ir al panel
+							</Button>
+						)
+					}
+				</div>
+
+				<p
+					class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[0.8125rem] text-zinc-500"
+					data-reveal="up"
+					style="--reveal-delay:260ms"
+				>
+					<span class="inline-flex items-center gap-1.5">
+						<Icon name="check" class="size-4 text-brand-700" weight={2.25} />
+						Datos de ejemplo en la demo
+					</span>
+					<span aria-hidden="true" class="size-1 rounded-full bg-zinc-300"></span>
+					<span class="inline-flex items-center gap-1.5">
+						<Icon name="check" class="size-4 text-brand-700" weight={2.25} />
+						Sin tarjeta de crédito
+					</span>
+				</p>
+			</div>
+
+			{/*
+				Ranura del futuro video hero. Con el campo visual basta; el vídeo
+				entra aquí y este bloque se retira. No lleva contenido propio, así
+				que no necesita columna de reserva: el copy ya se sostiene solo.
+			*/}
+			<div class="relative hidden lg:block" aria-hidden="true"></div>
+		</div>
+	</div>
+</section>
+
+<script>
+	/**
+	 * Rotador del titular.
+	 *
+	 * Ritmo: 3.2 s de lectura + 0.62 s de cambio. El cambio es corto y sin
+	 * `scale`: sube 10 px y se desvanece mientras entra la siguiente. Con una
+	 * duración mayor se percibe como animación; con una menor, como parpadeo.
+	 *
+	 * Se detiene si el puntero está sobre el titular o si la pestaña deja de
+	 * estar en primer plano, y no arranca nunca con `prefers-reduced-motion`.
+	 * Es un adorno, así que en ese caso la palabra se queda quieta y el titular
+	 * sigue siendo una frase completa.
+	 */
+	const rotator = document.querySelector<HTMLElement>('[data-hero-rotator]');
+	const wordSlot = rotator?.querySelector<HTMLElement>('[data-hero-word]');
+
+	if (rotator && wordSlot) {
+		const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+		const words = (rotator.dataset.words ?? '').split('|').filter(Boolean);
+		const HOLD = 3200;
+		const OUT_MS = 300;
+		const IN_MS = 320;
+
+		if (words.length > 1 && !reduced.matches) {
+			let index = 0;
+			let timer = 0;
+			let paused = false;
+
+			const show = (value: string, animate: boolean) => {
+				if (!animate) {
+					wordSlot.textContent = value;
+					return;
+				}
+
+				wordSlot.animate(
+					[
+						{ opacity: 1, transform: 'translateY(0)', filter: 'blur(0)' },
+						{ opacity: 0, transform: 'translateY(-10px)', filter: 'blur(4px)' },
+					],
+					{ duration: OUT_MS, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'forwards' }
+				);
+
+				setTimeout(() => {
+					wordSlot.textContent = value;
+					wordSlot.animate(
+						[
+							{ opacity: 0, transform: 'translateY(10px)', filter: 'blur(4px)' },
+							{ opacity: 1, transform: 'translateY(0)', filter: 'blur(0)' },
+						],
+						{ duration: IN_MS, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'both' }
+					);
+				}, OUT_MS);
+			};
+
+			const advance = () => {
+				index = (index + 1) % words.length;
+				show(words[index]!, true);
+			};
+
+			const start = () => {
+				if (paused || timer) return;
+				timer = window.setInterval(advance, HOLD + IN_MS);
+			};
+
+			const stop = () => {
+				if (!timer) return;
+				clearInterval(timer);
+				timer = 0;
+			};
+
+			rotator.addEventListener('pointerenter', () => {
+				paused = true;
+				stop();
+			});
+			rotator.addEventListener('pointerleave', () => {
+				paused = false;
+				start();
+			});
+			document.addEventListener('visibilitychange', () => {
+				document.hidden ? stop() : start();
+			});
+
+			start();
+		}
+	}
+</script>

@@ -1,0 +1,92 @@
+---
+/**
+ * Botón alineado con `components/ui/button.tsx` del panel: misma forma
+ * (rounded-md), mismo peso (font-medium), misma transición global y el mismo
+ * `active:translate-y-px` que confirma la pulsación.
+ *
+ * La diferencia está en el tamaño: aquí los CTA son de portada, no deToolbar.
+ *
+ * Sobre el color: el `--primary` del panel es #00A3A0 y se queda en 3.1:1 con
+ * texto claro, por debajo del 4.5:1 que exige AA para texto normal. El botón
+ * usa por eso brand-800 (#006A68, 6.4:1), dos pasos más oscuro en el mismo hue
+ * 192.4. El teal de marca (#00A9A5) se reserva para lo que no lleva texto
+ * encima: el logo, iconos grandes, anillos de foco y rellenos.
+ */
+interface Props {
+	href: string
+	variant?: 'primary' | 'outline' | 'ghost' | 'inverse'
+	size?: 'sm' | 'md' | 'lg'
+	class?: string
+	/** Dibuja la flecha de avance a la derecha. */
+	withArrow?: boolean
+}
+
+const {
+	href,
+	variant = 'primary',
+	size = 'md',
+	class: className = '',
+	withArrow = true,
+} = Astro.props
+
+const isExternal = /^https?:\/\//.test(href)
+
+const base =
+	'btn group/btn relative inline-flex shrink-0 items-center justify-center gap-2 overflow-hidden rounded-md border border-transparent font-medium whitespace-nowrap transition-all duration-300 ease-brand active:translate-y-px disabled:pointer-events-none disabled:opacity-50'
+
+const variants = {
+	primary: 'bg-brand-800 text-white hover:bg-brand-900 focus-visible:outline-brand-600',
+	outline:
+		'border-zinc-300 bg-white text-zinc-900 shadow-xs hover:bg-zinc-100 hover:text-zinc-950 focus-visible:outline-brand-600',
+	ghost: 'text-zinc-700 hover:bg-zinc-100 hover:text-zinc-950 focus-visible:outline-brand-600',
+	inverse:
+		'bg-white text-zinc-950 shadow-xs hover:bg-brand-50 focus-visible:outline-white',
+} as const
+
+const sizes = {
+	sm: 'h-8 px-3 text-[0.8125rem]',
+	md: 'h-10 px-4 text-sm',
+	lg: 'h-11 px-5 text-[0.9375rem]',
+} as const
+
+const classes = [base, variants[variant], sizes[size], className]
+---
+
+<a
+	href={href}
+	class:list={classes}
+	{...(isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+>
+	<span class="relative z-10"><slot /></span>
+	{
+		withArrow && (
+			<svg
+				class="relative z-10 size-4 shrink-0 transition-transform duration-300 ease-brand group-hover/btn:translate-x-0.5"
+				viewBox="0 0 16 16"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="1.75"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				aria-hidden="true"
+				focusable="false"
+			>
+				<path d="M3 8h9M8.5 4l4 4-4 4" />
+			</svg>
+		)
+	}
+	<!-- Barrido de brillo. Lento y con la curva de deceleration del panel: el
+	     brillo recorre el botón una vez, no da sensación de "parpadeo". -->
+	<span
+		aria-hidden="true"
+		class="pointer-events-none absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/18 to-transparent opacity-0 transition-opacity duration-300 group-hover/btn:opacity-100"
+	></span>
+</a>
+
+<style>
+	@media (prefers-reduced-motion: reduce) {
+		.btn {
+			transition-duration: 0.01ms;
+		}
+	}
+</style>

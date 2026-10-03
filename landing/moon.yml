@@ -1,0 +1,78 @@
+$schema: "https://moonrepo.dev/schemas/project.json"
+
+layer: "application"
+
+language: "typescript"
+stack: "frontend"
+
+tags:
+  - "astro"
+  - "marketing"
+
+fileGroups:
+  configs:
+    - "*.config.*"
+    - "tsconfig.json"
+    - ".vscode/*"
+  sources:
+    - "src/**/*.{astro,ts,css}"
+    - "src/assets/**/*"
+    - "public/**/*"
+    - "README.md"
+
+tasks:
+  dev:
+    command: "bunx astro dev"
+    args:
+      - "--host"
+      - "0.0.0.0"
+      - "--port"
+      - "$PORT"
+    env:
+      PORT: "${LANDING_PORT:-4321}"
+    options:
+      cache: false
+      persistent: true
+    description: "Inicia el servidor de desarrollo de la landing"
+
+  build:
+    command: "bunx astro build"
+    inputs:
+      - "@group(sources)"
+      - "@group(configs)"
+      - "astro.config.mjs"
+    outputs:
+      - "./dist"
+    description: "Genera el sitio estático de producción en dist/"
+
+  preview:
+    command: "bunx astro preview"
+    args:
+      - "--host"
+      - "0.0.0.0"
+      - "--port"
+      - "$PORT"
+    env:
+      PORT: "${LANDING_PORT:-4321}"
+    deps:
+      - "build"
+    options:
+      cache: false
+      persistent: true
+    description: "Sirve localmente el build de producción"
+
+  check:
+    command: "bunx astro check"
+    inputs:
+      - "@group(sources)"
+      - "@group(configs)"
+    description: "Verificación de tipos y de plantillas de Astro"
+
+  clean:
+    command: "rm -rf"
+    args:
+      - "dist"
+      - ".astro"
+    options:
+      cache: false
+    description: "Elimina los artefactos de build"

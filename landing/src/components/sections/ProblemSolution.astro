@@ -1,0 +1,129 @@
+---
+import Button from '../ui/Button.astro'
+import SectionHeading from '../ui/SectionHeading.astro'
+import Icon from '../ui/Icon.astro'
+import { problems, site, steps } from '../../data/site'
+
+/**
+ * Problema y flujo de trabajo.
+ *
+ * Izquierda: los problemas que el producto resuelve, sin cifras inventadas.
+ * Derecha: los tres pasos del ciclo real —cargar padrón, emitir cuota,
+ * registrar pago— que sí existen en el panel.
+ *
+ * El contraste es de superficie, no de tema: la columna del problema es zinc
+ * neutro y la del flujo lleva el acento de marca. La jerarquía la marca el
+ * espacio y el peso, no un fondo oscuro.
+ */
+---
+
+<section id="producto" aria-labelledby="producto-title" class="relative scroll-mt-24 py-24 sm:py-32">
+	<div class="container-page">
+		<SectionHeading
+			id="producto-title"
+			kicker="El problema"
+			title="La administración del condominio"
+			highlight="no cabe en una hoja de cálculo"
+			description="El padrón, las cuotas y los pagos se reparten entre el Excel, el grupo de mensajes y la memoria de la junta. El resultado se repite en cada cierre."
+			measure={52}
+			class="max-w-3xl"
+		/>
+
+		<div class="mt-14 grid gap-4 lg:grid-cols-2">
+			<!-- El problema -->
+			<div
+				class="flex flex-col rounded-xl border border-zinc-200 bg-zinc-50 p-6 sm:p-8"
+				data-reveal="slide-left"
+			>
+				<p class="kicker text-zinc-500">
+					<Icon name="clock" class="size-3.5" />
+					Sin Condora
+				</p>
+				<h3 class="text-xl font-semibold text-zinc-950">Lo que pasa en casi toda junta</h3>
+
+				<ul class="mt-4 space-y-1">
+					{
+						problems.map((problem, index) => (
+							<li
+								class="group flex gap-3.5 border-t border-zinc-200 py-4 transition-colors duration-500 ease-brand group-hover:border-brand-600/35"
+								style={`--reveal-delay:${index * 80}ms`}
+							>
+								<span class="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-zinc-200 font-mono text-[0.68rem] font-semibold text-zinc-600 transition-colors duration-500 ease-brand group-hover:bg-brand-600 group-hover:text-white">
+									{index + 1}
+								</span>
+								<div>
+									<p class="font-medium text-zinc-950">{problem.title}</p>
+									<p class="mt-1 text-[0.9rem] leading-relaxed text-zinc-600">
+										{problem.body}
+									</p>
+								</div>
+							</li>
+						))
+					}
+				</ul>
+			</div>
+
+			<!-- El flujo real -->
+			<div
+				id="como-funciona"
+				class="relative flex flex-col overflow-hidden rounded-xl border border-brand-600/20 bg-white p-6 sm:p-8"
+				data-reveal="slide-right"
+			>
+				<!-- Halo de marca en la esquina -->
+				<div
+					class="pointer-events-none absolute -top-28 -right-20 size-64 rounded-full bg-brand-100/70 blur-3xl"
+					aria-hidden="true"
+				>
+				</div>
+
+				<div class="relative">
+					<p class="kicker text-brand-800">
+						<Icon name="check" class="size-3.5" />
+						Con Condora
+					</p>
+					<h3 class="text-xl font-semibold text-zinc-950">El ciclo, en tres pasos</h3>
+					<p class="mt-2 text-[0.95rem] leading-relaxed text-zinc-600">
+						El padrón alimenta las cuotas, las cuotas reciben los pagos y el saldo
+						queda siempre calculado. Sin recálculos manuales al cierre del mes.
+					</p>
+				</div>
+
+				<ol class="relative mt-6 space-y-4">
+					{
+						steps.map((step, index) => (
+							<li
+								class="group relative flex gap-4"
+								data-reveal="fade"
+								style={`--reveal-delay:${index * 110}ms`}
+							>
+								<span class="flex flex-col items-center">
+									<span class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-brand-50 font-mono text-[0.75rem] font-semibold text-brand-800 ring-1 ring-brand-600/20 ring-inset transition-all duration-500 ease-brand group-hover:bg-brand-600 group-hover:text-white">
+										{step.step}
+									</span>
+									{
+										index < steps.length - 1 && (
+											<span
+												class="mt-1 w-px flex-1 bg-linear-to-b from-brand-600/35 to-transparent"
+												aria-hidden="true"
+											/>
+										)
+									}
+								</span>
+								<div class="pb-1">
+									<p class="text-[1.05rem] font-semibold text-zinc-950">{step.title}</p>
+									<p class="mt-1 text-[0.9rem] leading-relaxed text-zinc-600">{step.body}</p>
+								</div>
+							</li>
+						))
+					}
+				</ol>
+
+				<div class="relative mt-auto pt-4">
+					<Button href={site.requestDemoHref} variant="primary" size="md">
+						Verlo con datos de ejemplo
+					</Button>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>

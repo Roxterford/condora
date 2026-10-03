@@ -1,0 +1,513 @@
+@import 'tailwindcss';
+
+/* ==========================================================================
+   Sistema de diseño de la landing — réplica de apps/panel/src/app/app.css
+   ==========================================================================
+
+   La landing y el panel comparten el mismo vocabulario de tokens para que el
+   paso de una a otro se sienta como el mismo producto. Los valores de neutros,
+   marca y primarios están tomados literalmente del panel:
+
+     panel --primary            #00A3A0
+     logo de marca (condora.svg) #00A9A5
+     panel --background         #FFFFFF
+     panel --foreground         #09090B
+     panel --muted              #F4F4F5
+     panel --border             #E4E4E7
+     panel --radius             0.625rem
+
+   Tailwind v4 es "CSS-first": los tokens viven aquí y generan utilidades sin
+   necesidad de un tailwind.config.js.
+   ========================================================================== */
+
+@theme {
+	/* --- Marca: teal del logotipo y del --primary del panel -----------------
+	   El paso 600 reproduce exactamente el `--primary` del panel (#00A3A0) y se
+	   reserva para relleno y adorno: sobre blanco se queda en 3.1:1, por debajo
+	   del 4.5:1 que exige AA para texto. A partir del 700 el color ya es
+	   apto para texto (700 = 4.8:1, 800 = 6.4:1). */
+	--color-brand-50: #e9fcfb;
+	--color-brand-100: #d3f5f3;
+	--color-brand-200: #b4eae8;
+	--color-brand-300: #8fdbd7;
+	--color-brand-400: #6ccac6;
+	--color-brand-500: #42b2af;
+	--color-brand-600: #00a3a0;
+	--color-brand-700: #00807e;
+	--color-brand-800: #006a68;
+	--color-brand-900: #004e4c;
+	--color-brand-950: #003130;
+
+	/* --- Neutros: zinc, idéntico al del panel -------------------------------
+	   400 es el --muted-foreground real del panel (#A1A1AA) y se usa solo para
+	   texto decorativo; para texto legible se usa 500 o superior (4.6:1 o más). */
+	--color-zinc-50: #fafafa;
+	--color-zinc-100: #f4f4f5;
+	--color-zinc-200: #e4e4e7;
+	--color-zinc-300: #d4d4d8;
+	--color-zinc-400: #a1a1aa;
+	--color-zinc-500: #71717a;
+	--color-zinc-600: #52525b;
+	--color-zinc-700: #3f3f46;
+	--color-zinc-800: #27272a;
+	--color-zinc-900: #18181b;
+	--color-zinc-950: #09090b;
+
+	/* --- Estados ----------------------------------------------------------- */
+	--color-destructive: #e7000b;
+	--color-destructive-soft: #fee2e2;
+
+	/* --- Tipografía: la misma del panel -------------------------------------
+	   Noto Sans para todo (el panel lo usa en body y en encabezados, con
+	   `--font-heading` apuntando a la misma familia) y Geist Mono para datos. */
+	--font-sans:
+		'Noto Sans Variable', 'Noto Sans', ui-sans-serif, system-ui, -apple-system,
+		'Segoe UI', sans-serif;
+	--font-mono:
+		'Geist Mono Variable', 'Geist Mono', ui-monospace, 'SF Mono', 'Cascadia Code',
+		Menlo, monospace;
+
+	/* --- Radios: la escala del panel ---------------------------------------
+	   `--radius` es 0.625rem (10px). El panel usa rounded-md en botones (8px) y
+	   rounded-xl en tarjetas (14px). Nada de 28px como en la versión anterior. */
+	--radius: 0.625rem;
+	--radius-sm: calc(var(--radius) * 0.6);
+	--radius-md: calc(var(--radius) * 0.8);
+	--radius-lg: var(--radius);
+	--radius-xl: calc(var(--radius) * 1.4);
+	--radius-2xl: calc(var(--radius) * 1.8);
+	--radius-3xl: calc(var(--radius) * 2.2);
+	--radius-4xl: calc(var(--radius) * 2.6);
+
+	/* --- Sombras: las del panel ---------------------------------------------
+	   El panel casi no usa sombra: `shadow-xs` + `ring-1 ring-foreground/10`.
+	   Aquí se mantiene esa.recipe y se sube muy poco el vuelo. */
+	--shadow-xs: 0 1px 2px 0 rgb(9 9 11 / 0.05);
+	--shadow-soft:
+		0 1px 2px 0 rgb(9 9 11 / 0.05), 0 2px 8px -2px rgb(9 9 11 / 0.06);
+	--shadow-lift:
+		0 2px 4px -1px rgb(9 9 11 / 0.06), 0 8px 20px -6px rgb(9 9 11 / 0.1);
+	--shadow-float:
+		0 4px 8px -2px rgb(9 9 11 / 0.07), 0 16px 40px -12px rgb(9 9 11 / 0.14);
+
+	/* --- Curvas -------------------------------------------------------------
+	   `brand` es la curva dominante del panel (aparece 6 veces en su código):
+	   deceleración larga, sin rebote, sin recorte. Es la clave de que las
+	   animaciones se sientan suaves. `expo` para lo que debe notar. */
+	--ease-brand: cubic-bezier(0.22, 1, 0.36, 1);
+	--ease-expo: cubic-bezier(0.32, 0.72, 0, 1);
+	--ease-soft: cubic-bezier(0.23, 1, 0.32, 1);
+
+	/* --- Animaciones declaradas --------------------------------------------- */
+	--animate-rise: rise 0.85s var(--ease-brand) both;
+	--animate-sheen: sheen 1.4s ease-in-out infinite;
+
+	/* Derivas del campo del hero. Alternan en vaivén en vez de subir en bucle:
+	   no hay empalme que cerrar, así que no dependen de la altura del hero. */
+	--animate-float-a: field-float-a 19s ease-in-out infinite alternate;
+	--animate-float-b: field-float-b 27s ease-in-out infinite alternate;
+	--animate-drift-a: field-drift-a 38s ease-in-out infinite;
+	--animate-drift-b: field-drift-b 47s ease-in-out infinite;
+
+	@keyframes rise {
+		from {
+			opacity: 0;
+			transform: translate3d(0, 0.75rem, 0);
+		}
+		to {
+			opacity: 1;
+			transform: none;
+		}
+	}
+
+	/* Mismo barrido que la barra de progreso del panel (top-progress-sheen) */
+	@keyframes sheen {
+		0% {
+			transform: translateX(-100%);
+		}
+		100% {
+			transform: translateX(400%);
+		}
+	}
+
+	/* --- Campo del hero ---------------------------------------------------
+	   Los `keyframe` viven aquí y no en el componente: un bloque `<style>` de
+	   Astro va scopepeado con un atributo, y un nombre de animación definido
+	   dentro no quedaría disponible para la utilidad `animate-*`. */
+	@keyframes field-float-a {
+		from {
+			transform: translateY(-1.25rem);
+		}
+		to {
+			transform: translateY(1.25rem);
+		}
+	}
+
+	@keyframes field-float-b {
+		from {
+			transform: translateY(1.5rem);
+		}
+		to {
+			transform: translateY(-1.5rem);
+		}
+	}
+
+	@keyframes field-drift-a {
+		0%,
+		100% {
+			transform: translate(0, 0) scale(1);
+		}
+		50% {
+			transform: translate(-3rem, 2.5rem) scale(1.08);
+		}
+	}
+
+	@keyframes field-drift-b {
+		0%,
+		100% {
+			transform: translate(0, 0) scale(1.05);
+		}
+		50% {
+			transform: translate(3rem, -2rem) scale(1);
+		}
+	}
+}
+
+/* Alias semánticos: mismo vocabulario de roles que el panel, para que
+   `bg-background`, `text-muted-foreground` o `border-border` signifiquen
+   exactamente lo mismo en los dos proyectos. */
+@theme inline {
+	--color-background: var(--color-zinc-50);
+	--color-foreground: var(--color-zinc-950);
+	--color-card: #ffffff;
+	--color-card-foreground: var(--color-zinc-950);
+	--color-primary: var(--color-brand-600);
+	--color-primary-foreground: #f0f9ff;
+	--color-muted: var(--color-zinc-100);
+	--color-muted-foreground: var(--color-zinc-500);
+	--color-accent: var(--color-brand-200);
+	--color-accent-foreground: var(--color-brand-900);
+	--color-border: var(--color-zinc-200);
+	--color-input: var(--color-zinc-200);
+	--color-ring: var(--color-zinc-400);
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+@layer base {
+	:root {
+		--header-height: 4rem;
+		color-scheme: light;
+	}
+
+	* {
+		border-color: var(--color-border);
+		outline-color: --alpha(var(--color-ring) / 50%);
+	}
+
+	html {
+		scroll-behavior: smooth;
+		scroll-padding-top: calc(var(--header-height) + 1.5rem);
+		-webkit-text-size-adjust: 100%;
+		text-size-adjust: 100%;
+	}
+
+	body {
+		background-color: var(--color-background);
+		color: var(--color-foreground);
+		font-family: var(--font-sans);
+		font-synthesis-weight: none;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+		overflow-x: clip;
+	}
+
+	/* El panel usa la misma familia en body y encabezados, con contraste de
+	   peso (font-light ↔ font-extrabold) en lugar de una serif distinta. */
+	h1,
+	h2,
+	h3,
+	h4 {
+		color: var(--color-foreground);
+		text-wrap: balance;
+		letter-spacing: -0.02em;
+	}
+
+	p {
+		text-wrap: pretty;
+	}
+
+	:focus-visible {
+		outline: 2px solid var(--color-brand-600);
+		outline-offset: 2px;
+		border-radius: var(--radius-sm);
+	}
+
+	::selection {
+		background-color: var(--color-brand-200);
+		color: var(--color-brand-900);
+	}
+
+	[hidden] {
+		display: none !important;
+	}
+}
+
+/* ==========================================================================
+   Utilidades compuestas
+   ========================================================================== */
+
+@utility container-page {
+	--container-gutter: 1.25rem;
+	width: 100%;
+	margin-inline: auto;
+	padding-inline: var(--container-gutter);
+	max-width: 80rem;
+
+	@media (width >= 48rem) {
+		--container-gutter: 2rem;
+	}
+
+	@media (width >= 80rem) {
+		--container-gutter: 2.5rem;
+	}
+}
+
+/* Superficie base: blanco con un halo teal apenas perceptible, el mismo
+   recurso del `bg-muted` del panel pero sin ensuciar el blanco puro. */
+@utility bg-canvas {
+	background-color: var(--color-background);
+	background-image:
+		radial-gradient(
+			ellipse 70% 50% at 50% -10%,
+			--alpha(var(--color-brand-100) / 55%),
+			transparent 70%
+		);
+}
+
+/* Rejilla técnica, muy tenue: solo para bloques de producto */
+@utility bg-grid {
+	background-image:
+		linear-gradient(to right, --alpha(var(--color-zinc-950) / 4%) 1px, transparent 1px),
+		linear-gradient(to bottom, --alpha(var(--color-zinc-950) / 4%) 1px, transparent 1px);
+	background-size: 3rem 3rem;
+}
+
+/* Etiqueta sobre los encabezados de sección */
+@utility kicker {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	font-size: 0.72rem;
+	font-weight: 600;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	color: var(--color-brand-800);
+}
+
+/* ==========================================================================
+   Sistema de animación al hacer scroll
+
+   Qué cambió respecto a la versión anterior, que se sentía dura:
+
+   1. Distancias cortas (10-14px en vez de 20-28px). La distancia es lo que
+      más pesa en la sensación de "golpe": recorrer mucho espacio en poco
+      tiempo es lo que produce el tirón.
+   2. Curva --ease-brand (la del panel) en lugar de una curva con rebote.
+   3. Duraciones largas (0.8-1s) para la misma distancia.
+   4. Sin `scale` en las entradas: escalar provoca un "pop".
+   5. Escalonado corto (55ms) y con tope, para que el efecto acompañe sin
+     dejar una sala de espera.
+
+   Capa A (por defecto): CSS scroll-driven nativo, en el hilo del compositor.
+   Capa B (respaldo): IntersectionObserver añade `data-revealed`.
+   ========================================================================== */
+
+@layer components {
+	/* Enlace de salto: oculto hasta recibir foco. Entra con la curva suave, no
+	   de golpe, para no startling a quien navega con el teclado. */
+	.skip-link {
+		position: fixed;
+		top: 0.75rem;
+		left: 0.75rem;
+		z-index: 100;
+		display: inline-flex;
+		align-items: center;
+		border-radius: var(--radius-md);
+		background-color: var(--color-zinc-950);
+		padding: 0.625rem 1rem;
+		font-size: 0.875rem;
+		font-weight: 500;
+		color: #ffffff;
+		text-decoration: none;
+		box-shadow: var(--shadow-float);
+		transform: translateY(-250%);
+		visibility: hidden;
+		transition:
+			transform 0.45s var(--ease-brand),
+			visibility 0.45s var(--ease-brand);
+	}
+
+	.skip-link:focus-visible {
+		transform: translateY(0);
+		visibility: visible;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.skip-link {
+			transition: none;
+		}
+	}
+
+	[data-reveal] {
+		opacity: 1;
+		transform: none;
+	}
+
+	/* Capa A — solo si el navegador soporta timeline de scroll */
+	@supports (animation-timeline: view()) {
+		@media (prefers-reduced-motion: no-preference) {
+			[data-reveal='fade'],
+			[data-reveal='up'] {
+				animation: reveal-up 1ms linear both;
+				animation-timeline: view();
+				animation-range: entry 0% entry 90%;
+			}
+
+			[data-reveal='slide-left'],
+			[data-reveal='slide-right'] {
+				animation: reveal-x 1ms linear both;
+				animation-timeline: view();
+				animation-range: entry 0% entry 90%;
+			}
+
+			[data-reveal='draw'] {
+				animation: reveal-draw 1ms linear both;
+				animation-timeline: view();
+				animation-range: entry 0% entry 100%;
+			}
+
+			[data-parallax] {
+				animation: parallax-shift 1ms linear both;
+				animation-timeline: view();
+				animation-range: cover;
+			}
+		}
+	}
+
+	/* Capa B — fallback con IntersectionObserver */
+	@supports not (animation-timeline: view()) {
+		@media (prefers-reduced-motion: no-preference) {
+			html.js [data-reveal] {
+				opacity: 0;
+				transition:
+					opacity 0.85s var(--ease-brand),
+					transform 0.85s var(--ease-brand);
+				transition-delay: var(--reveal-delay, 0ms);
+			}
+
+			html.js [data-reveal='slide-left'] {
+				transform: translate3d(-0.875rem, 0, 0);
+			}
+
+			html.js [data-reveal='slide-right'] {
+				transform: translate3d(0.875rem, 0, 0);
+			}
+
+			html.js [data-reveal][data-revealed] {
+				opacity: 1;
+				transform: none;
+			}
+		}
+	}
+
+	/* Escalonado para grillas. El tope evita que las tarjetas de más abajo
+	   aparezcan un segundo después de que el usuario ya las está mirando. */
+	.stagger > * {
+		animation: reveal-up 0.85s var(--ease-brand) both;
+		animation-delay: calc(min(var(--i, 0), 6) * 55ms);
+	}
+
+	@keyframes reveal-up {
+		from {
+			opacity: 0;
+			transform: translate3d(0, 0.875rem, 0);
+		}
+		to {
+			opacity: 1;
+			transform: none;
+		}
+	}
+
+	@keyframes reveal-x {
+		from {
+			opacity: 0;
+			transform: translate3d(var(--reveal-from, 0.875rem), 0, 0);
+		}
+		to {
+			opacity: 1;
+			transform: none;
+		}
+	}
+
+	/* El subrayado del encabezado se dibuja, en vez de aparecer de golpe */
+	@keyframes reveal-draw {
+		from {
+			transform: scaleX(0);
+		}
+		to {
+			transform: scaleX(1);
+		}
+	}
+
+	@keyframes parallax-shift {
+		from {
+			transform: translate3d(0, 1.25rem, 0);
+		}
+		to {
+			transform: translate3d(0, -1.25rem, 0);
+		}
+	}
+}
+
+/* ==========================================================================
+   Movimiento reducido
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+	html {
+		scroll-behavior: auto;
+	}
+
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+
+	[data-reveal] {
+		opacity: 1 !important;
+		transform: none !important;
+	}
+
+	.stagger > * {
+		animation: none !important;
+	}
+
+	/* El campo del hero se queda quieto: la información que acompaña a las
+	   columnas está íntegra en la sección de Módulos, así que no se pierde
+	   nada por no moverlas. */
+	.hero-field__column {
+		transform: none !important;
+		animation: none !important;
+	}
+
+	.hero-field__glow {
+		opacity: 0 !important;
+	}
+}

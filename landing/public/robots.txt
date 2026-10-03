@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Rutas privadas o de administración: no forman parte de la landing pública
+Disallow: /registro
+Disallow: /panel
+Disallow: /api/
+
+Sitemap: https://condora.app/sitemap-index.xml

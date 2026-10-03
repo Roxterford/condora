@@ -19,7 +19,8 @@
         "mtxr.sqltools",
         "ckolkman.vscode-postgres",
         "Prisma.prisma",
-        "pucelle.run-on-save"
+        "pucelle.run-on-save",
+        "astro-build.astro-vscode"
       ]
     }
   }

@@ -1,0 +1,32 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import Header from '../components/Header.astro'
+import Footer from '../components/Footer.astro'
+import Button from '../components/ui/Button.astro'
+import { site } from '../data/site'
+---
+
+<BaseLayout path="/404" noindex title="Página no encontrada · Condora">
+	<Header />
+
+	<main id="contenido" class="flex min-h-[70vh] items-center pt-[var(--header-height)]">
+		<div class="container-page py-20 text-center">
+			<p class="font-mono text-[clamp(5rem,18vw,10rem)] leading-none font-semibold text-zinc-300">
+				404
+			</p>
+			<h1 class="mt-2 text-[clamp(1.8rem,4vw,2.6rem)] font-semibold text-zinc-950">
+				Esta página no existe
+			</h1>
+			<p class="mx-auto mt-4 max-w-md text-[1rem] leading-relaxed text-zinc-600">
+				El enlace que seguiste no lleva a ningún lado. Vuelve al inicio o escríbenos y
+				te orientamos.
+			</p>
+			<div class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+				<Button href="/" variant="primary" size="lg">Volver al inicio</Button>
+				<Button href={site.supportHref} variant="outline" size="lg">Escribir a soporte</Button>
+			</div>
+		</div>
+	</main>
+
+	<Footer />
+</BaseLayout>

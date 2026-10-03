@@ -1,0 +1,186 @@
+---
+import SectionHeading from '../ui/SectionHeading.astro'
+import Icon from '../ui/Icon.astro'
+import { modules } from '../../data/site'
+
+/**
+ * Módulos reales del panel.
+ *
+ * Cada tarjeta es una pantalla que existe en `apps/panel`, con su ruta real en
+ * el pie. No hay "características" genéricas ni promesas: si algo no está
+ * construido, no se lista. Los íconos son los mismos del sidebar del panel.
+ *
+ * Las tarjetas son interactivas. Al abrirlas no se descubre texto que ya
+ * estaba a la vista —eso solo estorba—, sino el encaje de cada módulo dentro
+ * del ciclo: de dónde recibe los datos y a qué alimenta. Esa información solo
+ * tiene sentido por módulo, así que ocultarla detrás de un clic no esconde
+ * nada importante.
+ *
+ * El número del titular sale de `modules.length`. Estaba escrito a mano
+ * ("seis pantallas") y se quedó obsoleto en cuanto se quitó un módulo; ahora
+ * no puede volver a pasar.
+ */
+const screenCount = new Intl.NumberFormat('es-ES').format(modules.length)
+---
+
+<section id="modulos" aria-labelledby="modulos-title" class="relative bg-canvas py-24 sm:py-32">
+	<div class="container-page">
+		<SectionHeading
+			id="modulos-title"
+			kicker="Módulos"
+			title={`${screenCount} pantallas,`}
+			highlight="un solo sistema"
+			description="Cada módulo resuelve una parte del ciclo: quién está en el padrón, qué se emite, qué entra y qué queda pendiente. Todos existen hoy en el panel. Abre cualquiera para ver de dónde recibe sus datos y a qué alimenta."
+			align="center"
+			measure={52}
+			class="mx-auto items-center"
+		/>
+
+		{/*
+			Bento de 5 tarjetas en 3 columnas: la primera ocupa dos celdas y
+			las otras cuatro una cada una. Así las dos filas quedan completas
+			(2+1 y 1+1+1) en vez de dejar un hueco feo al final.
+		*/}
+		<ul class="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" data-modules>
+			{
+				modules.map((module, index) => {
+					const panelId = `modulo-${module.id}-detalle`;
+
+					return (
+						<li
+							class:list={[
+								'group relative flex flex-col rounded-xl border border-zinc-200 bg-white shadow-xs transition-[border-color,box-shadow] duration-500 ease-brand',
+								'hover:border-brand-600/25 hover:shadow-lift',
+								'focus-within:border-brand-600/40 focus-within:shadow-lift',
+								index === 0 && 'lg:col-span-2',
+							]}
+							data-reveal="up"
+							style={`--reveal-delay:${index * 60}ms`}
+							data-module
+						>
+							{/* Halo superior al enfocar o al abrir */}
+							<span
+								class="pointer-events-none absolute inset-0 rounded-xl opacity-0 transition-opacity duration-500 ease-brand group-hover:opacity-100 group-focus-within:opacity-100"
+								aria-hidden="true"
+							>
+								<span class="absolute inset-x-6 -top-px h-px bg-gradient-to-r from-transparent via-brand-500/70 to-transparent" />
+							</span>
+
+							{/*
+								`aria-expanded` + `aria-controls` es un patrón de
+								divulgación, no de pestañas: cada tarjeta es
+								independiente y se pueden abrir varias a la vez.
+							*/}
+							<button
+								type="button"
+								class="flex flex-1 flex-col items-start gap-4 p-6 text-left"
+								aria-expanded="false"
+								aria-controls={panelId}
+								data-module-toggle
+							>
+								<span class="inline-flex size-10 items-center justify-center rounded-lg bg-brand-50 text-brand-700 ring-1 ring-brand-600/15 ring-inset">
+									<Icon name={module.icon} class="size-5" weight={2} />
+								</span>
+
+								<span class="flex w-full items-start justify-between gap-4">
+									<span class="flex flex-col gap-1">
+										<span class="font-semibold text-zinc-950">{module.title}</span>
+										{/* La etapa se ve siempre: es el dato que ordena la
+										    lista mentalmente, no un premio por hacer clic. */}
+										<span class="font-mono text-[0.7rem] tracking-wide text-zinc-400 uppercase">
+											{module.stage}
+										</span>
+									</span>
+
+									{/* El wrapper lleva el hook del script: `Icon` solo reenvía
+									    `class`, `name` y `weight`, así que un `data-*` pasado
+									    directamente al componente se descartaría. */}
+									<span
+										class="mt-0.5 inline-flex shrink-0 transition-transform duration-500 ease-brand"
+										data-module-chevron
+									>
+										<Icon name="chevron-down" class="size-4 text-zinc-400" weight={2.25} />
+									</span>
+								</span>
+
+								<span class="text-[0.9375rem] leading-relaxed text-zinc-600">{module.body}</span>
+							</button>
+
+							{/*
+								El alto se anima con la técnica de `grid-template-rows`
+								0fr → 1fr: `hidden` daría un salto seco y
+								`max-height` adivina mal cuando el texto se
+								traduce o cambia de ancho. `inert` mantiene fuera
+								del recorrido de tabulación lo colapsado.
+							*/}
+							<div
+								id={panelId}
+								role="region"
+								aria-label={`Encaje de ${module.title} en el ciclo`}
+								class="grid transition-[grid-template-rows] duration-500 ease-brand"
+								style="grid-template-rows:0fr"
+								data-module-panel
+								inert
+							>
+								<div class="overflow-hidden">
+									<div class="border-t border-zinc-100 px-6 pt-4 pb-6">
+										<dl class="grid gap-3 text-[0.8125rem] sm:grid-cols-2">
+											<div class="flex flex-col gap-0.5">
+												<dt class="text-zinc-400">Recibe de</dt>
+												<dd class="text-zinc-700">{module.feedsFrom}</dd>
+											</div>
+											<div class="flex flex-col gap-0.5">
+												<dt class="text-zinc-400">Alimenta</dt>
+												<dd class="text-zinc-700">{module.feedsTo}</dd>
+											</div>
+										</dl>
+
+										<ul class="mt-4 space-y-1.5">
+											{module.points.map((point) => (
+												<li class="flex items-start gap-2 text-[0.8125rem] text-zinc-500">
+													<Icon name="check" class="mt-0.5 size-3.5 shrink-0 text-brand-700" weight={2.25} />
+													{point}
+												</li>
+											))}
+										</ul>
+
+										{/* Ruta real en el panel. No es clicable a propósito: la landing
+										    no debe llevar a una URL de despliegue que no conocemos. */}
+										<span class="mt-4 inline-flex items-center gap-1.5 font-mono text-[0.7rem] text-zinc-400">
+											<Icon name="arrow-right" class="size-3" weight={2} />
+											{module.route}
+										</span>
+									</div>
+								</div>
+							</div>
+						</li>
+					);
+				})
+			}
+		</ul>
+	</div>
+</section>
+
+<script>
+	/**
+	 * Divulgación de las tarjetas de módulo.
+	 *
+	 * Cada botón alterna su propia región. El chevron gira 180° con el mismo
+	 * `duration` que la apertura, así que las dos señales terminan a la vez y el
+	 * usuario no las percibe como dos eventos separados.
+	 */
+	for (const toggle of document.querySelectorAll<HTMLButtonElement>('[data-module-toggle]')) {
+		const panel = toggle.nextElementSibling as HTMLElement | null;
+		if (!panel) continue;
+
+		toggle.addEventListener('click', () => {
+			const open = toggle.getAttribute('aria-expanded') === 'true';
+			toggle.setAttribute('aria-expanded', String(!open));
+			panel.style.gridTemplateRows = open ? '0fr' : '1fr';
+			panel.toggleAttribute('inert', open);
+
+			const chevron = toggle.querySelector('[data-module-chevron]');
+			chevron?.classList.toggle('rotate-180', !open);
+		});
+	}
+</script>

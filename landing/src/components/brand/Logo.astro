@@ -1,0 +1,57 @@
+---
+/**
+ * Isotipo real de Condora.
+ *
+ * Trazo tomado literalmente de `apps/panel/public/condora.svg` (la marca que
+ * el panel ya usa en el sidebar y en el login), no de una reinterpretación.
+ * El panel lo pinta en #00A9A5 y su `--primary` es #00A3A0: mismo teal.
+ *
+ * Se dibuja en línea —no como <img>— para poder heredar el color con
+ * currentColor y escalar sin pérdida.
+ */
+interface Props {
+	/** Altura en rem. El ancho sale del viewBox (134:100). */
+	size?: number
+	/** `brand` usa el teal de la marca; `current` hereda el color del texto. */
+	variant?: 'brand' | 'current'
+	class?: string
+}
+
+const { size = 1.75, variant = 'brand', class: className = '' } = Astro.props
+
+const MARK_FILL = variant === 'brand' ? '#00A9A5' : 'currentColor'
+---
+
+<svg
+	class:list={['condora-mark', className]}
+	style={`height:${size}rem;width:auto`}
+	viewBox="0 0 134 100"
+	role="img"
+	aria-label="Condora"
+	fill="none"
+	xmlns="http://www.w3.org/2000/svg"
+>
+	<path
+		fill={MARK_FILL}
+		d="M57.4228 2.6778C48.4501 5.52856 41.144 14.5914 26.5321 32.717C8.50692 55.0766 -0.505645 66.2561 0.0218893 75.7253C0.376858 82.097 3.18148 88.0751 7.83591 92.3812C14.7531 98.7805 29.0105 98.7805 57.5256 98.7805H59.1123C66.086 98.7805 72.6849 95.6078 77.0716 90.1663C91.5149 72.2497 98.7366 63.2917 108.066 61.9407C110.334 61.6124 112.637 61.6124 114.905 61.9407C121.161 62.8466 126.469 67.1727 133.642 75.3266C122.167 53.719 101.102 10.5818 76.2245 2.6778C70.1047 0.733376 63.5426 0.733376 57.4228 2.6778Z"
+	></path>
+</svg>
+
+<style>
+	.condora-mark {
+		display: block;
+		color: inherit;
+		transition: transform 0.6s var(--ease-brand);
+	}
+
+	:global(a:hover) .condora-mark,
+	:global(a:focus-visible) .condora-mark {
+		transform: translateY(-1px);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.condora-mark {
+			transition: none;
+		}
+	}
+</style>

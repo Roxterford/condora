@@ -1,0 +1,92 @@
+---
+/**
+ * Iconografía en línea, en el mismo lenguaje que `lucide-react` (la librería
+ * que usa el panel): viewBox 24×24, trazo de 2, remates redondos y
+ * `currentColor`. Sin dependencias ni bundle extra.
+ *
+ * Cada glifo está dibujado solo con `stroke`, así que el color lo hereda el
+ * contenedor y `stroke-width` se puede ajustar desde fuera.
+ */
+interface Props {
+	name:
+		| 'chart'
+		| 'receipt'
+		| 'home'
+		| 'card'
+		| 'swap'
+		| 'settings'
+		| 'check'
+		| 'arrow-right'
+		| 'chevron-down'
+		| 'shield'
+		| 'clock'
+		| 'sparkle'
+	class?: string
+	/** Grosor del trazo. El panel usa 2 por defecto. */
+	weight?: number
+}
+
+const { name, class: className = 'size-5', weight = 2 } = Astro.props
+
+const paths: Record<Props['name'], string[]> = {
+	// BarChart3 del panel: tres barras y la línea base
+	chart: ['M3 3v16a2 2 0 0 0 2 2h16', 'M18 17V9', 'M13 17V5', 'M8 17v-3'],
+	receipt: [
+		'M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z',
+		'M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8',
+		'M12 17.5v-11',
+	],
+	// Home del sidebar del panel
+	home: [
+		'M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8',
+		'M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z',
+	],
+	card: [
+		'M2 7h20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Z',
+		'M2 10h20',
+	],
+	// ArrowLeftRight del sidebar (Operaciones)
+	swap: ['M8 3 4 7l4 4', 'M4 7h16', 'm16 21 4-4-4-4', 'M20 17H4'],
+	settings: [
+		'M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z',
+		'circle:12,12,3',
+	],
+	check: ['M20 6 9 17l-5-5'],
+	'arrow-right': ['M5 12h14', 'm12 5 7 7-7 7'],
+	// ChevronDown de lucide (set del panel), para los desplegables
+	'chevron-down': ['m6 9 6 6 6-6'],
+	shield: ['M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c3 0 6-2 7-4 1 2 4 4 7 4a1 1 0 0 1 1 1z', 'm9 12 2 2 4-4'],
+	clock: ['M12 6v6l4 2', 'circle:12,12,10'],
+	sparkle: [
+		'M11 3h2l1.2 3.4a2 2 0 0 0 1.2 1.2L19 9v2l-3.6 1.4a2 2 0 0 0-1.2 1.2L13 17h-2l-1.2-3.4a2 2 0 0 0-1.2-1.2L5 11V9l3.6-1.4a2 2 0 0 0 1.2-1.2z',
+		'M18 3v4', 'M20 5h-4', 'M5 17v3', 'M6.5 18.5h-3',
+	],
+}
+---
+
+<svg
+	class={className}
+	viewBox="0 0 24 24"
+	fill="none"
+	stroke="currentColor"
+	stroke-width={weight}
+	stroke-linecap="round"
+	stroke-linejoin="round"
+	aria-hidden="true"
+	focusable="false"
+	xmlns="http://www.w3.org/2000/svg"
+>
+	{
+		paths[name].map((d) =>
+			d.startsWith('circle:') ? (
+				<circle
+					cx={d.split(':')[1]}
+					cy={d.split(':')[2]}
+					r={d.split(':')[3]}
+				/>
+			) : (
+				<path d={d} />
+			)
+		)
+	}
+</svg>

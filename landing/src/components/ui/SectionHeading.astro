@@ -1,0 +1,86 @@
+---
+import Icon from './Icon.astro'
+
+/**
+ * Encabezado de sección reutilizable.
+ *
+ * El recurso tipográfico del panel es el contraste de peso dentro de una misma
+ * línea (`font-light` junto a `font-extrabold`), no una familia serif distinta.
+ * Por eso `highlight` se renders como un `<strong>` en negrita dentro del
+ * propio título: es el mismo gesto que en `login-showcase.tsx`.
+ */
+interface Props {
+	kicker?: string
+	title: string
+	/** Fragmento del título que va en `font-extrabold`. */
+	highlight?: string
+	description?: string
+	level?: 'h1' | 'h2'
+	align?: 'left' | 'center'
+	class?: string
+	/** Ancho máximo del bloque de texto, en rem. */
+	measure?: number
+	id?: string
+}
+
+const {
+	kicker,
+	title,
+	highlight,
+	description,
+	level = 'h2',
+	align = 'left',
+	class: className = '',
+	measure = 42,
+	id,
+} = Astro.props
+
+const Tag = level
+---
+
+<div
+	class:list={[
+		'flex flex-col gap-4',
+		align === 'center' && 'items-center text-center',
+		className,
+	]}
+>
+	{
+		kicker && (
+			<p class="kicker">
+				<Icon name="sparkle" class="size-3.5" />
+				{kicker}
+			</p>
+		)
+	}
+
+	<Tag
+		id={id}
+		class:list={[
+			'font-semibold tracking-[-0.02em]',
+			level === 'h1'
+				? 'text-[clamp(2.4rem,6.2vw,4.25rem)] leading-[1.04]'
+				: 'text-[clamp(1.75rem,3.6vw,2.75rem)] leading-[1.1]',
+		]}
+	>
+		{highlight ? <>{title} <strong class="font-extrabold">{highlight}</strong></> : title}
+	</Tag>
+
+	{
+		description && (
+			<p
+				class="text-[1.0625rem] leading-relaxed text-zinc-600"
+				style={`max-width:${measure}rem`}
+			>
+				{description}
+			</p>
+		)
+	}
+
+	{/* Regla que se dibuja al entrar: el trazo crece en X, no aparece de golpe. */}
+	<span
+		class="mt-1 block h-px w-14 origin-left bg-brand-600/45"
+		data-reveal="draw"
+		aria-hidden="true"
+	></span>
+</div>
