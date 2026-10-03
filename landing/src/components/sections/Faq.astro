@@ -71,10 +71,15 @@ import Icon from '../ui/Icon.astro'
 									</svg>
 								</span>
 							</summary>
-							<div class="faq-content">
-								<p class="mt-3 max-w-prose text-[0.92rem] leading-relaxed text-zinc-600">
-									{faq.answer}
-								</p>
+							<div
+								class="grid transition-[grid-template-rows] duration-500 ease-brand overflow-hidden"
+								style="grid-template-rows: 0fr"
+							>
+								<div class="overflow-hidden">
+									<p class="mt-3 max-w-prose text-[0.92rem] leading-relaxed text-zinc-600">
+										{faq.answer}
+									</p>
+								</div>
 							</div>
 						</details>
 					))
@@ -83,3 +88,18 @@ import Icon from '../ui/Icon.astro'
 		</div>
 	</div>
 </section>
+
+<script>
+	/**
+	 * Animación suave de los acordeones FAQ usando grid-template-rows.
+	 * Igual que en la sección Módulos: 0fr ↔ 1fr con transición CSS.
+	 */
+	for (const details of document.querySelectorAll<HTMLDetailsElement>('details.faq-item')) {
+		const panel = details.querySelector<HTMLDivElement>('.grid');
+		if (!panel) continue;
+
+		details.addEventListener('toggle', () => {
+			panel.style.gridTemplateRows = details.open ? '1fr' : '0fr';
+		});
+	}
+</script>
