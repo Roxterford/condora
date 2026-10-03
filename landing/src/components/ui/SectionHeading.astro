@@ -11,6 +11,8 @@ import Icon from './Icon.astro'
  */
 interface Props {
 	kicker?: string
+	/** Icono para el kicker (por defecto: sparkle). */
+	kickerIcon?: Props['name']
 	title: string
 	/** Fragmento del título que va en `font-extrabold`. */
 	highlight?: string
@@ -25,6 +27,7 @@ interface Props {
 
 const {
 	kicker,
+	kickerIcon = 'sparkle',
 	title,
 	highlight,
 	description,
@@ -61,7 +64,7 @@ const Tag = level
 	{
 		kicker && (
 			<p class="kicker animate-on-scroll animate-slide-left duration-700 ease-out" style="transition-delay: 0ms">
-				<Icon name="sparkle" class="size-3.5" />
+				<Icon name={kickerIcon} class="size-3.5" />
 				{kicker}
 			</p>
 		)
