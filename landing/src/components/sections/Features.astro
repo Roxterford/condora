@@ -68,8 +68,8 @@ const screenCount = new Intl.NumberFormat('es-ES').format(modules.length)
 								'focus-within:border-brand-600/40 focus-within:shadow-lift',
 								index === 0 && 'lg:col-span-2',
 							]}
-							data-reveal="up"
-							style={`--reveal-delay:${index * 60}ms`}
+							data-reveal="scale"
+							style={`--i:${index}`}
 							data-module
 						>
 							{/* Halo superior al enfocar o al abrir */}

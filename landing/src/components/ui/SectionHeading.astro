@@ -45,16 +45,22 @@ const Tag = level
 		className,
 	]}
 	/*
-	 * El bloque entra como una sola pieza. Vive aquí y no en cada sección
-	 * porque todos los encabezados deberían comportarse igual; si se deja en
-	 * el marcado de cada uno, basta un forgotten para que uno se quede quieto
+	 * Cada pieza entra por separado y en orden de lectura, no el bloque entero
+	 * como una sola pieza. El gesto de leer una sección va de la etiqueta al
+	 * título y de ahí al texto; si el título aparece cuando todavía no se ha
+	 * leído la etiqueta, el ojo llega tarde. Vive aquí y no en cada sección
+	 * porque todos los encabezados deberían comportarse igual; si se deja en el
+	 * marcado de cada uno, basta un forgotten para que uno se quede quieto
 	 * mientras los demás entran.
+	 *
+	 * `--i` es la posición en la secuencia y las dos capas del sistema lo
+	 * leen: milisegundos en el respaldo con `transition`, porcentaje del
+	 * recorrido en la animación de scroll.
 	 */
-	data-reveal="up"
 >
 	{
 		kicker && (
-			<p class="kicker">
+			<p class="kicker" data-reveal="nudge" style="--i:0">
 				<Icon name="sparkle" class="size-3.5" />
 				{kicker}
 			</p>
@@ -69,6 +75,8 @@ const Tag = level
 				? 'text-[clamp(2.4rem,6.2vw,4.25rem)] leading-[1.04]'
 				: 'text-[clamp(1.75rem,3.6vw,2.75rem)] leading-[1.1]',
 		]}
+		data-reveal="up"
+		style="--i:1"
 	>
 		{highlight ? <>{title} <strong class="font-extrabold">{highlight}</strong></> : title}
 	</Tag>
@@ -77,17 +85,21 @@ const Tag = level
 		description && (
 			<p
 				class="text-[1.0625rem] leading-relaxed text-zinc-600"
-				style={`max-width:${measure}rem`}
+				style={`max-width:${measure}rem; --i:2`}
+				data-reveal="fade"
 			>
 				{description}
 			</p>
 		)
 	}
 
-	{/* Regla que se dibuja al entrar: el trazo crece en X, no aparece de golpe. */}
+	{/* Regla que se dibuja al entrar: el trazo crece en X, no aparece de golpe.
+	    Va al final de la secuencia y por eso tarda más que el texto: cierra el
+	    encabezado en vez de competir con él. */}
 	<span
 		class="mt-1 block h-px w-14 origin-left bg-brand-600/45"
 		data-reveal="draw"
+		style="--i:3"
 		aria-hidden="true"
 	></span>
 </div>

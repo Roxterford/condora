@@ -60,7 +60,8 @@ import { problems, site, steps } from '../../data/site'
 						problems.map((problem, index) => (
 							<li
 								class="group flex gap-3.5 border-t border-zinc-200 py-4 transition-colors duration-500 ease-brand group-hover:border-brand-600/35"
-								style={`--reveal-delay:${index * 80}ms`}
+								data-reveal="up"
+								style={`--i:${index}`}
 							>
 								<span class="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-zinc-200 font-mono text-[0.68rem] font-semibold text-zinc-600 transition-colors duration-500 ease-brand group-hover:bg-brand-600 group-hover:text-white">
 									{index + 1}
@@ -107,8 +108,8 @@ import { problems, site, steps } from '../../data/site'
 						steps.map((step, index) => (
 							<li
 								class="group relative flex gap-4"
-								data-reveal="fade"
-								style={`--reveal-delay:${index * 110}ms`}
+								data-reveal="up"
+								style={`--i:${index}`}
 							>
 								<span class="flex flex-col items-center">
 									<span class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-brand-50 font-mono text-[0.75rem] font-semibold text-brand-800 ring-1 ring-brand-600/20 ring-inset transition-all duration-500 ease-brand group-hover:bg-brand-600 group-hover:text-white">

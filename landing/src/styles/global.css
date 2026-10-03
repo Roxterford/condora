@@ -235,6 +235,35 @@
 	[hidden] {
 		display: none !important;
 	}
+
+	/* ==========================================================================
+	   Sintonía del movimiento al hacer scroll
+
+	   Estos valores se ajustan desde aquí, no desde las animaciones: cambiar la
+	   cadencia de toda la página en un solo sitio es la diferencia entre "se
+	   mueve" y "se mueve demasiado".
+
+	   - Las distancias ARE el peso de la entrada. Con 14 px el bloque se limita a
+	     desvanecerse y el scroll se percibe como una lista quieta; a partir de
+	     unos 28 px el movimiento se registra sin volverse un golpe.
+	   - `--reveal-stagger` (respaldo con `transition`) y `--reveal-stagger-range`
+	     (nativo con `animation-timeline`) son el mismo escalonado medido en dos
+	     unidades distintas: milisegundos y porcentaje del recorrido de entrada.
+	   ========================================================================== */
+	:root {
+		--reveal-distance: 1.75rem;
+		--reveal-distance-x: 2.5rem;
+		/* Recorrido corto para piezas pequeñas. Una etiqueta de 11 px no puede
+		   recorrer 40 px en horizontal: el travelled supera su propio ancho y
+		   se lee como que entra volando desde fuera, no como que aparece. */
+		--reveal-distance-sm: 0.875rem;
+		--reveal-scale: 0.94;
+		--reveal-duration: 0.9s;
+		--reveal-stagger: 90ms;
+		--reveal-stagger-range: 7%;
+		/** Tope del escalonado: más allá de esto el último llega tarde. */
+		--reveal-stagger-cap: 5;
+	}
 }
 
 /* ==========================================================================
@@ -292,19 +321,22 @@
 /* ==========================================================================
    Sistema de animación al hacer scroll
 
-   Qué cambió respecto a la versión anterior, que se sentía dura:
+   Cada bloque animable lleva `data-reveal="<tipo>"` y, si va en una lista, un
+   `--i` con su posición. Las dos capas de abajo leen ese mismo `--i` y traducen
+   el escalonado a su unidad: milisegundos para una transición, porcentaje del
+   recorrido para una animación de scroll.
 
-   1. Distancias cortas (10-14px en vez de 20-28px). La distancia es lo que
-      más pesa en la sensación de "golpe": recorrer mucho espacio en poco
-      tiempo es lo que produce el tirón.
-   2. Curva --ease-brand (la del panel) en lugar de una curva con rebote.
-   3. Duraciones largas (0.8-1s) para la misma distancia.
-   4. Sin `scale` en las entradas: escalar provoca un "pop".
-   5. Escalonado corto (55ms) y con tope, para que el efecto acompañe sin
-     dejar una sala de espera.
+   El orden importa. Hay dos caminos porque no todos los navegadores ejecutan
+   `animation-timeline: view()`:
 
-   Capa A (por defecto): CSS scroll-driven nativo, en el hilo del compositor.
-   Capa B (respaldo): IntersectionObserver añade `data-revealed`.
+   Capa A (Chrome, Edge, Opera): CSS scroll-driven nativo, en el hilo del
+     compositor y sin código.
+   Capa B (respaldo): IntersectionObserver añade `data-revealed` y la entrada se
+     resuelve con una transición normal.
+
+   En ambos caminos el estado final es el mismo: opaco y sin transformar. Sin JS
+   tampoco hay estado inicial, así que sin JavaScript el contenido aparece
+   completo y quieto, que es el diseño bueno.
    ========================================================================== */
 
 @layer components {
@@ -343,53 +375,110 @@
 		}
 	}
 
+	/* Estado final por defecto. Las capas de abajo solo se encargan de la
+	   entrada; esto garantiza que nunca se quede a medio camino si una
+	   animación se interrumpe. */
 	[data-reveal] {
 		opacity: 1;
 		transform: none;
 	}
 
-	/* Capa A — solo si el navegador soporta timeline de scroll */
+	/* --- Capa A: scroll-driven nativo -------------------------------------- */
 	@supports (animation-timeline: view()) {
 		@media (prefers-reduced-motion: no-preference) {
-			[data-reveal='fade'],
-			[data-reveal='up'] {
-				animation: reveal-up 1ms linear both;
+			[data-reveal] {
 				animation-timeline: view();
-				animation-range: entry 0% entry 90%;
+/* `entry` empieza cuando el borde del bloque asoma. El
+				   escalonado corre el inicio Y el final, no solo el inicio: si
+				   solo se moviera el principio, la última tarjeta de una grilla
+				   seguiría animando cuando ya está por debajo de la mitad de la
+				   pantalla, y el efecto se siente tarde en lugar de escalonado. */
+				animation-range: entry
+					calc(min(var(--i, 0), var(--reveal-stagger-cap)) * var(--reveal-stagger-range))
+					entry
+					calc(
+						min(88% + min(var(--i, 0), var(--reveal-stagger-cap)) * var(--reveal-stagger-range), 100%)
+					);
 			}
 
-			[data-reveal='slide-left'],
+			[data-reveal='fade'] {
+				animation-name: reveal-fade;
+			}
+
+			[data-reveal='up'] {
+				animation-name: reveal-up;
+			}
+
+			[data-reveal='scale'] {
+				animation-name: reveal-scale;
+			}
+
+			[data-reveal='nudge'] {
+				animation-name: reveal-nudge;
+			}
+
+			[data-reveal='slide-left'] {
+				animation-name: reveal-left;
+			}
+
 			[data-reveal='slide-right'] {
-				animation: reveal-x 1ms linear both;
-				animation-timeline: view();
-				animation-range: entry 0% entry 90%;
+				animation-name: reveal-right;
 			}
 
 			[data-reveal='draw'] {
-				animation: reveal-draw 1ms linear both;
-				animation-timeline: view();
-				animation-range: entry 0% entry 100%;
+				animation-name: reveal-draw;
+				animation-range: entry
+					calc(min(var(--i, 0), var(--reveal-stagger-cap)) * var(--reveal-stagger-range))
+					entry
+					calc(
+						min(70% + min(var(--i, 0), var(--reveal-stagger-cap)) * var(--reveal-stagger-range), 100%)
+					);
+			}
+
+			/*
+			 * Las animaciones de scroll se escriben con duración `1ms` y una
+			 * línea de tiempo propia: la duración no marca el ritmo, lo marca
+			 * `animation-range`. Es el patrón documentado para `view()`.
+			 */
+			[data-reveal] {
+				animation-duration: 1ms;
+				animation-timing-function: linear;
+				animation-fill-mode: both;
 			}
 		}
 	}
 
-	/* Capa B — fallback con IntersectionObserver */
+	/* --- Capa B: IntersectionObserver --------------------------------------- */
 	@supports not (animation-timeline: view()) {
 		@media (prefers-reduced-motion: no-preference) {
 			html.js [data-reveal] {
 				opacity: 0;
 				transition:
-					opacity 0.85s var(--ease-brand),
-					transform 0.85s var(--ease-brand);
-				transition-delay: var(--reveal-delay, 0ms);
+					opacity var(--reveal-duration) var(--ease-brand),
+					transform var(--reveal-duration) var(--ease-brand);
+				transition-delay: calc(
+					min(var(--i, 0), var(--reveal-stagger-cap)) * var(--reveal-stagger)
+				);
+			}
+
+			html.js [data-reveal='up'] {
+				transform: translate3d(0, var(--reveal-distance), 0);
+			}
+
+			html.js [data-reveal='scale'] {
+				transform: scale(var(--reveal-scale));
+			}
+
+			html.js [data-reveal='nudge'] {
+				transform: translate3d(var(--reveal-distance-sm), 0, 0);
 			}
 
 			html.js [data-reveal='slide-left'] {
-				transform: translate3d(-0.875rem, 0, 0);
+				transform: translate3d(calc(var(--reveal-distance-x) * -1), 0, 0);
 			}
 
 			html.js [data-reveal='slide-right'] {
-				transform: translate3d(0.875rem, 0, 0);
+				transform: translate3d(var(--reveal-distance-x), 0, 0);
 			}
 
 			html.js [data-reveal][data-revealed] {
@@ -397,13 +486,6 @@
 				transform: none;
 			}
 		}
-	}
-
-	/* Escalonado para grillas. El tope evita que las tarjetas de más abajo
-	   aparezcan un segundo después de que el usuario ya las está mirando. */
-	.stagger > * {
-		animation: reveal-up 0.85s var(--ease-brand) both;
-		animation-delay: calc(min(var(--i, 0), 6) * 55ms);
 	}
 
 	/*
@@ -430,10 +512,23 @@
 		}
 	}
 
+	/* Fade puro, sin desplazamiento. Es lo que usan los párrafos: un texto que
+	   además se mueve se lee como un elemento que llega, no como una frase que
+	   se está leyendo. La capa B no declara transform para `fade`, así que
+	   ambas capas tienen que coincidir aquí. */
+	@keyframes reveal-fade {
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
+	}
+
 	@keyframes reveal-up {
 		from {
 			opacity: 0;
-			transform: translate3d(0, 0.875rem, 0);
+			transform: translate3d(0, var(--reveal-distance), 0);
 		}
 		to {
 			opacity: 1;
@@ -441,10 +536,48 @@
 		}
 	}
 
-	@keyframes reveal-x {
+	/* Escalar entra con una curva larga y un recorrido chico. Con distancia
+	   grande el "pop" es inevitable: la forma cambia mientras se atraviesa, y
+	   eso se lee como un cambio de tamaño en lugar de una entrada. */
+	@keyframes reveal-scale {
 		from {
 			opacity: 0;
-			transform: translate3d(var(--reveal-from, 0.875rem), 0, 0);
+			transform: scale(var(--reveal-scale));
+		}
+		to {
+			opacity: 1;
+			transform: scale(1);
+		}
+	}
+
+	/* Deslizamiento corto en horizontal: para etiquetas y metas, donde el
+	   recorrido largo de una columna se vería exagerado. */
+	@keyframes reveal-nudge {
+		from {
+			opacity: 0;
+			transform: translate3d(var(--reveal-distance-sm), 0, 0);
+		}
+		to {
+			opacity: 1;
+			transform: none;
+		}
+	}
+
+	@keyframes reveal-left {
+		from {
+			opacity: 0;
+			transform: translate3d(calc(var(--reveal-distance-x) * -1), 0, 0);
+		}
+		to {
+			opacity: 1;
+			transform: none;
+		}
+	}
+
+	@keyframes reveal-right {
+		from {
+			opacity: 0;
+			transform: translate3d(var(--reveal-distance-x), 0, 0);
 		}
 		to {
 			opacity: 1;
@@ -484,9 +617,5 @@
 	[data-reveal] {
 		opacity: 1 !important;
 		transform: none !important;
-	}
-
-	.stagger > * {
-		animation: none !important;
 	}
 }

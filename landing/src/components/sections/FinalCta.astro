@@ -30,24 +30,41 @@ import { site } from '../../data/site'
 			data-parallax
 		></div>
 
-		<div class="relative" data-reveal="up">
-			<div class="flex justify-center">
+		{/*
+			Las piezas entran por separado y en orden de lectura. Este bloque era
+			un solo `data-reveal`, así que el logotipo, el titular, el texto, los
+			botones y la lista de comprobaciones aparecían de golpe como una sola
+			masa: el ojo no tenía por dónde entrar. Con `--i` la secuencia sube
+			hacia abajo, que es como se lee el bloque.
+		*/}
+		<div class="relative">
+			<div class="flex justify-center" data-reveal="scale" style="--i:0">
 				<BrandLockup variant="blanco" size={2.1} class="opacity-95" />
 			</div>
 
 			<h2
 				id="cta-title"
 				class="mx-auto mt-8 max-w-[22ch] text-[clamp(2rem,4.8vw,3.25rem)] leading-[1.06] font-light tracking-[-0.025em] text-zinc-50"
+				data-reveal="up"
+				style="--i:1"
 			>
 				Empieza por ver <strong class="font-extrabold">tu condominio</strong> funcionando
 			</h2>
 
-			<p class="mx-auto mt-5 max-w-[52ch] text-[1.05rem] leading-relaxed text-zinc-300/75">
+			<p
+				class="mx-auto mt-5 max-w-[52ch] text-[1.05rem] leading-relaxed text-zinc-300/75"
+				data-reveal="fade"
+				style="--i:2"
+			>
 				Escríbenos y te preparamos una demo con los datos de una propiedad de ejemplo.
 				Te mostramos qué ya funciona y qué está en camino, sin adornos.
 			</p>
 
-			<div class="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+			<div
+				class="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row"
+				data-reveal="up"
+				style="--i:3"
+			>
 				<Button href={site.requestDemoHref} variant="inverse" size="lg">
 					Solicita una demo
 				</Button>
@@ -65,7 +82,7 @@ import { site } from '../../data/site'
 				}
 			</div>
 
-			<p class="mt-8 text-[0.8125rem] text-zinc-400">
+			<p class="mt-8 text-[0.8125rem] text-zinc-400" data-reveal="fade" style="--i:4">
 				Respondemos por correo a{' '}
 				<a
 					href={site.supportHref}
@@ -75,11 +92,19 @@ import { site } from '../../data/site'
 				</a>
 			</p>
 
-			<ul class="mx-auto mt-10 flex max-w-2xl flex-wrap items-center justify-center gap-x-6 gap-y-3">
+			<ul
+				class="mx-auto mt-10 flex max-w-2xl flex-wrap items-center justify-center gap-x-6 gap-y-3"
+				data-reveal="up"
+				style="--i:5"
+			>
 				{
 					['Dashboard, cuotas y pagos', 'Cuotas ordinarias y especiales', 'Sin tarjeta de crédito'].map(
-						(item) => (
-							<li class="inline-flex items-center gap-2 text-[0.84rem] text-zinc-400">
+						(item, index) => (
+							<li
+								class="inline-flex items-center gap-2 text-[0.84rem] text-zinc-400"
+								data-reveal="fade"
+								style={`--i:${5 + index}`}
+							>
 								<Icon name="check" class="size-4 shrink-0 text-brand-400" weight={2.25} />
 								{item}
 							</li>

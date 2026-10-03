@@ -30,6 +30,15 @@ function initParallax() {
 	const items = [...document.querySelectorAll<HTMLElement>('[data-parallax]')];
 	if (items.length === 0 || REDUCED_MOTION.matches) return;
 
+	/**
+	 * Amplitud en píxeles por unidad de profundidad, con el elemento en el centro
+	 * del viewport. Antes eran 26 px y la sensación era que el decorado estaba
+	 * quieto: el ojo solo registra depths de parallax a partir de unos 40 px.
+	 * 68 px es suficiente para que la profundidad se note sin que el manchón se
+	 * despegue del borde que lo ancla.
+	 */
+	const AMPLITUDE = 68;
+
 	let raf = 0;
 
 	const update = () => {
@@ -48,7 +57,7 @@ function initParallax() {
 			const depth = Number(item.dataset.parallax) || 1;
 			const sign = item.dataset.parallaxDir === 'reverse' ? -1 : 1;
 
-			item.style.setProperty('--parallax-y', `${(relative * depth * sign * 26).toFixed(2)}px`);
+			item.style.setProperty('--parallax-y', `${(relative * depth * sign * AMPLITUDE).toFixed(2)}px`);
 		}
 	};
 
