@@ -57,7 +57,10 @@ export function PanelBreadcrumb() {
   }
 
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+      {/* `min-w-0 overflow-x-auto` para que una ruta larga scrollee en lugar de
+          empujar el botón "Volver" fuera de la pantalla. */}
+      <div className="min-w-0 overflow-x-auto">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -92,11 +95,12 @@ export function PanelBreadcrumb() {
             ))}
         </BreadcrumbList>
       </Breadcrumb>
+      </div>
 
       <Button
         variant="link"
         onClick={handleBack}
-        className={`text-gray-500 ${showBackButton ? "" : "invisible pointer-events-none"}`}
+        className={`shrink-0 self-start text-gray-500 sm:self-auto ${showBackButton ? "" : "invisible pointer-events-none"}`}
         aria-label={parent ? `Volver a ${parent.label}` : "Volver atrás"}
       >
         <ArrowLeft size={16} />

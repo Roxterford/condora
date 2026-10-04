@@ -51,7 +51,7 @@ export function OutboxAdminView() {
   return (
     <div className="mt-8 space-y-6">
       {/* Stat cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+      <div className="statcards">
         <OutboxStatCard
           title="Eventos pendientes"
           value={stats.data?.pending}
@@ -70,21 +70,23 @@ export function OutboxAdminView() {
 
       {/* Tabs */}
       <Tabs defaultValue="dlq">
-        <div className="flex items-center justify-between">
-          <TabsList>
-            <TabsTrigger value="dlq">
-              Dead Letter Queue
-              <Badge variant="destructive" className="ml-1">
-                {dlq.data?.count ?? "-"}
-              </Badge>
-            </TabsTrigger>
-            <TabsTrigger value="pending">
-              Pendientes
-              <Badge variant="outline" className="ml-1">
-                {pending.data?.count ?? "-"}
-              </Badge>
-            </TabsTrigger>
-          </TabsList>
+        <div className="flex items-center justify-between gap-3">
+          <div className="tabs-scroll min-w-0">
+            <TabsList>
+              <TabsTrigger value="dlq">
+                Dead Letter Queue
+                <Badge variant="destructive" className="ml-1">
+                  {dlq.data?.count ?? "-"}
+                </Badge>
+              </TabsTrigger>
+              <TabsTrigger value="pending">
+                Pendientes
+                <Badge variant="outline" className="ml-1">
+                  {pending.data?.count ?? "-"}
+                </Badge>
+              </TabsTrigger>
+            </TabsList>
+          </div>
           <button
             className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700"
             onClick={() =>

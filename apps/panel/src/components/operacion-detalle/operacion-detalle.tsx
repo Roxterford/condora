@@ -80,7 +80,7 @@ function ResumenBoxes({ operacion }: { operacion: Operacion }) {
   const positivo = operacion.__typename === "Pago";
 
   return (
-    <div className="grid grid-cols-3 divide-x divide-border">
+    <div className="detail-grid">
       <Box titulo="Total">
         <p
           className={[
@@ -122,7 +122,7 @@ function CajasDeDetalle({ operacion }: { operacion: Operacion }) {
         </p>
       </Box>
 
-      <div className="grid grid-cols-2 divide-x divide-border">
+      <div className="grid grid-cols-1 divide-y divide-border sm:grid-cols-2 sm:divide-y-0 sm:divide-x">
         <Box titulo="Monto">
           <p
             className={[

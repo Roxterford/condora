@@ -9,7 +9,7 @@ import {
   CreditCardPlus,
 } from "lucide-react";
 
-import StatCard from "../../../components/ui/StatCard";
+import StatCard from "@/components/stat-card/stat-card";
 import FinancialChart from "./components/FinancialChart";
 import RecentPayments from "./components/RecentPayments";
 import DashboardTabs from "./components/DashboardTabs";
@@ -41,7 +41,7 @@ export default function Dashboard() {
   return (
     <>
       {/* Title */}
-      <header className="flex justify-between">
+      <header className="page-header">
         <div>
           <h1 className="text-4xl font-bold text-gray-800">
             Condora
@@ -51,7 +51,7 @@ export default function Dashboard() {
           </p>
         </div>
 
-        <div className="flex self-start gap-2">
+        <div className="page-actions">
           <Button variant="outline" onClick={registrarGastoOverlay.open}>
             <CreditCardMinus /> Registrar Gasto
           </Button>
@@ -62,7 +62,7 @@ export default function Dashboard() {
       </header>
 
       {/* Stat Cards */}
-      <ul className="statcards | mt-8">
+      <ul className="statcards mt-8">
         <li>
           <StatCard
             title="Mensualidad"

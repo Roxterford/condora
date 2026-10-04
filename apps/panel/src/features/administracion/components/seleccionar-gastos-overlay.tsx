@@ -105,7 +105,7 @@ export function SeleccionarGastosOverlay(props: SeleccionarGastosOverlayProps) {
             )}
           </p>
           <hr />
-          <ul className="mt-3  -mx-6 px-6 space-y-5 max-h-[40vh] min-h-[30vh] overflow-y-auto">
+          <ul className="mt-3  -mx-6 px-6 space-y-5 max-h-[40dvh] min-h-[30dvh] overflow-y-auto">
             {gastos_selectos.length === 0 && (
               <li className="grid">
                 <Empty>
@@ -286,7 +286,7 @@ function Busqueda({ onAdd, onVerDetalles, omitIDs }: BusquedaProps) {
         align="center"
         side="bottom"
         collisionAvoidance={{ side: "flip", fallbackAxisSide: "none" }}
-        className="w-(--anchor-width) max-h-[30vh]"
+        className="w-(--anchor-width) max-h-[30dvh]"
         initialFocus={false}
       >
         {(buscarOperaciones.data?.data?.gastos.data.filter(

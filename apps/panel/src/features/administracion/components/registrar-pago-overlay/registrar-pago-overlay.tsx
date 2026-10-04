@@ -225,7 +225,7 @@ export function RegistrarPagoOverlay({
   return (
     <Dialog {...props} modal={false}>
       <DialogContent
-        className="md:min-w-lg max-h-[90vh] max-w-2xl"
+        className="md:min-w-lg max-h-[90dvh] max-w-2xl"
         initialFocus={inputRefs[initialFocus]}
       >
         <DialogHeader>
@@ -236,7 +236,7 @@ export function RegistrarPagoOverlay({
         </DialogHeader>
 
         <form
-          className="grid gap-4 overflow-y-auto max-h-[70vh] -mx-6 px-6 pb-6"
+          className="grid gap-4 overflow-y-auto max-h-[70dvh] -mx-6 px-6 pb-6"
           onSubmit={handleSubmit}
         >
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

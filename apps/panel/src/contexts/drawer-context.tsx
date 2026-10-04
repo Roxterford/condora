@@ -4,13 +4,23 @@ import { createContext, useContext, useState, useCallback, type ReactNode } from
 
 type DrawerSide = 'right' | 'left' | 'bottom'
 
+/**
+ * Ancho máximo del drawer, en px, **aplicado solo desde `sm`**.
+ *
+ * En móvil el drawer ocupa el 100% del viewport (ver `DynamicDrawer`), así que
+ * este valor no tiene sentido por debajo de 768px. Se expresa en px y no como
+ * clase porque viaja por una variable CSS.
+ */
+export const DRAWER_DEFAULT_SIZE = 400
+
 type DrawerOptions = {
 	content?: ReactNode
 	loader?: () => Promise<ReactNode>
 	title?: string
 	titleBadge?: ReactNode
 	side?: DrawerSide
-	size?: number | string
+	/** Ancho máximo desde `sm`. Ignorado cuando `side` es `bottom`. */
+	size?: number
 }
 
 type DrawerState = {
@@ -19,7 +29,7 @@ type DrawerState = {
 	title: string
 	titleBadge?: ReactNode
 	side: DrawerSide
-	size: number | string
+	size: number
 	loading: boolean
 }
 
@@ -34,7 +44,7 @@ const INITIAL_STATE: DrawerState = {
 	content: null,
 	title: '',
 	side: 'right',
-	size: 400,
+	size: DRAWER_DEFAULT_SIZE,
 	loading: false,
 }
 
@@ -44,7 +54,7 @@ export function DrawerProvider({ children }: { children: ReactNode }) {
 	const [state, setState] = useState<DrawerState>(INITIAL_STATE)
 
 	const open = useCallback((options: DrawerOptions) => {
-		const { content, loader, title = '', titleBadge, side = 'right', size = 400 } = options
+		const { content, loader, title = '', titleBadge, side = 'right', size = DRAWER_DEFAULT_SIZE } = options
 
 		if (loader) {
 			setState({ isOpen: true, content: null, title, titleBadge, side, size, loading: true })

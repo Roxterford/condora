@@ -19,6 +19,11 @@ import { Spinner } from "@/components/ui/spinner";
 import { graphql } from "@/providers/graphql";
 import { execute } from "@/providers/graphql/execute";
 import type { LoginMutationVariables } from "@/providers/graphql/graphql";
+import {
+  REMEMBER_ME_MAX_AGE,
+  SESSION_MAX_AGE,
+  setAuthCookie,
+} from "@/lib/auth-cookie";
 import { FORGOT_PASSWORD_HREF } from "../support-links";
 
 const LoginMutation = graphql(/* GraphQL */ `
@@ -28,10 +33,6 @@ const LoginMutation = graphql(/* GraphQL */ `
     }
   }
 `);
-
-const COOKIE_NAME = "api_token";
-const SESSION_MAX_AGE = 60 * 60 * 24;
-const REMEMBER_ME_MAX_AGE = 60 * 60 * 24 * 30;
 
 export function LoginForm() {
   const router = useRouter();
@@ -46,7 +47,7 @@ export function LoginForm() {
       if (!token) return;
 
       const maxAge = rememberMe ? REMEMBER_ME_MAX_AGE : SESSION_MAX_AGE;
-      document.cookie = `${COOKIE_NAME}=${token}; path=/; max-age=${maxAge}; SameSite=Lax`;
+      setAuthCookie(token, maxAge);
 
       router.push("/dashboard");
       router.refresh();

@@ -30,7 +30,7 @@ export function GastoSidebar({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent>
-        <SheetHeader className="px-8">
+        <SheetHeader className="px-4 sm:px-8">
           <div className="flex gap-2 items-center">
             <SheetTitle className="font-semibold text-lg">
               Información de Pago
@@ -101,7 +101,7 @@ export function GastoSidebar({
             <div className="grid place-items-center select-none rounded-lg size-15 font-medium text-3xl bg-indigo-100 text-indigo-500">
               {gasto?.proveedor.nombre.charAt(0).toUpperCase()}
             </div>
-            <table className="w-full">
+            <table className="w-full table-fixed">
               <tbody>
                 <tr>
                   <th className="text-start py-2">Nombre:</th>

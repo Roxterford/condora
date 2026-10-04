@@ -18,7 +18,7 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
 	const isDebug = isDebugMode() && error instanceof GraphqlError;
 
 	return (
-		<div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 p-6 text-center">
+		<div className="flex min-h-[60dvh] flex-col items-center justify-center gap-4 p-6 text-center">
 			{isDebug ? (
 				<div className="w-full max-w-2xl text-left">
 					<GraphqlErrorView errors={error.errors} />

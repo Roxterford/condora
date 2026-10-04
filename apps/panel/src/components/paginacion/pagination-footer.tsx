@@ -19,13 +19,18 @@ export function PaginacionFooter({
   onLimitChange,
   onPageChange,
 }: PaginacionFooterProps) {
+  /*
+   * Este pie lo comparten todas las tablas. Con una sola fila y `justify-between`
+   * el grupo de la derecha no entraba en 375px y se salía de la pantalla, así
+   * que en móvil el texto y los controles bajan a filas separadas.
+   */
   return (
-    <div className="flex items-center justify-between pt-4">
+    <div className="flex flex-col gap-3 pt-4 sm:flex-row sm:items-center sm:justify-between">
       <p className="text-muted-foreground text-sm">
         Página <span className="font-bold">{currentPage}</span> de{" "}
         <span className="font-bold">{totalPages}</span>
       </p>
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 sm:justify-end">
         <ResultadosPorPagina limit={limit} onLimitChange={onLimitChange} />
         <div className="flex items-center gap-1">
           <Button

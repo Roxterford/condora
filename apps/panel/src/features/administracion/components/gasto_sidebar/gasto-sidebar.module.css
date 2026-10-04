@@ -1,21 +1,17 @@
 @reference "#app.css";
 
-
 .section {
-  @apply px-8 ;
+  /* `px-4` en móvil: `px-8` (32px por lado) dejaba 64px de gutter en un
+     viewport de 375px y el contenido quedaba con ~310px útiles. */
+  @apply px-4 sm:px-8;
 }
 
 .infixboxes {
-  @apply grid gap-x-10 gap-y-2;
+  @apply grid gap-x-6 gap-y-2 sm:gap-x-10;
 }
 
 .infoboxes {
-  @apply flex gap-10 flex-wrap;
-}
-
-.infoboxes {
-  @apply flex gap-10;
-
+  @apply flex flex-wrap gap-6 sm:gap-10;
 }
 
 .infoboxes__separator {
@@ -29,6 +25,5 @@
 }
 
 .infobox__value {
-  @apply  font-medium;
-
+  @apply font-medium;
 }

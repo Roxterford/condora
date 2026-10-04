@@ -6,7 +6,7 @@ import { EstadoUnidadTag } from "@/components/estado-unidad-tag";
 import { DeudaUnidadTag } from "@/components/deuda-unidad-tag";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { money } from "@/lib/money-display";
-import StatCard from "@/components/ui/StatCard";
+import StatCard from "@/components/stat-card/stat-card";
 import { EstadoDeDeuda, VillaPageQuery } from "@/providers/graphql/graphql";
 import { es } from "date-fns/locale";
 import { format } from "date-fns";
@@ -169,7 +169,7 @@ export default async function VillaPage(page: VillaPageProps) {
             )}
           </ul>
 
-          <ul className="statcards |  mt-10">
+          <ul className="statcards mt-10">
             <li>
               <StatCard
                 title={"Estado de cuenta"}
@@ -228,12 +228,14 @@ export default async function VillaPage(page: VillaPageProps) {
           </ul>
 
           <Tabs defaultValue="deudas">
-            <TabsList variant="line">
-              <TabsTrigger value="deudas">Deudas</TabsTrigger>
-              <TabsTrigger value="pagos">Pagos</TabsTrigger>
-              <TabsTrigger value="documentos">Documentos</TabsTrigger>
-              <TabsTrigger value="notificaciones">Notificaciones</TabsTrigger>
-            </TabsList>
+            <div className="tabs-scroll">
+              <TabsList variant="line">
+                <TabsTrigger value="deudas">Deudas</TabsTrigger>
+                <TabsTrigger value="pagos">Pagos</TabsTrigger>
+                <TabsTrigger value="documentos">Documentos</TabsTrigger>
+                <TabsTrigger value="notificaciones">Notificaciones</TabsTrigger>
+              </TabsList>
+            </div>
 
             <TabsContent value="deudas" className="space-y-5">
               <h3>Historial de deudas</h3>

@@ -42,6 +42,7 @@ export function CuotasPageTaps({
   return (
     <>
       <Tabs value={tab} onValueChange={(v) => onTabChange(v as CuotasPageTab)}>
+        <div className="tabs-scroll">
         <TabsList variant="line">
           {CUOTAS_TABS.map((t) => (
             <TabsTrigger key={t.value} value={t.value}>
@@ -55,6 +56,7 @@ export function CuotasPageTaps({
             </TabsTrigger>
           ))}
         </TabsList>
+        </div>
       </Tabs>
       <Paginacion
         currentPage={currentPage}

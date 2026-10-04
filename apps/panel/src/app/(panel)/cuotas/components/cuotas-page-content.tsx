@@ -166,7 +166,7 @@ export function CuotasPageContent() {
 
   return (
     <>
-      <header className="flex items-center justify-between">
+      <header className="page-header">
         <div>
           <h1 className="page-title">Cuotas</h1>
           <p className="page-description">
@@ -174,7 +174,7 @@ export function CuotasPageContent() {
           </p>
         </div>
 
-        <Link href="/cuotas/registrar">
+        <Link href="/cuotas/registrar" className="shrink-0">
           <Button>
             <Plus /> Nueva cuota
           </Button>

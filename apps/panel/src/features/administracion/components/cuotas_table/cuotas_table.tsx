@@ -95,14 +95,14 @@ const COLUMNS: ColumnConfig[] = [
     getValue: (c) => {
       const detalles = detallesDeLaCuota(c);
       return detalles ? (
-        <div className="flex min-w-48 flex-col">
+        <div className="flex flex-col sm:min-w-48">
           <span className="font-medium text-foreground">{detalles.titulo}</span>
           <span className="text-xs text-muted-foreground">
             {NOMBRE_DE_MES[c.mes]} {c.anio}
           </span>
         </div>
       ) : (
-        <div className="flex min-w-48 flex-col">
+        <div className="flex flex-col sm:min-w-48">
           <span className="font-medium text-foreground">
             {NOMBRE_DE_MES[c.mes]} {c.anio}
           </span>
@@ -243,7 +243,7 @@ export function CuotasTable({
               switch (col) {
                 case 0:
                   return (
-                    <div className="grid min-w-48 gap-1.5">
+                    <div className="grid gap-1.5 sm:min-w-48">
                       <Skeleton className="h-4 w-28" />
                       <Skeleton className="h-3 w-20" />
                     </div>

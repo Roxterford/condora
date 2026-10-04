@@ -13,17 +13,23 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-[#fff]">
+    <div className="flex min-h-dvh bg-[#fff]">
       {/* Sidebar (izquierda) */}
       <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
       {/* Main */}
-      <div className="flex-1 flex flex-col">
+      {/* `min-w-0` es lo que permite que el contenido angosto se encoja en vez
+          de estirar el flex row. Sin él, cualquier hijo con ancho fijo (tabla,
+          drawer) ensancha la columna y aparece scroll horizontal en la página. */}
+      <div className="flex min-w-0 flex-1 flex-col">
         {/* Header */}
         <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
         {/* Content */}
-        <main className="flex-1 p-4 md:p-6 overflow-x-hidden overflow-y-auto">
+        {/* `overflow-x-clip` en vez de `hidden`: `hidden` convierte el elemento
+            en contenedor de scroll y rompe `position: sticky` de los hijos,
+            mientras que `clip` recorta sin crear contexto de scroll. */}
+        <main className="flex-1 overflow-x-clip p-4 md:p-6">
           <PanelBreadcrumb />
           <div className="mt-4">{children}</div>
         </main>

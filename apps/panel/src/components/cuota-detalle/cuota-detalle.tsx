@@ -247,7 +247,7 @@ function ResumenBoxes({ cuota }: { cuota: CuotaDetalleCuota }) {
   const porcentaje = calcularPorcentaje(recaudacion);
 
   return (
-    <div className="grid grid-cols-3 divide-x divide-border">
+    <div className="detail-grid">
       <Box titulo="Monto por unidad">
         <p className="text-sm font-semibold">{money(cuota.monto)}</p>
       </Box>

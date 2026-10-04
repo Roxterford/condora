@@ -18,7 +18,7 @@ import { execute } from "@/providers/graphql/execute";
 import { renderGraphql } from "@/providers/graphql/render";
 import { CuotaPageQuery } from "@/providers/graphql/graphql";
 import { Progress } from "@/components/ui/progress";
-import StatCard from "@/components/ui/StatCard";
+import StatCard from "@/components/stat-card/stat-card";
 import {
   Empty,
   EmptyDescription,
@@ -141,7 +141,7 @@ function StatsSection({ cuota }: { cuota: Cuota }) {
   const estado = estadoRecaudacion(porcentaje);
 
   return (
-    <ul className="statcards | mt-10">
+    <ul className="statcards mt-10">
       <li>
         <StatCard
           title={"Presupuesto estimado"}
@@ -218,7 +218,11 @@ function RecaudacionSection({ cuota }: { cuota: Cuota }) {
         {cuota.__typename === "CuotaEspecial" ? "cuota especial" : "cuota"}
       </p>
 
-      <div className="mt-10 flex justify-between gap-10">
+      {/*
+       * `flex-wrap` + `gap-y`: con 5 estadísticas y `gap-10` la fila se iba 245px
+       * del viewport en 375px. En escritorio mantiene el mismo `justify-between`.
+       */}
+      <div className="mt-10 flex flex-wrap justify-between gap-x-10 gap-y-4">
         <div>
           <h3 className={styles.infobox__title}>Pagos recibidos</h3>
           <p className={styles.infobox__value}>

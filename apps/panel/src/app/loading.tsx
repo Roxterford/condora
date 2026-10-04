@@ -20,7 +20,7 @@
  */
 export default function Loading() {
   return (
-    <div className="flex min-h-screen w-full flex-col items-center justify-center gap-6 bg-[#05070a] px-6">
+    <div className="flex min-h-dvh w-full flex-col items-center justify-center gap-6 bg-[#05070a] px-6">
       <div className="relative flex size-12 items-center justify-center">
         <span className="wake-veil text-teal-400/40" />
         <span className="wake-veil text-teal-400/25 [animation-delay:0.9s]" />

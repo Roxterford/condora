@@ -15,7 +15,7 @@ import { execute } from "@/providers/graphql/execute";
 import { EstadoDeUnidad, UnidadFilter } from "@/providers/graphql/graphql";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import StatCard from "@/components/ui/StatCard";
+import StatCard from "@/components/stat-card/stat-card";
 import { money } from "@/lib/money-display";
 import { Paginacion } from "@/components/paginacion/paginacion";
 import { PaginacionFooter } from "@/components/paginacion/pagination-footer";
@@ -215,17 +215,17 @@ export function VillasPageContent() {
 
   return (
     <>
-      <header className="flex items-end justify-between">
+      <header className="page-header">
         <div>
           <h1>Villas</h1>
           <p className="page-description">
             Gestione la información de propietarios del condominio
           </p>
         </div>
-        <div className="flex gap-2"></div>
+        <div className="page-actions"></div>
       </header>
 
-      <ul className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mt-8">
+      <ul className="statcards mt-8">
         <StatCard
           color="bg-primary/10"
           icon={<Box className="text-primary" />}
@@ -258,6 +258,7 @@ export function VillasPageContent() {
 
       <section className="mt-5">
         <Tabs value={tab} onValueChange={onTabChange}>
+          <div className="tabs-scroll">
           <TabsList variant="line">
             {TABS.map((t) => (
               <TabsTrigger key={t.value} value={t.value}>
@@ -271,14 +272,15 @@ export function VillasPageContent() {
               </TabsTrigger>
             ))}
           </TabsList>
+          </div>
 
           <TabsContent value={tab} className="space-y-5">
-            <div className="flex">
+            <div className="toolbar">
               <form>
                 <InputGroup>
                   <InputGroupInput
                     placeholder="Buscar por código"
-                    className="md:min-w-68"
+                    className="w-full md:min-w-68"
                     onChange={(e) => onDebounceBusqueda(`%${e.target.value}%`)}
                   />
                   <InputGroupAddon>

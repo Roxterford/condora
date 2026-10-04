@@ -108,13 +108,11 @@ tasks:
     args:
       - "--no-error-on-unmatched-pattern"
       - "."
-      - "--ext"
-      - ".ts,.tsx,.js,.jsx"
     inputs:
       - "@group(sources)"
       - "@group(configs)"
-      - ".eslintrc*"
-    description: "Ejecuta ESLint"
+      - "eslint.config.mjs"
+    description: "Ejecuta ESLint. ROTO: eslint-plugin-react@7.37.5 no soporta eslint@10 (ver nota)"
 
   typecheck:
     command: "tsc"
@@ -142,3 +140,51 @@ tasks:
       - "--write"
       - "."
     description: "Formatea archivos con Prettier"
+
+  install-e2e:
+    command: "bunx"
+    args:
+      - "playwright"
+      - "install"
+      - "--with-deps"
+      - "chromium"
+    options:
+      cache: false
+    description: "Descarga el Chromium que usan los tests e2e (solo una vez)"
+
+  test-e2e:
+    command: "bunx"
+    args:
+      - "playwright"
+      - "test"
+    inputs:
+      - "@group(sources)"
+      - "playwright.config.ts"
+      - "e2e/**/*"
+    outputs:
+      - "e2e/.artifacts"
+      - "playwright-report"
+    env:
+      NEXT_PORT: "${NEXT_PORT:-4000}"
+    description: "Smoke tests responsivos en 375 / 768 / 1440"
+
+  check:
+    deps:
+      - "typecheck"
+    inputs:
+      - "@group(sources)"
+    description: "Verificación de tipos. NO incluye lint: está roto (ver abajo)"
+
+# NOTA — `lint` está roto y `format` no existe
+# --------------------------------------------
+# 1. `lint`: `eslint-plugin-react@7.37.5` (lo arrastra `eslint-config-next@16`)
+#    declara peer `eslint: ^3 || … || ^9.7`, pero el monorepo tiene
+#    `eslint@^10.9.1`. Todas las reglas `react/*` mueren con
+#    `contextOrFilename.getFilename is not a function`, porque ESLint 10
+#    eliminó esa API. No hay versión de `eslint-plugin-react` que lo arregle:
+#    7.37.5 es la última. La salida es bajar `eslint` a `^9`.
+#    También se retiró el flag `--ext`, que ESLint 9 eliminó.
+#
+# 2. `format` / `format-write`: no hay `prettier` instalado en el monorepo ni
+#    un `.prettierrc`, así que la task falla. `AGENTS.md` documenta las reglas
+#    de formato pero no están cableadas a ninguna herramienta.

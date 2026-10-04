@@ -218,8 +218,14 @@ export function RegistrarCuotaForm({ proveedores }: RegistrarCuotaFormProps) {
           form={form}
         />
 
-        <section>
-          <div className="flex justify-between items-center">
+        {/*
+          * `min-w-0` es obligatorio: sin él el `min-width: auto` del grid item
+          * deja que la tabla de desglose (envuelta en un `overflow-x-auto`)
+          * imponga su ancho mínimo y estire el track del `form` más allá del
+          * viewport en 375px.
+          */}
+        <section className="min-w-0">
+          <div className="flex flex-wrap justify-between items-center gap-2">
             <h3>
               Desglose de gastos
               {gastos.length > 0 && <> ({gastos.length})</>}

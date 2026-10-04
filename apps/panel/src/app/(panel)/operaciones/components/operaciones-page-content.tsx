@@ -21,7 +21,7 @@ import { OperacionesTable } from "./operaciones-table";
 import { RegistrarPagoOverlay } from "@/features/administracion/components/registrar-pago-overlay";
 import { useOverlay } from "@/hooks/useOverlay";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import StatCard from "@/components/ui/StatCard";
+import StatCard from "@/components/stat-card/stat-card";
 import {
   InputGroup,
   InputGroupAddon,
@@ -172,14 +172,14 @@ export function OperacionesPageContent() {
 
   return (
     <>
-      <header className="flex items-end justify-between">
+      <header className="page-header">
         <div>
           <h1>Operaciones</h1>
           <p className="page-description">
             Finanzas · Movimientos, pagos y gastos
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="page-actions">
           <Button variant="outline" onClick={registrarGasto.open}>
             <CreditCardMinus /> Gasto
           </Button>
@@ -191,7 +191,7 @@ export function OperacionesPageContent() {
           </Button>
         </div>
       </header>
-      <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mt-8">
+      <section className="statcards mt-8">
         <StatCard
           title="Ingresos"
           value="$440"
@@ -226,12 +226,14 @@ export function OperacionesPageContent() {
       </section>
       <section className="mt-5">
         <Tabs value={tab} onValueChange={onTabChange}>
-          <TabsList variant="line">
-            <TabsTrigger value="todas">Todas</TabsTrigger>
-            <TabsTrigger value="pagos">Pagos</TabsTrigger>
-            <TabsTrigger value="gastos">Gastos</TabsTrigger>
-            <TabsTrigger value="transacciones">Transacciones</TabsTrigger>
-          </TabsList>
+          <div className="tabs-scroll">
+            <TabsList variant="line">
+              <TabsTrigger value="todas">Todas</TabsTrigger>
+              <TabsTrigger value="pagos">Pagos</TabsTrigger>
+              <TabsTrigger value="gastos">Gastos</TabsTrigger>
+              <TabsTrigger value="transacciones">Transacciones</TabsTrigger>
+            </TabsList>
+          </div>
           <TabsContent value={tab} className="space-y-5">
             {tab === "transacciones" ? (
               <Empty>
@@ -248,12 +250,12 @@ export function OperacionesPageContent() {
               </Empty>
             ) : (
               <>
-                <div className="flex">
+                <div className="toolbar">
                   <form>
                     <InputGroup>
                       <InputGroupInput
                         placeholder="Buscar por consepto, villa o proveedor"
-                        className="md:min-w-68"
+                        className="w-full md:min-w-68"
                         onChange={(e) =>
                           onDebounceBusqueda(`%${e.target.value}%`)
                         }

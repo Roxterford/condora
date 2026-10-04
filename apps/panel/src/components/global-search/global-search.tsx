@@ -382,7 +382,7 @@ export function GlobalSearch() {
         collisionPadding={8}
         initialFocus={false}
         finalFocus={false}
-        className="gap-0 w-[min(560px,calc(100vw-2rem))] max-h-[min(480px,calc(100vh-8rem))] overflow-hidden rounded-xl p-0 shadow-lg"
+        className="gap-0 w-[min(560px,calc(100vw-2rem))] max-h-[min(480px,calc(100dvh-8rem))] overflow-hidden rounded-xl p-0 shadow-lg"
       >
         <GlobalSearchContent
           state={state}

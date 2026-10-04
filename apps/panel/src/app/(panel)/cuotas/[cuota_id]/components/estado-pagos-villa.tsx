@@ -244,6 +244,7 @@ export function EstadoPagosVilla({ cuota_id }: { cuota_id: string }) {
   return (
     <>
       <Tabs value={tab} onValueChange={onTabChange}>
+        <div className="tabs-scroll">
         <TabsList variant="line">
           {ESTADOS.map((t) => (
             <TabsTrigger key={t.value} value={t.value}>
@@ -257,14 +258,15 @@ export function EstadoPagosVilla({ cuota_id }: { cuota_id: string }) {
             </TabsTrigger>
           ))}
         </TabsList>
+        </div>
 
         <TabsContent value={tab} className="@container space-y-5">
-          <div className="flex">
+          <div className="toolbar">
             <form>
               <InputGroup>
                 <InputGroupInput
                   placeholder="Buscar por código"
-                  className="md:min-w-68"
+                  className="w-full md:min-w-68"
                   onChange={(e) => onDebounceBusqueda(`%${e.target.value}%`)}
                 />
                 <InputGroupAddon>

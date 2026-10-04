@@ -156,8 +156,60 @@
     @apply text-gray-600;
   }
 
+  /*
+   * Patrones de composición responsiva
+   * ---------------------------------
+   * Estas clases existen para que la política responsive del panel esté escrita
+   * una sola vez. Antes cada pantalla repetía el mismo `grid-cols-1
+   * md:grid-cols-2 xl:grid-cols-4` literal, y cambiar el comportamiento en
+   * móvil obligaba a grep sobre medio `src/`.
+   */
+
+  /* Grilla de tarjetas de estadística y KPI. 1 → 2 → 4 columnas. */
   .statcards {
     @apply grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6;
+  }
+
+  /*
+   * Encabezado de página: título a la izquierda, acciones a la derecha.
+   * En móvil las acciones bajan a una fila propia y se les permite partirse.
+   */
+  .page-header {
+    @apply flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between;
+  }
+
+  /* Contenedor del grupo de botones de acción. */
+  .page-actions {
+    @apply flex flex-wrap items-center gap-2;
+  }
+
+  /*
+   * Barra de herramientas: buscador + paginación sobre la misma fila.
+   * Sin esto ambos viven en un `flex` sin wrap y en 375px la paginación queda
+   * empujada fuera de la pantalla.
+   */
+  .toolbar {
+    @apply flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between;
+  }
+
+  /*
+   * Tira de tabs con scroll horizontal.
+   * `TabsList` es `w-fit` con `whitespace-nowrap`, así que con 4-5 tabs se sale
+   * del viewport en móvil. Este wrapper lo hace scrollear en lugar de desbordar.
+   */
+  .tabs-scroll {
+    @apply -mx-1 overflow-x-auto px-1;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  /* Fila de detalle dentro de un drawer: 3 columnas en escritorio, apiladas en móvil. */
+  .detail-grid {
+    @apply grid grid-cols-1 divide-y divide-border sm:grid-cols-3 sm:divide-y-0 sm:divide-x;
   }
 }
 
