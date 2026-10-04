@@ -18,7 +18,7 @@ export const site = {
 	name: 'Condora',
 	tagline: 'Gestión de cuotas y pagos para condominios',
 	description:
-		'Condora es el software de gestión de cuotas, pagos y operaciones para condominios. Centraliza el padrón, las cuotas, los pagos y los indicadores de cobranza.',
+		'Condora es el software de gestión de cuotas, pagos y operaciones para condominios. Centraliza el registro de propietarios, las cuotas, los pagos y los indicadores de cobranza.',
 	url: import.meta.env.SITE ?? 'https://condora.app',
 	locale: 'es_LA',
 	email: SUPPORT_EMAIL,
@@ -75,10 +75,10 @@ export const footerNav = [
  * Se evitan las promesas cuantitativas.
  */
 export const problems = [
-	{
-		title: 'El padrón vive en una hoja de cálculo',
-		body: 'Unidades, propietarios y saldos repartidos entre el Excel, el grupo de WhatsApp y la memoria de la administración.',
-	},
+{
+			title: 'El registro de propietarios vive en una hoja de cálculo',
+			body: 'Unidades, propietarios y saldos repartidos entre el Excel, el grupo de WhatsApp y la memoria de la administración.',
+		},
 	{
 		title: 'Cada cuota se cobra a mano',
 		body: 'Se anota lo que entra, se persigue lo que falta y nadie tiene el estado de cuenta listo para la asamblea.',
@@ -123,7 +123,7 @@ export const modules = [
 		route: '/cuotas',
 		title: 'Cuotas',
 		stage: 'Emisión',
-		feedsFrom: 'El padrón cargado',
+		feedsFrom: 'El registro de propietarios cargado',
 		feedsTo: 'Los pagos que se registran',
 		body: 'Cuotas ordinarias y especiales, con su detalle, sus pagos asociados y el historial de cada período.',
 		points: ['Ordinarias y especiales', 'Detalle por cuota', 'Pagos recibidos y asociados'],
@@ -133,10 +133,10 @@ export const modules = [
 		icon: 'home',
 		route: '/villas',
 		title: 'Villas',
-		stage: 'Padrón',
+		stage: 'Registro',
 		feedsFrom: '—',
 		feedsTo: 'Las cuotas que se emiten',
-		body: 'El padrón ordenado por unidad, con el detalle de cada villa y el estado de sus cuotas pendientes.',
+		body: 'El registro de propietarios ordenado por unidad, con el detalle de cada villa y el estado de sus cuotas pendientes.',
 		points: ['Listado por villa', 'Detalle por código', 'Cuotas pendientes por unidad'],
 	},
 	{
@@ -180,7 +180,7 @@ export const heroWords = ['condominios', 'cuotas', 'pagos', 'operaciones'] as co
 export const steps = [
 	{
 		step: '01',
-		title: 'Carga el padrón',
+		title: 'Carga el registro de propietarios',
 		body: 'Registra villas y unidades con sus propietarios. El cálculo de la cuota se prepara por villa y por mes.',
 	},
 	{
