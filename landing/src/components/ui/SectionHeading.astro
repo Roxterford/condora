@@ -70,16 +70,19 @@ const Tag = level
 		)
 	}
 
-	<Tag
-		id={id}
-		class:list={[
-			'font-semibold tracking-[-0.02em] animate-on-scroll animate-slide-up duration-700 ease-out',
-			level === 'h1'
-				? 'text-[clamp(2.4rem,6.2vw,4.25rem)] leading-[1.04]'
-				: 'text-[clamp(1.75rem,3.6vw,2.75rem)] leading-[1.1]',
-		]}
-		style="transition-delay: 100ms"
-	>
+<Tag
+			id={id}
+			class:list={[
+				'font-semibold tracking-[-0.02em] animate-on-scroll animate-slide-up duration-700 ease-out',
+				/* Los suelos del `clamp` están medidos contra la palabra más
+				   larga de cada titular: a 2.75rem, "preguntar" o
+				   "condominios" ya no cabían en una pantalla estrecha. */
+				level === 'h1'
+					? 'text-[clamp(1.85rem,6.2vw,4.25rem)] leading-[1.04]'
+					: 'text-[clamp(1.4rem,3.6vw,2.75rem)] leading-[1.1]',
+			]}
+			style="transition-delay: 100ms"
+		>
 		{highlight ? <>{title} <strong class="font-extrabold">{highlight}</strong></> : title}
 	</Tag>
 

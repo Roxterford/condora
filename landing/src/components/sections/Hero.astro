@@ -84,13 +84,18 @@ import { heroWords, site } from '../../data/site'
 
 			<h1
 				id="hero-title"
-				class="mt-7 text-[clamp(2.4rem,6.2vw,4.5rem)] leading-[1.05] font-normal tracking-[-0.03em] text-balance text-zinc-950"
+				class="mt-7 text-[clamp(1.85rem,6.2vw,4.5rem)] leading-[1.05] font-normal tracking-[-0.03em] text-balance text-zinc-950"
 			>
 				{/*
 					Una sola columna y dos líneas. Con "de" en su propia línea el
 					bloque se leía desproporcionado —una línea larga y dos de una
 					palabra—, así que la primera línea sostiene el marco y la
 					segunda lleva el peso, que es donde tiene que estar la atención.
+
+					El suelo del `clamp` no es decorativo: la palabra más larga que
+					 rota es de once letras, y a 2.4rem ya medía más que una
+					pantalla de 230px de ancho. Un `clamp` con mínimo alto es un
+					tamaño fijo disfrazado.
 				*/}
 				<span class="block animate-rise">Gestión moderna de</span>
 

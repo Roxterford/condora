@@ -17,18 +17,25 @@ import { problems, site, steps } from '../../data/site'
  */
 ---
 
-<section id="producto" aria-labelledby="producto-title" class="relative scroll-mt-24 py-24 sm:py-32">
+<section
+	id="producto"
+	aria-labelledby="producto-title"
+	class="relative scroll-mt-24 overflow-x-clip py-24 sm:py-32"
+>
 		{/*
 			Decorado con paralaje. Se mueve a una velocidad distinta del texto, y
 			por eso el scroll se siente como profundidad y no como una lista que
 			se desplaza. Va en un `aria-hidden` porque no aporta nada al lector: es
 			mancha de color, no información.
+
+			El centrado va en `-translate-x-1/2` y no en `--parallax-x`: la
+			traducción es parte de la posición del elemento, no de la animación.
+			Si viviera en la variable, `transform: none` de `prefers-reduced-motion`
+			dejaría la mancha descentrada y colgando fuera del borde.
 		*/}
 		<span
-			class="pointer-events-none absolute -top-24 left-1/2 size-[34rem] rounded-full bg-brand-200/25 blur-[110px]"
-			style="--parallax-x:-50%"
+			class="pointer-events-none absolute -top-24 left-1/2 size-[34rem] -translate-x-1/2 rounded-full bg-brand-200/25 blur-[110px]"
 			data-parallax="0.6"
-			
 			aria-hidden="true"
 		></span>
 
@@ -47,7 +54,7 @@ import { problems, site, steps } from '../../data/site'
 		<div class="mt-14 grid gap-4 lg:grid-cols-2">
 			<!-- El problema -->
 			<div
-				class="flex flex-col rounded-xl border border-zinc-200 bg-zinc-50 p-6 sm:p-8"
+				class="flex flex-col rounded-xl border border-zinc-200 bg-zinc-50 p-4 sm:p-6 lg:p-8"
 				data-reveal="slide-left"
 			>
 				<p class="kicker text-zinc-500 animate-on-scroll animate-slide-left duration-700 ease-out" style="transition-delay: 0ms">
@@ -82,7 +89,7 @@ import { problems, site, steps } from '../../data/site'
 			<!-- El flujo real -->
 			<div
 				id="como-funciona"
-				class="relative flex flex-col overflow-hidden rounded-xl border border-brand-600/20 bg-white p-6 sm:p-8"
+				class="relative flex flex-col overflow-hidden rounded-xl border border-brand-600/20 bg-white p-4 sm:p-6 lg:p-8"
 				data-reveal="slide-right"
 			>
 				<!-- Halo de marca en la esquina -->
@@ -136,8 +143,16 @@ import { problems, site, steps } from '../../data/site'
 
 				<div class="relative mt-auto pt-4">
 					<div class="animate-on-scroll animate-slide-up duration-700 ease-out" style="transition-delay: 450ms">
+						{/*
+							Etiqueta corta a propósito: el botón no parte su texto y
+							el alto está fijo, así que lo que no cabe no se
+							recorta, se desborda. "Verlo con datos de ejemplo"
+							medía 240px, más que la tarjeta entera en una pantalla
+							de 230px. El cuerpo del paso 03 ya dice qué se ve en la
+							demo.
+						*/}
 						<Button href={site.requestDemoHref} variant="primary" size="md">
-							Verlo con datos de ejemplo
+							Ver un ejemplo
 						</Button>
 					</div>
 				</div>

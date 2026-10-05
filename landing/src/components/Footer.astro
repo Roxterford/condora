@@ -7,15 +7,18 @@ import { footerNav, legalNote, site } from '../data/site'
 const year = new Date().getFullYear()
 ---
 
-<footer id="legal" class="relative scroll-mt-24 border-t border-zinc-200 bg-zinc-950 text-zinc-50">
+<footer
+	id="legal"
+	class="relative scroll-mt-24 overflow-x-clip border-t border-zinc-200 bg-zinc-950 text-zinc-50"
+>
 	<div
 		class="pointer-events-none absolute -top-24 left-1/4 size-[24rem] rounded-full bg-brand-500/12 blur-[120px]"
 		aria-hidden="true"
 	>
 	</div>
 
-	<div class="container-page relative py-16 sm:py-20">
-		<div class="grid gap-12 lg:grid-cols-[1.4fr_2fr]">
+	<div class="container-page relative py-12 sm:py-20">
+		<div class="grid gap-10 lg:grid-cols-[1.4fr_2fr]">
 			<div class="flex flex-col gap-6">
 				<BrandLockup href="/" size={2.2} variant="blanco" />
 
@@ -66,7 +69,10 @@ const year = new Date().getFullYear()
 				</div>
 			</div>
 
-			<nav aria-label="Navegación del pie de página" class="grid grid-cols-2 gap-8">
+			<nav
+			aria-label="Navegación del pie de página"
+			class="grid grid-cols-1 gap-x-8 gap-y-8 sm:grid-cols-2"
+		>
 				{
 					footerNav.map((group) => (
 						<div>

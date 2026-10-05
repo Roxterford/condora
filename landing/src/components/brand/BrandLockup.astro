@@ -11,19 +11,45 @@ interface Props {
 	href?: string
 	/** Altura en rem. El lockup mide 517:100. */
 	size?: number
+	/**
+	 * Deja que la altura se recorte sola en pantallas muy estrechas en vez de
+	 * dejar que el flexbox la aplaste. Solo el encabezado lo necesita: es la
+	 * única fila que comparte ancho con un control de tamaño fijo.
+	 */
+	fluid?: boolean
 	/** `blanco` carga la variante monocroma para fondos oscuros. */
 	variant?: 'color' | 'blanco'
 	class?: string
 }
 
-const { href = '/', size = 1.75, variant = 'color', class: className = '' } = Astro.props
+const {
+	href = '/',
+	size = 1.75,
+	fluid = false,
+	variant = 'color',
+	class: className = '',
+} = Astro.props
 const src = variant === 'blanco' ? '/condora_blanco.svg' : '/condora.svg'
+
+/**
+ * El alto disponible en el encabezado es el ancho de la ventana menos lo que
+ * la fila ya gasta: gutter (2 × 1.25rem), hueco del flexbox (0.75rem) y el
+ * botón de menú (2.25rem). Lo que sobra, dividido entre la proporción 517:100
+ * del propio lockup, es la altura máxima que cabe sin empujar nada.
+ *
+ * El `min()` mantiene el tamaño de diseño en cuanto hay sitio de sobra: por
+ * debajo de ~245px de ventana es el `min()` el que manda y el logo se reduce
+ * en vez de desaparecer.
+ */
+const height = fluid
+	? `min(${size}rem, calc((100vw - 5.25rem) / 5.17))`
+	: `${size}rem`
 ---
 
 <a
 	href={href}
 	class:list={[
-		'brand-lockup inline-flex items-center rounded-md no-underline',
+		'brand-lockup inline-flex shrink-0 items-center rounded-md no-underline',
 		className,
 	]}
 	aria-label="Condora, ir al inicio"
@@ -35,7 +61,8 @@ const src = variant === 'blanco' ? '/condora_blanco.svg' : '/condora.svg'
 		height="100"
 		loading="eager"
 		decoding="sync"
-		style={`height:${size}rem;width:auto`}
+		class="shrink-0"
+		style={`height:${height};width:auto`}
 	/>
 </a>
 

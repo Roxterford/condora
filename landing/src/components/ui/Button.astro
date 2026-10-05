@@ -17,7 +17,9 @@ interface Props {
 	variant?: 'primary' | 'outline' | 'ghost' | 'inverse'
 	size?: 'sm' | 'md' | 'lg'
 	class?: string
-	/** Dibuja la flecha de avance a la derecha. */
+	/**
+	 * Dibuja la flecha de avance a la derecha.
+	 */
 	withArrow?: boolean
 }
 
@@ -31,6 +33,13 @@ const {
 
 const isExternal = /^https?:\/\//.test(href)
 
+/**
+ * `inline-flex` va en la base, así que un `hidden` que llegue por `class` pierde
+ * siempre: Tailwind v4 emite `.flex`, `.hidden` y `.inline-flex` en ese orden, y
+ * a igual especificidad gana la última. Quien necesite ocultarlo en móvil tiene
+ * que pasar la variante (`max-sm:hidden`), que sí se ordena después de las
+ * utilidades base.
+ */
 const base =
 	'btn group/btn relative inline-flex shrink-0 items-center justify-center gap-2 overflow-hidden rounded-md border border-transparent font-medium whitespace-nowrap transition-all duration-300 ease-brand active:translate-y-px disabled:pointer-events-none disabled:opacity-50'
 
@@ -84,6 +93,23 @@ const classes = [base, variants[variant], sizes[size], className]
 </a>
 
 <style>
+	/**
+	 * Pantallas por debajo de 20rem.
+	 *
+	 * El botón no baja de tamaño porque el alto está fijo y el texto no puede
+	 * partirse. Lo que cede es el chrome: un `size="lg"` con su flecha mide
+	 * ~194px a 15px de texto y a 14px de tipografía no hay forma de meterlo en
+	 * una tarjeta estrecha. Bajando cuerpo y padding horizontal el mismo texto
+	 * entra en ~160px, y la altura no se toca: el botón sigue siendo el mismo
+	 * bloque, un poco más compacto.
+	 */
+	@media (width < 20rem) {
+		.btn {
+			font-size: 0.8125rem;
+			padding-inline: 0.75rem;
+		}
+	}
+
 	@media (prefers-reduced-motion: reduce) {
 		.btn {
 			transition-duration: 0.01ms;

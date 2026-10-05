@@ -4,18 +4,25 @@ import SectionHeading from '../ui/SectionHeading.astro'
 import Icon from '../ui/Icon.astro'
 ---
 
-<section id="faq" aria-labelledby="faq-title" class="relative scroll-mt-24 py-24 sm:py-32">
+<section
+	id="faq"
+	aria-labelledby="faq-title"
+	class="relative scroll-mt-24 overflow-x-clip py-24 sm:py-32"
+>
 		{/*
 			Decorado con paralaje. Se mueve a una velocidad distinta del texto, y
 			por eso el scroll se siente como profundidad y no como una lista que
 			se desplaza. Va en un `aria-hidden` porque no aporta nada al lector: es
 			mancha de color, no información.
+
+			El centrado va en `-translate-x-1/2` y no en `--parallax-x`: la
+			traducción es parte de la posición del elemento, no de la animación.
+			Si viviera en la variable, `transform: none` de `prefers-reduced-motion`
+			dejaría la mancha descentrada y colgando fuera del borde.
 		*/}
 		<span
-			class="pointer-events-none absolute -top-24 left-1/2 size-[34rem] rounded-full bg-brand-200/25 blur-[110px]"
-			style="--parallax-x:-50%"
+			class="pointer-events-none absolute -top-24 left-1/2 size-[34rem] -translate-x-1/2 rounded-full bg-brand-200/25 blur-[110px]"
 			data-parallax="0.7"
-			
 			aria-hidden="true"
 		></span>
 
@@ -48,7 +55,7 @@ import Icon from '../ui/Icon.astro'
 				{
 					faqs.map((faq, index) => (
 						<details
-							class="faq-item group rounded-lg border border-zinc-200 bg-white px-5 py-4 transition-[border-color,box-shadow] duration-500 ease-brand hover:border-brand-600/25 open:shadow-xs sm:px-6 sm:py-5 animate-on-scroll animate-slide-up duration-700 ease-out"
+							class="faq-item group rounded-lg border border-zinc-200 bg-white px-4 py-4 transition-[border-color,box-shadow] duration-500 ease-brand hover:border-brand-600/25 open:shadow-xs sm:px-6 sm:py-5 animate-on-scroll animate-slide-up duration-700 ease-out"
 							name="faq"
 							style={`transition-delay: ${index * 60}ms`}
 						>

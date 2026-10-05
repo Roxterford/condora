@@ -23,16 +23,24 @@ import { modules } from '../../data/site'
 const screenCount = new Intl.NumberFormat('es-ES').format(modules.length)
 ---
 
-<section id="modulos" aria-labelledby="modulos-title" class="relative bg-canvas py-24 sm:py-32">
+<section
+	id="modulos"
+	aria-labelledby="modulos-title"
+	class="relative overflow-x-clip bg-canvas py-24 sm:py-32"
+>
 		{/*
 			Decorado con paralaje. Se mueve a una velocidad distinta del texto, y
 			por eso el scroll se siente como profundidad y no como una lista que
 			se desplaza. Va en un `aria-hidden` porque no aporta nada al lector: es
 			mancha de color, no información.
+
+			El centrado va en `-translate-x-1/2` y no en `--parallax-x`: la
+			traducción es parte de la posición del elemento, no de la animación.
+			Si viviera en la variable, `transform: none` de `prefers-reduced-motion`
+			dejaría la mancha descentrada y colgando fuera del borde.
 		*/}
 		<span
-			class="pointer-events-none absolute -top-24 left-1/2 size-[34rem] rounded-full bg-brand-200/25 blur-[110px]"
-			style="--parallax-x:-50%"
+			class="pointer-events-none absolute -top-24 left-1/2 size-[34rem] -translate-x-1/2 rounded-full bg-brand-200/25 blur-[110px]"
 			data-parallax="-0.5"
 			data-parallax-dir="reverse"
 			aria-hidden="true"
@@ -87,7 +95,7 @@ const screenCount = new Intl.NumberFormat('es-ES').format(modules.length)
 							*/}
 							<button
 								type="button"
-								class="flex flex-1 flex-col items-start gap-4 p-6 text-left"
+								class="flex flex-1 flex-col items-start gap-4 p-4 text-left sm:p-6"
 								aria-expanded="false"
 								aria-controls={panelId}
 								data-module-toggle
@@ -137,7 +145,7 @@ const screenCount = new Intl.NumberFormat('es-ES').format(modules.length)
 								inert
 							>
 								<div class="overflow-hidden">
-									<div class="border-t border-zinc-100 px-6 pt-4 pb-6">
+									<div class="border-t border-zinc-100 px-4 pt-4 pb-5 sm:px-6 sm:pb-6">
 										<dl class="grid gap-3 text-[0.8125rem] sm:grid-cols-2">
 											<div class="flex flex-col gap-0.5">
 												<dt class="text-zinc-400">Recibe de</dt>

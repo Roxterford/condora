@@ -196,13 +196,21 @@
 		text-size-adjust: 100%;
 	}
 
-	body {
+body {
 		background-color: var(--color-background);
 		color: var(--color-foreground);
 		font-family: var(--font-sans);
 		font-synthesis-weight: none;
 		-webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;
+		/*
+		 * Última red de seguridad, no la solución. Decirlo aquí evita que
+		 * quede como la única: en Chrome el valor del body NO se propaga al
+		 * viewport como contenedor de recorte, así que `scrollWidth` seguía
+		 * dando 442px con 230 de ventana y la página admitía 212px de
+		 * desplazamiento horizontal. El recorte que sí funciona es el de
+		 * cada sección (`overflow-x-clip`), donde el decorado está dentro.
+		 */
 		overflow-x: clip;
 	}
 
@@ -271,11 +279,18 @@
    ========================================================================== */
 
 @utility container-page {
-	--container-gutter: 1.25rem;
+	/* Por debajo de 20rem el gutter del 1.25rem se comía casi una décima parte
+	   de la pantalla: a 230px dejaba 190px útiles, y un botón con su icono
+	   mide más que eso. 0.75rem devuelve 24px de ancho real. */
+	--container-gutter: 0.75rem;
 	width: 100%;
 	margin-inline: auto;
 	padding-inline: var(--container-gutter);
 	max-width: 80rem;
+
+	@media (width >= 20rem) {
+		--container-gutter: 1.25rem;
+	}
 
 	@media (width >= 48rem) {
 		--container-gutter: 2rem;
@@ -495,6 +510,13 @@
 	 * un `translate`. La propiedad empieza en 0 para que sin JS el decorado
 	 * quede exactamente donde está en el HTML, que es el diseño bueno: el
 	 * paralaje es una capa encima, nunca la base.
+	 *
+	 * Por eso el centrado de las manchas no se declara aquí: va en el marcado
+	 * con `-translate-x-1/2`, que usa la propiedad `translate` y se compone con
+	 * este `transform`. Si el centrado viviera en `--parallax-x`, la regla de
+	 * `prefers-reduced-motion` de abajo —que anula el `transform` para no
+	 * mover nada— se llevaría por delante el centrado y dejaría cada mancha
+	 * colgando 272px fuera del borde, con su scroll horizontal incluido.
 	 *
 	 * `will-change` se limita al decorado puntual. Ponerlo en todo el
 	 * documento fuerza capas de composición para cientos de elementos y es la
