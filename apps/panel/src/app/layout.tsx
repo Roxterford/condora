@@ -61,7 +61,7 @@ export default async function RootLayout({
         <Providers>
           <WakeGate armed={shouldArmWakeScreen} />
           {children}
-          <Devtools />
+          {process.env.NODE_ENV === "development" && <Devtools />}
           <Toaster
             position="top-right"
             toastOptions={{
