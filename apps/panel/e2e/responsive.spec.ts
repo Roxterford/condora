@@ -164,36 +164,61 @@ test.describe('drawer lateral', () => {
 })
 
 /**
- * En móvil el sidebar es un drawer con `framer-motion` y el header tiene un
- * botón de menú. Sin esto no hay forma de navigating el panel a 375px.
+ * En móvil la navegación principal es la barra inferior (`MobileTabBar`) y las
+ * rutas secundarias se abren desde "Más" en un bottom sheet. Antes el header
+ * tenía un hamburguesa y el sidebar era la navegación primaria; el test se
+ * actualizó con ese cambio.
  */
 test.describe('navegación móvil', () => {
-	test('el menú lateral abre y cerrable', async ({ page }, testInfo) => {
+	test('la barra inferior aparece solo en móvil y "Más" abre el bottom sheet', async ({
+		page
+	}, testInfo) => {
 		const viewport = testInfo.project.use.viewport
 		const isMobileLayout = (viewport?.width ?? 0) < 768
 
 		await gotoAndSettle(page, '/dashboard')
 
-		// `/menu/i` no matchea "Abrir menú": la `ú` acentuada es otro carácter.
-		// La clase de caracteres cubre ambas escrituras.
-		const menuButton = page.getByRole('button', { name: /men[uú]/i }).first()
-		const visible = await menuButton.isVisible().catch(() => false)
+		const tabBar = page.locator('nav[aria-label="Navegación principal"]')
+		const moreButton = page.getByRole('button', { name: 'Más opciones' })
 
 		if (!isMobileLayout) {
-			expect(visible, 'el botón de menú debe estar oculto en escritorio').toBe(false)
+			// En escritorio manda el sidebar de la izquierda.
+			await expect(tabBar, 'la barra inferior debe estar oculta en escritorio').toBeHidden()
+			await expect(moreButton).toBeHidden()
 			return
 		}
 
-		expect(visible, 'el botón de menú debe estar visible en móvil').toBe(true)
+		await expect(tabBar, 'la barra inferior debe estar visible en móvil').toBeVisible()
 
-		await menuButton.click()
+		// Un tab por destino principal, y `aria-current` solo en el activo.
+		await expect(tabBar.locator('li')).toHaveCount(5)
+		await expect(tabBar.locator('[aria-current="page"]')).toHaveCount(1)
 
-		// `:visible` importa: el sidebar de escritorio sigue en el DOM con
-		// `display: none`, y `.first()` se lo agarra a él en vez del drawer.
-		const nav = page.locator('nav:visible').first()
-		await expect(nav).toBeVisible()
-		await page.waitForTimeout(400)
+		await moreButton.click()
 
-		await expectNoHorizontalOverflow(page, '/dashboard (sidebar abierto)')
+		// `Sheet` sobre Base UI: es un diálogo modal, no un aside. El contenido
+		// entra con una transición de CSS, así que hay que esperarlo.
+		const sheet = page.getByRole('dialog')
+		await expect(sheet).toBeVisible({ timeout: 5000 })
+
+		// Modal de verdad: el scroll del body se bloquea mientras está abierto.
+		await expect
+			.poll(() => page.evaluate(() => getComputedStyle(document.body).overflow))
+			.toBe('hidden')
+
+		// Las 7 rutas del panel, agrupadas, y la de activa marcada.
+		await expect(sheet.locator('a')).toHaveCount(7)
+		await expect(sheet.locator('[aria-current="page"]')).toHaveCount(1)
+
+		await expectNoHorizontalOverflow(page, '/dashboard (bottom sheet abierto)')
+
+		// Cerrar y comprobar que sale del DOM.
+		await sheet.getByRole('button', { name: 'Cerrar' }).click()
+		await expect(sheet).toHaveCount(0, { timeout: 5000 })
+
+		// El scroll tiene que volver, si no la página queda bloqueada.
+		await expect
+			.poll(() => page.evaluate(() => getComputedStyle(document.body).overflow))
+			.toBe('visible')
 	})
 })
