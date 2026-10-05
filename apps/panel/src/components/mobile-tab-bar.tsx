@@ -24,9 +24,10 @@ import { isNavItemActive, PRIMARY_NAV_ITEMS, SECONDARY_NAV_ITEMS } from '@/lib/p
  *   (Reportes, Configuración, Administración) quedan detrás de "Más", que abre un
  *   bottom sheet. Así no se pierde ninguna ruta.
  *
- * - **Solo rutas que existen.** Las cuatro principales sí tienen `page.tsx`.
- *   `/reportes` y `/configuracion` aparecen en el menú lateral pero no están
- *   implementadas, así que no pueden ser tabs.
+ * - **Cuatro tabs, no seis.** `Reportes` y `Configuración` también tienen
+ *   ruta, pero a 375px un sexto item vuelve ilegibles las etiquetas. Es una
+ *   decisión de espacio, no de funcionalidad: los siete destinos siguen a un
+ *   toque desde "Más".
  *
  * - **`pb-[env(safe-area-inset-bottom)]`.** Sin esto la barra queda debajo del
  *   indicador de inicio del iPhone y el último item es intocable.

@@ -22,9 +22,11 @@ export type NavGroup = {
 }
 
 /**
- * Las cuatro rutas que tienen `page.tsx` y por eso pueden ser tab de la barra
- * inferior. `/reportes` y `/configuracion` todavía no existen, así que si entran
- * acá la barra lleva al 404.
+ * Las cuatro rutas que son tab de la barra inferior.
+ *
+ * `Reportes` y `Configuración` también tienen `page.tsx` (placeholder de
+ * "próximamente"), pero a 375px un sexto item vuelve ilegibles las etiquetas,
+ * así que van detrás de "Más". La decisión es de espacio, no de existencia.
  */
 export const PRIMARY_NAV_ITEMS: NavItem[] = [
 	{ title: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },

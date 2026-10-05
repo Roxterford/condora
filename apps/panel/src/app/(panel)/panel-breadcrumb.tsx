@@ -20,6 +20,8 @@ const LABELS: Record<string, string> = {
   registrar: 'Registrar',
   operaciones: 'Operaciones',
   pagos: 'Pagos',
+  reportes: 'Reportes',
+  configuracion: 'Configuración',
   admin: 'Administración',
   outbox: 'Outbox',
 }
