@@ -21,6 +21,7 @@ import (
 type Cuota interface {
 	IsCuota()
 	GetID() string
+	GetDisplayName() string
 	GetMonto() float64
 	GetMes() mes.Mes
 	GetAnio() int32
@@ -116,6 +117,7 @@ type BooleanCondition struct {
 
 type CuotaEspecial struct {
 	ID            string       `json:"id"`
+	DisplayName   string       `json:"display_name"`
 	Monto         float64      `json:"monto"`
 	Mes           mes.Mes      `json:"mes"`
 	Anio          int32        `json:"anio"`
@@ -128,6 +130,7 @@ type CuotaEspecial struct {
 
 func (CuotaEspecial) IsCuota()                          {}
 func (this CuotaEspecial) GetID() string                { return this.ID }
+func (this CuotaEspecial) GetDisplayName() string       { return this.DisplayName }
 func (this CuotaEspecial) GetMonto() float64            { return this.Monto }
 func (this CuotaEspecial) GetMes() mes.Mes              { return this.Mes }
 func (this CuotaEspecial) GetAnio() int32               { return this.Anio }
@@ -158,6 +161,7 @@ type CuotaFilter struct {
 
 type CuotaRegular struct {
 	ID            string       `json:"id"`
+	DisplayName   string       `json:"display_name"`
 	Monto         float64      `json:"monto"`
 	Mes           mes.Mes      `json:"mes"`
 	Anio          int32        `json:"anio"`
@@ -169,6 +173,7 @@ type CuotaRegular struct {
 
 func (CuotaRegular) IsCuota()                          {}
 func (this CuotaRegular) GetID() string                { return this.ID }
+func (this CuotaRegular) GetDisplayName() string       { return this.DisplayName }
 func (this CuotaRegular) GetMonto() float64            { return this.Monto }
 func (this CuotaRegular) GetMes() mes.Mes              { return this.Mes }
 func (this CuotaRegular) GetAnio() int32               { return this.Anio }
@@ -190,6 +195,7 @@ func (CuotaRegular) IsCuotaType() {}
 
 type CuotaSemilla struct {
 	ID            string       `json:"id"`
+	DisplayName   string       `json:"display_name"`
 	Monto         float64      `json:"monto"`
 	Mes           mes.Mes      `json:"mes"`
 	Anio          int32        `json:"anio"`
@@ -201,6 +207,7 @@ type CuotaSemilla struct {
 
 func (CuotaSemilla) IsCuota()                          {}
 func (this CuotaSemilla) GetID() string                { return this.ID }
+func (this CuotaSemilla) GetDisplayName() string       { return this.DisplayName }
 func (this CuotaSemilla) GetMonto() float64            { return this.Monto }
 func (this CuotaSemilla) GetMes() mes.Mes              { return this.Mes }
 func (this CuotaSemilla) GetAnio() int32               { return this.Anio }

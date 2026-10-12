@@ -72,6 +72,7 @@ type ComplexityRoot struct {
 		Actualizacion func(childComplexity int) int
 		Anio          func(childComplexity int) int
 		Detalles      func(childComplexity int) int
+		DisplayName   func(childComplexity int) int
 		Gastos        func(childComplexity int) int
 		ID            func(childComplexity int) int
 		Mes           func(childComplexity int) int
@@ -83,6 +84,7 @@ type ComplexityRoot struct {
 	CuotaRegular struct {
 		Actualizacion func(childComplexity int) int
 		Anio          func(childComplexity int) int
+		DisplayName   func(childComplexity int) int
 		Gastos        func(childComplexity int) int
 		ID            func(childComplexity int) int
 		Mes           func(childComplexity int) int
@@ -94,6 +96,7 @@ type ComplexityRoot struct {
 	CuotaSemilla struct {
 		Actualizacion func(childComplexity int) int
 		Anio          func(childComplexity int) int
+		DisplayName   func(childComplexity int) int
 		Gastos        func(childComplexity int) int
 		ID            func(childComplexity int) int
 		Mes           func(childComplexity int) int
@@ -494,6 +497,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.CuotaEspecial.Detalles(childComplexity), true
+	case "CuotaEspecial.display_name":
+		if e.complexity.CuotaEspecial.DisplayName == nil {
+			break
+		}
+
+		return e.complexity.CuotaEspecial.DisplayName(childComplexity), true
 	case "CuotaEspecial.gastos":
 		if e.complexity.CuotaEspecial.Gastos == nil {
 			break
@@ -543,6 +552,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.CuotaRegular.Anio(childComplexity), true
+	case "CuotaRegular.display_name":
+		if e.complexity.CuotaRegular.DisplayName == nil {
+			break
+		}
+
+		return e.complexity.CuotaRegular.DisplayName(childComplexity), true
 	case "CuotaRegular.gastos":
 		if e.complexity.CuotaRegular.Gastos == nil {
 			break
@@ -592,6 +607,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.CuotaSemilla.Anio(childComplexity), true
+	case "CuotaSemilla.display_name":
+		if e.complexity.CuotaSemilla.DisplayName == nil {
+			break
+		}
+
+		return e.complexity.CuotaSemilla.DisplayName(childComplexity), true
 	case "CuotaSemilla.gastos":
 		if e.complexity.CuotaSemilla.Gastos == nil {
 			break
@@ -2241,6 +2262,7 @@ extend type Query {
 `, BuiltIn: false},
 	{Name: "../internal/administracion/models/cuota/cuota.graphqls", Input: `interface Cuota {
   id: ID!
+  display_name: String!
   monto: Float!
   mes: Mes!
   anio: Int!
@@ -2252,6 +2274,7 @@ extend type Query {
 
 type CuotaRegular implements Cuota {
   id: ID!
+  display_name: String!
   monto: Float!
   mes: Mes!
   anio: Int!
@@ -2263,6 +2286,7 @@ type CuotaRegular implements Cuota {
 
 type CuotaEspecial implements Cuota {
   id: ID!
+  display_name: String!
   monto: Float!
   mes: Mes!
   anio: Int!
@@ -2275,6 +2299,7 @@ type CuotaEspecial implements Cuota {
 
 type CuotaSemilla implements Cuota {
   id: ID!
+  display_name: String!
   monto: Float!
   mes: Mes!
   anio: Int!
@@ -3277,6 +3302,35 @@ func (ec *executionContext) fieldContext_CuotaEspecial_id(_ context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _CuotaEspecial_display_name(ctx context.Context, field graphql.CollectedField, obj *model.CuotaEspecial) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CuotaEspecial_display_name,
+		func(ctx context.Context) (any, error) {
+			return obj.DisplayName, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CuotaEspecial_display_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CuotaEspecial",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _CuotaEspecial_monto(ctx context.Context, field graphql.CollectedField, obj *model.CuotaEspecial) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -3576,6 +3630,35 @@ func (ec *executionContext) fieldContext_CuotaRegular_id(_ context.Context, fiel
 	return fc, nil
 }
 
+func (ec *executionContext) _CuotaRegular_display_name(ctx context.Context, field graphql.CollectedField, obj *model.CuotaRegular) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CuotaRegular_display_name,
+		func(ctx context.Context) (any, error) {
+			return obj.DisplayName, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CuotaRegular_display_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CuotaRegular",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _CuotaRegular_monto(ctx context.Context, field graphql.CollectedField, obj *model.CuotaRegular) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -3823,6 +3906,35 @@ func (ec *executionContext) fieldContext_CuotaSemilla_id(_ context.Context, fiel
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CuotaSemilla_display_name(ctx context.Context, field graphql.CollectedField, obj *model.CuotaSemilla) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_CuotaSemilla_display_name,
+		func(ctx context.Context) (any, error) {
+			return obj.DisplayName, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_CuotaSemilla_display_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CuotaSemilla",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -13754,6 +13866,11 @@ func (ec *executionContext) _CuotaEspecial(ctx context.Context, sel ast.Selectio
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "display_name":
+			out.Values[i] = ec._CuotaEspecial_display_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
 		case "monto":
 			out.Values[i] = ec._CuotaEspecial_monto(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -13895,6 +14012,11 @@ func (ec *executionContext) _CuotaRegular(ctx context.Context, sel ast.Selection
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "display_name":
+			out.Values[i] = ec._CuotaRegular_display_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
 		case "monto":
 			out.Values[i] = ec._CuotaRegular_monto(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -14028,6 +14150,11 @@ func (ec *executionContext) _CuotaSemilla(ctx context.Context, sel ast.Selection
 			out.Values[i] = graphql.MarshalString("CuotaSemilla")
 		case "id":
 			out.Values[i] = ec._CuotaSemilla_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "display_name":
+			out.Values[i] = ec._CuotaSemilla_display_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
