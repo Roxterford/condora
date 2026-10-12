@@ -22,5 +22,6 @@
     "build.workspaceFiles": [
       "${workspaceFolder}/go.work"
     ]
-  }
+  },
+  "editor.formatOnSave": true
 }
