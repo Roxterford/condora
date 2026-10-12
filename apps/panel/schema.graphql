@@ -38,6 +38,7 @@ input BooleanCondition {
 interface Cuota {
   actualizacion: DateTime!
   anio: Int!
+  display_name: String!
   gastos: [GastoType!]!
   id: ID!
   mes: Mes!
@@ -50,6 +51,7 @@ type CuotaEspecial implements Cuota {
   actualizacion: DateTime!
   anio: Int!
   detalles: Proyecto!
+  display_name: String!
   gastos: [GastoType!]!
   id: ID!
   mes: Mes!
@@ -70,6 +72,7 @@ input CuotaFilter {
 type CuotaRegular implements Cuota {
   actualizacion: DateTime!
   anio: Int!
+  display_name: String!
   gastos: [GastoType!]!
   id: ID!
   mes: Mes!
@@ -81,6 +84,7 @@ type CuotaRegular implements Cuota {
 type CuotaSemilla implements Cuota {
   actualizacion: DateTime!
   anio: Int!
+  display_name: String!
   gastos: [GastoType!]!
   id: ID!
   mes: Mes!

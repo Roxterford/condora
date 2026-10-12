@@ -37,6 +37,7 @@ export type BooleanCondition = {
 export type Cuota = {
   actualizacion: Scalars['DateTime']['output'];
   anio: Scalars['Int']['output'];
+  display_name: Scalars['String']['output'];
   gastos: Array<GastoType>;
   id: Scalars['ID']['output'];
   mes: Mes;
@@ -50,6 +51,7 @@ export type CuotaEspecial = Cuota & {
   actualizacion: Scalars['DateTime']['output'];
   anio: Scalars['Int']['output'];
   detalles: Proyecto;
+  display_name: Scalars['String']['output'];
   gastos: Array<GastoType>;
   id: Scalars['ID']['output'];
   mes: Mes;
@@ -71,6 +73,7 @@ export type CuotaRegular = Cuota & {
   __typename?: 'CuotaRegular';
   actualizacion: Scalars['DateTime']['output'];
   anio: Scalars['Int']['output'];
+  display_name: Scalars['String']['output'];
   gastos: Array<GastoType>;
   id: Scalars['ID']['output'];
   mes: Mes;
@@ -83,6 +86,7 @@ export type CuotaSemilla = Cuota & {
   __typename?: 'CuotaSemilla';
   actualizacion: Scalars['DateTime']['output'];
   anio: Scalars['Int']['output'];
+  display_name: Scalars['String']['output'];
   gastos: Array<GastoType>;
   id: Scalars['ID']['output'];
   mes: Mes;
@@ -831,9 +835,9 @@ export type CuotasPageQueryVariables = Exact<{
 
 
 export type CuotasPageQuery = { __typename?: 'Query', cuotas: { __typename?: 'PaginatedCuota', limit: number, page: number, pages: number, total: number, data: Array<
-      | { __typename: 'CuotaEspecial', id: string, monto: number, mes: Mes, anio: number, registro: Date, recaudacion: { __typename?: 'Recaudacion', unidades_aplicadas: number, pagos_asociados: number, monto_estimado: number, monto_recaudado: number, moneda: Moneda }, detalles: { __typename?: 'Proyecto', titulo: string, descripcion: string } }
-      | { __typename: 'CuotaRegular', id: string, monto: number, mes: Mes, anio: number, registro: Date, recaudacion: { __typename?: 'Recaudacion', unidades_aplicadas: number, pagos_asociados: number, monto_estimado: number, monto_recaudado: number, moneda: Moneda } }
-      | { __typename: 'CuotaSemilla', id: string, monto: number, mes: Mes, anio: number, registro: Date, recaudacion: { __typename?: 'Recaudacion', unidades_aplicadas: number, pagos_asociados: number, monto_estimado: number, monto_recaudado: number, moneda: Moneda } }
+      | { __typename: 'CuotaEspecial', id: string, display_name: string, monto: number, mes: Mes, anio: number, registro: Date, recaudacion: { __typename?: 'Recaudacion', unidades_aplicadas: number, pagos_asociados: number, monto_estimado: number, monto_recaudado: number, moneda: Moneda }, detalles: { __typename?: 'Proyecto', titulo: string, descripcion: string } }
+      | { __typename: 'CuotaRegular', id: string, display_name: string, monto: number, mes: Mes, anio: number, registro: Date, recaudacion: { __typename?: 'Recaudacion', unidades_aplicadas: number, pagos_asociados: number, monto_estimado: number, monto_recaudado: number, moneda: Moneda } }
+      | { __typename: 'CuotaSemilla', id: string, display_name: string, monto: number, mes: Mes, anio: number, registro: Date, recaudacion: { __typename?: 'Recaudacion', unidades_aplicadas: number, pagos_asociados: number, monto_estimado: number, monto_recaudado: number, moneda: Moneda } }
     > } };
 
 export type ConteoCuotasPorTipoQueryVariables = Exact<{
@@ -1159,6 +1163,7 @@ export const CuotasPageDocument = new TypedDocumentString(`
       __typename
       ... on Cuota {
         id
+        display_name
         monto
         mes
         anio

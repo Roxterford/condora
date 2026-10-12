@@ -55,7 +55,14 @@ export interface CuotasTableData<
   T extends CuotasTableType = "default",
 > extends Pick<
   CuotaEspecial | CuotaRegular | CuotaSemilla,
-  "id" | "__typename" | "monto" | "mes" | "anio" | "registro" | "actualizacion"
+  | "id"
+  | "__typename"
+  | "display_name"
+  | "monto"
+  | "mes"
+  | "anio"
+  | "registro"
+  | "actualizacion"
 > {
   detalles: T extends "regular"
     ? never
@@ -96,15 +103,17 @@ const COLUMNS: ColumnConfig[] = [
       const detalles = detallesDeLaCuota(c);
       return detalles ? (
         <div className="flex flex-col sm:min-w-48">
-          <span className="font-medium text-foreground">{detalles.titulo}</span>
+          <span className="font-medium text-foreground truncate">
+            {c.display_name}
+          </span>
           <span className="text-xs text-muted-foreground">
             {NOMBRE_DE_MES[c.mes]} {c.anio}
           </span>
         </div>
       ) : (
         <div className="flex flex-col sm:min-w-48">
-          <span className="font-medium text-foreground">
-            {NOMBRE_DE_MES[c.mes]} {c.anio}
+          <span className="font-medium text-foreground truncate">
+            {c.display_name}
           </span>
           <span className="text-xs text-muted-foreground">Mensualidad</span>
         </div>

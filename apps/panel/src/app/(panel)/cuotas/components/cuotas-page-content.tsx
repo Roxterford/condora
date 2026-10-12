@@ -1,6 +1,6 @@
 "use client";
 
-import { keepPreviousData, useQueries, useQuery } from "@tanstack/react-query";
+import { useQueries, useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useState } from "react";
@@ -25,6 +25,7 @@ const PageQuery = graphql(/* GraphQL */ `
         __typename
         ... on Cuota {
           id
+          display_name
           monto
           mes
           anio
@@ -140,11 +141,13 @@ export function CuotasPageContent() {
   };
 
   const cuota_table_data = (cuotas?.data ?? []).map<CuotasTableData>((c) => ({
+    __typename: c.__typename,
     id: c.id,
     tipo:
       c.__typename === "CuotaEspecial"
         ? TipoDeCuota.Especial
         : TipoDeCuota.Regular,
+    display_name: c.display_name,
     monto: c.monto,
     mes: c.mes,
     anio: c.anio,
