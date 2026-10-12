@@ -1,5 +1,6 @@
 interface Cuota {
   id: ID!
+  display_name: String!
   monto: Float!
   mes: Mes!
   anio: Int!
@@ -11,6 +12,7 @@ interface Cuota {
 
 type CuotaRegular implements Cuota {
   id: ID!
+  display_name: String!
   monto: Float!
   mes: Mes!
   anio: Int!
@@ -22,6 +24,7 @@ type CuotaRegular implements Cuota {
 
 type CuotaEspecial implements Cuota {
   id: ID!
+  display_name: String!
   monto: Float!
   mes: Mes!
   anio: Int!
@@ -34,6 +37,7 @@ type CuotaEspecial implements Cuota {
 
 type CuotaSemilla implements Cuota {
   id: ID!
+  display_name: String!
   monto: Float!
   mes: Mes!
   anio: Int!

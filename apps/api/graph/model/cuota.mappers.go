@@ -40,6 +40,10 @@ func CuotaTypeFromDomain(cuota cuota.Cuota) CuotaType {
 			Anio:          int32(cuota_regular.Anio()),
 			Registro:      cuota_regular.Audit.CreatedAt,
 			Actualizacion: cuota_regular.Audit.UpdatedAt,
+			DisplayName:   cuota.DisplayName(),
+			// TODO: revisar
+			Recaudacion: &Recaudacion{},
+			Gastos:      []GastoType{},
 		}
 	}
 
@@ -61,6 +65,9 @@ func CuotaTypeFromDomain(cuota cuota.Cuota) CuotaType {
 				Registro:       cuota_especial.Detalles.Audit.CreatedAt,
 				Actualizacion:  cuota_especial.Detalles.Audit.UpdatedAt,
 			},
+			DisplayName: cuota_especial.DisplayName(),
+			Recaudacion: &Recaudacion{},
+			Gastos:      []GastoType{},
 		}
 	}
 
@@ -72,6 +79,10 @@ func CuotaTypeFromDomain(cuota cuota.Cuota) CuotaType {
 			Anio:          int32(cuota_semilla.Anio()),
 			Registro:      cuota_semilla.Audit.CreatedAt,
 			Actualizacion: cuota_semilla.Audit.UpdatedAt,
+			DisplayName:   cuota_semilla.DisplayName(),
+			// TODO: revisar
+			Recaudacion: &Recaudacion{},
+			Gastos:      []GastoType{},
 		}
 	}
 

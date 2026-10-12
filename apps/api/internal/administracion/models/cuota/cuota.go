@@ -14,9 +14,11 @@ var (
 
 type Cuota interface {
 	ID() CuotaID
+	DisplayName() string
 	Monto() quantity.Quantity
 	Mes() mes.Mes
 	Anio() int
+
 	AsRegular() *CuotaRegular
 	AsEspecial() *CuotaEspecial
 	AsSemilla() *CuotaSemilla
@@ -35,6 +37,7 @@ type CuotaBase struct {
 }
 
 func (c CuotaBase) ID() CuotaID              { return c.id }
+func (c CuotaBase) DisplayName() string      { return "Cuota sin nombre" }
 func (c CuotaBase) Monto() quantity.Quantity { return c.monto }
 func (c CuotaBase) Mes() mes.Mes             { return c.mes }
 func (c CuotaBase) Anio() int                { return c.anio }

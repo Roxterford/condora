@@ -5,6 +5,10 @@ type CuotaEspecial struct {
 	Detalles Proyecto
 }
 
+func (c *CuotaEspecial) DisplayName() string {
+	return c.Detalles.titulo
+}
+
 func (c *CuotaEspecial) AsEspecial() *CuotaEspecial {
 	return c
 }
