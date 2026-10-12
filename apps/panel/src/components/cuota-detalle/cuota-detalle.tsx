@@ -25,6 +25,7 @@ export const CuotaDetalleQuery = graphql(/* GraphQL */ `
       __typename
       ... on CuotaRegular {
         id
+        display_name
         monto
         mes
         anio
@@ -62,6 +63,7 @@ export const CuotaDetalleQuery = graphql(/* GraphQL */ `
       }
       ... on CuotaEspecial {
         id
+        display_name
         monto
         mes
         anio
@@ -106,6 +108,7 @@ export const CuotaDetalleQuery = graphql(/* GraphQL */ `
       }
       ... on CuotaSemilla {
         id
+        display_name
         monto
         mes
         anio
@@ -171,21 +174,6 @@ type GastoAProveedorDeCuota = Extract<
 export type CuotaDetalleData = {
   cuota: CuotaDetalleCuota;
   deudasPendientes: CuotaDetalleDeuda[];
-};
-
-const NOMBRE_DE_MES: Record<Mes, string> = {
-  [Mes.Enero]: "Enero",
-  [Mes.Febrero]: "Febrero",
-  [Mes.Marzo]: "Marzo",
-  [Mes.Abril]: "Abril",
-  [Mes.Mayo]: "Mayo",
-  [Mes.Junio]: "Junio",
-  [Mes.Julio]: "Julio",
-  [Mes.Agosto]: "Agosto",
-  [Mes.Septiembre]: "Septiembre",
-  [Mes.Octubre]: "Octubre",
-  [Mes.Noviembre]: "Noviembre",
-  [Mes.Diciembre]: "Diciembre",
 };
 
 export function CuotaDetalle({ cuota, deudasPendientes }: CuotaDetalleData) {
@@ -287,7 +275,7 @@ function DetalleDeLaCuota({ cuota }: { cuota: CuotaDetalleCuota }) {
         />
         <Fila
           label="Mes / Año"
-          value={`${NOMBRE_DE_MES[cuota.mes]} ${cuota.anio}`}
+          value={cuota.display_name}
         />
         <Fila
           label="Registro"
@@ -304,7 +292,7 @@ function DetalleDeLaCuota({ cuota }: { cuota: CuotaDetalleCuota }) {
           )}
         />
         {cuota.__typename === "CuotaEspecial" && (
-          <Fila label="Proyecto" value={cuota.detalles.titulo} strong />
+          <Fila label="Proyecto" value={cuota.display_name} strong />
         )}
       </dl>
     </section>

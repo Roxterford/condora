@@ -37,6 +37,7 @@ const PageQuery = graphql(/* GraphQL */ `
       __typename
       ... on Cuota {
         id
+        display_name
         mes
         anio
         registro
@@ -102,11 +103,7 @@ export default async function CuotaPage({
       <>
         <header>
           <div>
-            <h1>
-              {cuota.__typename === "CuotaEspecial"
-                ? cuota.detalles.titulo
-                : `${cuota.mes} ${cuota.anio}`}
-            </h1>
+            <h1>{cuota.display_name}</h1>
             <p className="page-description">
               Detalle de cuota{" "}
               {cuota.__typename === "CuotaEspecial" ? "especial" : "regular"}
@@ -183,11 +180,7 @@ function StatsSection({ cuota }: { cuota: Cuota }) {
                 })
               : "No aplica"
           }
-          subtitle={
-            cuota.__typename === "CuotaEspecial"
-              ? cuota.detalles.titulo
-              : "Cuota regular"
-          }
+          subtitle={cuota.display_name}
           icon={<CalendarDays className="text-teal-600" />}
           color="bg-teal-100"
         />
