@@ -10,7 +10,7 @@ DELETE FROM transacciones;
 DELETE FROM internal_operaciones;
 DELETE FROM proyectos;
 DELETE FROM internal_deudas;
-DELETE FROM cuotas;
+DELETE FROM internal_cuotas;
 DELETE FROM proveedores;
 DELETE FROM titularidades;
 DELETE FROM unidades;
@@ -1662,7 +1662,7 @@ INSERT INTO proveedores (id, rif, nombre, email, telefono, direccion, registro, 
     ('pvdr19', 'J-310020010', 'Constructora Metro C.A.', 'gerencia@constructometro.com', '04120000019', 'Av. Intercomunal, Edif. Metro, PB', '2025-07-01 09:00:00', '2025-07-01 09:00:00'),
     ('pvdr20', 'J-310020011', 'Equipos de Cómputo y Oficina', 'ventas@equiposoficina.com', '04120000020', 'Centro Comercial Ciudad, Piso 1', '2025-05-05 09:00:00', '2025-05-05 09:00:00'),
     ('pvdr21', 'J-310020012', 'Decoración y Ambientación Común', 'eventos@ambientacion.com', '04120000021', 'Av. Los Ilustres, Local 8', '2025-06-20 09:00:00', '2025-06-20 09:00:00');
-INSERT INTO cuotas (id, tipo, monto, mes, anio, registro, registrado_por, actualizacion, actualizado_por) VALUES
+INSERT INTO internal_cuotas (id, tipo, monto, mes, anio, registro, registrado_por, actualizacion, actualizado_por) VALUES
   ('c-2025-03-semilla', 'SEMILLA', 381300, 3, 2025, '2025-03-01 08:00:00', 'tester', '2025-03-01 08:00:00', 'tester'),
   ('c-2025-04-reg', 'REGULAR', 452445, 4, 2025, '2025-04-02 08:00:00', 'tester', '2025-04-02 08:00:00', 'tester'),
   ('c-2025-05-reg', 'REGULAR', 479415, 5, 2025, '2025-05-02 08:00:00', 'tester', '2025-05-02 08:00:00', 'tester'),

@@ -753,7 +753,7 @@ export function generarSQL(): string {
   out.push('DELETE FROM internal_operaciones;')
   out.push('DELETE FROM proyectos;')
   out.push('DELETE FROM internal_deudas;')
-  out.push('DELETE FROM cuotas;')
+  out.push('DELETE FROM internal_cuotas;')
   out.push('DELETE FROM proveedores;')
   out.push('DELETE FROM titularidades;')
   out.push('DELETE FROM unidades;')
@@ -840,7 +840,7 @@ export function generarSQL(): string {
   const cuotaRows: string[] = cuotas.map((c) =>
     `  ('${c.id}', '${c.tipo}', ${c.monto}, ${c.mes}, ${c.anio}, '${c.registro}', 'tester', '${c.registro}', 'tester')`,
   )
-  out.push(`INSERT INTO cuotas (id, tipo, monto, mes, anio, registro, registrado_por, actualizacion, actualizado_por) VALUES`)
+  out.push(`INSERT INTO internal_cuotas (id, tipo, monto, mes, anio, registro, registrado_por, actualizacion, actualizado_por) VALUES`)
   out.push(cuotaRows.join(',\n') + ';')
 
   // Deudas (solo unidades elegibles, estrategia lineal)
