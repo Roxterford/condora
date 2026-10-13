@@ -77,7 +77,7 @@ func validateConditionForType(cond Condition, t ValueType) error {
 	switch t {
 	case TypeString:
 		switch cond {
-		case CONDITON_EQ, CONDITON_NEQ, CONDITON_LIKE, CONDITON_IN:
+		case CONDITON_EQ, CONDITON_NEQ, CONDITON_LIKE, CONDITON_ILIKE, CONDITON_IN:
 			return nil
 		default:
 			return fmt.Errorf("condición '%s' no soportada para String", cond)

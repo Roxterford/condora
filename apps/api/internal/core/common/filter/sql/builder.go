@@ -194,6 +194,9 @@ func (b *SQLBuilder) writeColumnPredicate(col string, cond filter.Condition, val
 	case filter.CONDITON_LIKE:
 		b.sql.WriteString(fmt.Sprintf("%s LIKE ?", col))
 		b.args = append(b.args, value)
+	case filter.CONDITON_ILIKE:
+		b.sql.WriteString(fmt.Sprintf("LOWER(%s) LIKE LOWER(?)", col))
+		b.args = append(b.args, value)
 	case filter.CONDITON_IN:
 		return b.handleInCondition(col, value)
 	default:
@@ -288,6 +291,8 @@ func invertCondition(cond filter.Condition) (filter.Condition, error) {
 		return filter.CONDITON_GT, nil
 	case filter.CONDITON_LIKE:
 		return "", fmt.Errorf("la inversión de LIKE (NOT LIKE) requiere lógica dedicada")
+	case filter.CONDITON_ILIKE:
+		return "", fmt.Errorf("la inversión de ILIKE (NOT ILIKE) requiere lógica dedicada")
 	case filter.CONDITON_IN:
 		return "", fmt.Errorf("la inversión de IN (NOT IN) requiere lógica dedicada")
 	default:

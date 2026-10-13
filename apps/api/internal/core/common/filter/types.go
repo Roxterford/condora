@@ -13,14 +13,15 @@ const (
 type Condition string
 
 const (
-	CONDITON_EQ   Condition = "eq"
-	CONDITON_NEQ  Condition = "neq"
-	CONDITON_GT   Condition = "gt"
-	CONDITON_GTE  Condition = "gte"
-	CONDITON_LT   Condition = "lt"
-	CONDITON_LTE  Condition = "lte"
-	CONDITON_LIKE Condition = "like"
-	CONDITON_IN   Condition = "in"
+	CONDITON_EQ    Condition = "eq"
+	CONDITON_NEQ   Condition = "neq"
+	CONDITON_GT    Condition = "gt"
+	CONDITON_GTE   Condition = "gte"
+	CONDITON_LT    Condition = "lt"
+	CONDITON_LTE   Condition = "lte"
+	CONDITON_LIKE  Condition = "like"
+	CONDITON_ILIKE Condition = "ilike"
+	CONDITON_IN    Condition = "in"
 	// ... agregar otros según necesidad
 )
 

@@ -2,6 +2,7 @@ input StringCondition {
   eq: String @goField(omittable: true)
   neq: String @goField(omittable: true)
   like: String
+  ilike: String
   regex: String
   in: [String]
 }
