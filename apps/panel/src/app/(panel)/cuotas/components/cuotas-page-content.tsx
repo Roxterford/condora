@@ -102,7 +102,7 @@ export function CuotasPageContent() {
     return {
       and: [
         baseFilter,
-        { display_name: { like: busqueda } },
+        { nombre: { ilike: busqueda } },
       ],
     };
   }, [tab, busqueda]);
@@ -132,7 +132,7 @@ export function CuotasPageContent() {
         const tabFilter = FILTROS_POR_TAB[t.value];
         const combinedFilter = busqueda === "%%"
           ? tabFilter
-          : { and: [tabFilter, { display_name: { like: busqueda } }] };
+          : { and: [tabFilter, { nombre: { ilike: busqueda } }] };
         const result = await execute<{ cuotas: { total: number } }, { filter: any }>(ConteoQueryString, {
           filter: combinedFilter as any,
         });
