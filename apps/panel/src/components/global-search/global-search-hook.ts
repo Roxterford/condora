@@ -78,7 +78,7 @@ const GLOBAL_SEARCH_QUERY_STRING = /* GraphQL */ `
     }
 
     cuotas: obtenerCuotas(
-      filtro: { nombre: { ilike: $busqueda } }
+      filtro: { display_name: { ilike: $busqueda } }
       paginador: { limit: $limit, page: 1 }
     ) {
       data {
