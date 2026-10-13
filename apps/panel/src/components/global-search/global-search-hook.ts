@@ -11,8 +11,8 @@ export const LIMITE_GLOBAL_SEARCH = 5;
 const GLOBAL_SEARCH_QUERY_STRING = /* GraphQL */ `
   query GlobalSearch($busqueda: String!, $limit: Int!) {
     unidades: obtenerUnidades(
-      filtro: { codigo: { like: $busqueda } }
-      paginador: { limit: $limit, page: 1 }
+      filter: { codigo: { like: $busqueda } }
+      paginator: { limit: $limit, page: 1 }
     ) {
       data {
         codigo

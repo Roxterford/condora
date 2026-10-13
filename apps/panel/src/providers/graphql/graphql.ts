@@ -982,6 +982,25 @@ export type CuotaDetalleQuery = { __typename?: 'Query', cuota?:
       > }
    | null, deudas: { __typename?: 'PaginatedDeuda', data: Array<{ __typename?: 'Deuda', id: string, deuda: number, estado: EstadoDeDeuda, unidad: { __typename?: 'UnidadIdentifiers', codigo: string }, titular?: { __typename?: 'Deuda__Titular', display_name: string } | null }> } };
 
+export type GlobalSearchQueryVariables = Exact<{
+  busqueda: Scalars['String']['input'];
+  limit: Scalars['Int']['input'];
+}>;
+
+
+export type GlobalSearchQuery = { __typename?: 'Query', unidades?: { __typename?: 'PaginatedUnidad', total: number, data: Array<{ __typename?: 'Unidad', codigo: string, estado: EstadoDeUnidad, deuda: number, titular_primario?:
+        | { __typename: 'Ente', id: string, cedula: string, display_name: string, razon_social: string }
+        | { __typename: 'Persona', id: string, cedula: string, display_name: string, nombres: string, apellidos: string }
+       | null }> } | null, operaciones: { __typename?: 'PaginatedOperacion', total: number, data: Array<
+      | { __typename: 'GastoACondominio', fecha: Date, operacion: string, concepto: string, monto: number, moneda: Moneda }
+      | { __typename: 'GastoAProveedor', fecha: Date, operacion: string, concepto: string, monto: number, moneda: Moneda, proveedor: { __typename?: 'Proveedor', nombre: string } }
+      | { __typename: 'Pago', fecha: Date, operacion: string, concepto: string, monto: number, moneda: Moneda, unidad: { __typename?: 'UnidadIdentifiers', id: string, codigo: string } }
+    > }, proveedores: Array<{ __typename?: 'Proveedor', id: string, nombre: string, rif: string }>, cuotas: { __typename?: 'PaginatedCuota', total: number, data: Array<
+      | { __typename: 'CuotaEspecial', id: string, display_name: string, monto: number, mes: Mes, anio: number, detalles: { __typename?: 'Proyecto', titulo: string } }
+      | { __typename: 'CuotaRegular', id: string, display_name: string, monto: number, mes: Mes, anio: number }
+      | { __typename: 'CuotaSemilla', id: string, display_name: string, monto: number, mes: Mes, anio: number }
+    > } };
+
 export type ObtenerPerodosDisponiblesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -1615,6 +1634,92 @@ export const CuotaDetalleDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<CuotaDetalleQuery, CuotaDetalleQueryVariables>;
+export const GlobalSearchDocument = new TypedDocumentString(`
+    query GlobalSearch($busqueda: String!, $limit: Int!) {
+  unidades: obtenerUnidades(
+    filter: {codigo: {like: $busqueda}}
+    paginator: {limit: $limit, page: 1}
+  ) {
+    data {
+      codigo
+      estado
+      deuda
+      titular_primario {
+        __typename
+        ... on Sujeto {
+          id
+          cedula
+          display_name
+        }
+        ... on Persona {
+          nombres
+          apellidos
+        }
+        ... on Ente {
+          razon_social
+        }
+      }
+    }
+    total
+  }
+  operaciones: obtenerOperaciones(
+    paginador: {limit: $limit, page: 1}
+    filtro: {or: [{concepto: {like: $busqueda}}, {unidad: {like: $busqueda}}, {proveedor_nombre: {like: $busqueda}}]}
+  ) {
+    data {
+      __typename
+      ... on IOperacion {
+        fecha
+        operacion
+        concepto
+        monto
+        moneda
+      }
+      ... on Pago {
+        unidad {
+          id
+          codigo
+        }
+      }
+      ... on GastoAProveedor {
+        proveedor {
+          nombre
+        }
+      }
+    }
+    total
+  }
+  proveedores: obtenerProveedores {
+    id
+    nombre
+    rif
+  }
+  cuotas: obtenerCuotas(
+    filtro: {nombre: {ilike: $busqueda}}
+    paginador: {limit: $limit, page: 1}
+  ) {
+    data {
+      __typename
+      ... on Cuota {
+        id
+        display_name
+        monto
+        mes
+        anio
+      }
+      ... on CuotaEspecial {
+        id
+        display_name
+        monto
+        detalles {
+          titulo
+        }
+      }
+    }
+    total
+  }
+}
+    `) as unknown as TypedDocumentString<GlobalSearchQuery, GlobalSearchQueryVariables>;
 export const ObtenerPerodosDisponiblesDocument = new TypedDocumentString(`
     query ObtenerPerodosDisponibles {
   periodos: obtenerPeriodosDisponibles {
