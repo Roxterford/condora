@@ -25,8 +25,8 @@ model Usuario {
   OperacionesRegistradas   IOperacion[]   @relation(name: "op_registradas")
   TransaccionesRegistradas ITransaccion[] @relation(name: "tx_registradas")
 
-  CuotasRegistradas     Cuota[]    @relation(name: "cuotas_registradas")
-  CuotasActualizadas    Cuota[]    @relation(name: "cuotas_actualizadas")
+  CuotasRegistradas     ICuota[]   @relation(name: "cuotas_registradas")
+  CuotasActualizadas    ICuota[]   @relation(name: "cuotas_actualizadas")
   ProyectosRegistrados  Proyecto[] @relation(name: "proyectos_registrados")
   ProyectosActualizados Proyecto[] @relation(name: "proyectos_actualizados")
 
@@ -54,7 +54,7 @@ model Proyecto {
   actualizacion    DateTime         @default(now()) @updatedAt
   actualizado_por  String
 
-  Cuota Cuota @relation(fields: [cuota], references: [id], onDelete: Cascade)
+  Cuota ICuota @relation(fields: [cuota], references: [id], onDelete: Cascade)
 
   Registrador  Usuario @relation(name: "proyectos_registrados", fields: [registrado_por], references: [id])
   Actualizador Usuario @relation(name: "proyectos_actualizados", fields: [actualizado_por], references: [id])
@@ -86,10 +86,10 @@ model Unidad {
   descripcion      String?
 
   // Campos denormalizados (migración 001)
-  deuda_total       Int      @default(0)
-  estado_cuenta     String   @default("SOLVENTE")
-  cuotas_pendientes Int      @default(0)
-  cuenta            Int      @default(0)
+  deuda_total       Int    @default(0)
+  estado_cuenta     String @default("SOLVENTE")
+  cuotas_pendientes Int    @default(0)
+  cuenta            Int    @default(0)
 
   Titular     Sujeto?      @relation("titular_primario", fields: [titular_primario], references: [id])
   Contacto    Sujeto?      @relation("representante", fields: [contacto], references: [id])
@@ -192,7 +192,7 @@ model IOperacion {
   Unidad      Unidad?                @relation(fields: [unidad_codigo], references: [codigo])
   Proveedor   Proveedor?             @relation(fields: [proveedor], references: [id])
   Destinos    DestinoDePago[]
-  Cuota       Cuota?                 @relation(fields: [cuota], references: [id])
+  Cuota       ICuota?                @relation(fields: [cuota], references: [id])
   Contenedor  ITransaccionOperacion?
 
   @@map("internal_operaciones")
@@ -292,7 +292,7 @@ enum TipoDeCuota {
   ESPECIAL
 }
 
-model Cuota {
+model ICuota {
   id              String      @id @default(cuid())
   tipo            TipoDeCuota
   monto           Int
@@ -306,10 +306,25 @@ model Cuota {
   Registrador  Usuario @relation(name: "cuotas_registradas", fields: [registrado_por], references: [id])
   Actualizador Usuario @relation(name: "cuotas_actualizadas", fields: [actualizado_por], references: [id])
 
-  Deudas      Deuda[]
   IDeudas     IDeuda[]
   Proyectos   Proyecto[]
   Operaciones IOperacion[]
+  Deudas      Deuda[]
+
+  @@map("internal_cuotas")
+}
+
+view Cuota {
+  id              String      @unique
+  tipo            TipoDeCuota
+  monto           Int
+  mes             Int
+  anio            Int
+  registro        DateTime    @default(now())
+  registrado_por  String
+  actualizacion   DateTime    @default(now()) @updatedAt
+  actualizado_por String
+  nombre          String
 
   @@map("cuotas")
 }
@@ -346,7 +361,7 @@ model IDeuda {
   actualizacion DateTime @default(now()) @updatedAt
 
   Unidad Unidad          @relation(fields: [unidad], references: [codigo])
-  Cuota  Cuota           @relation(fields: [cuota], references: [id])
+  Cuota  ICuota          @relation(fields: [cuota], references: [id])
   Pagos  DestinoDePago[]
 
   @@map("internal_deudas")
@@ -366,7 +381,7 @@ view Deuda {
   actualizacion DateTime      @default(now()) @updatedAt
 
   Unidad Unidad          @relation(fields: [unidad_codigo, unidad_id], references: [codigo, id])
-  Cuota  Cuota           @relation(fields: [cuota], references: [id])
+  Cuota  ICuota          @relation(fields: [cuota], references: [id])
   Pagos  DestinoDePago[]
 
   @@map("deudas")

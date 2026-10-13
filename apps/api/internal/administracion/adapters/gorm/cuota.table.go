@@ -8,10 +8,8 @@ import (
 	"github.com/Sanaruca/condominio/internal/core/common/mes"
 )
 
-// Legacy
-//
-// Deprecated: use github.com/Sanaruca/condominio/internal/shared/adapters/gorm
-type Cuota struct {
+// ICuota -> internal_cuotas (tabla base, escrituras)
+type ICuota struct {
 	ID             string
 	Tipo           tipodecuota.TipoDeCuota
 	Monto          int
@@ -26,12 +24,11 @@ type Cuota struct {
 	Proyecto *Proyecto `gorm:"foreignKey:cuota"`
 }
 
-func (t Cuota) TableName() string {
-	return "cuotas"
+func (t ICuota) TableName() string {
+	return "internal_cuotas"
 }
 
-// Deprecated: use github.com/Sanaruca/condominio/internal/shared/adapters/gorm
-func (c Cuota) ToDomainCuota(factory *cuota.CuotaFactory) cuota.Cuota {
+func (c ICuota) ToDomainCuota(factory *cuota.CuotaFactory) cuota.Cuota {
 
 	switch c.Tipo {
 	case tipodecuota.Regular:

@@ -252,8 +252,72 @@ type Gasto struct {
 
 func (Gasto) TableName() string { return "gastos" }
 
-func (c Cuota) ToDomainCuota(factory *cuota.CuotaFactory) cuota.Cuota {
+// DestinoDePago -> destino_de_pagos
+type DestinoDePago struct {
+	ID        string `gorm:"primaryKey"`
+	Operacion string `gorm:"column:operacion"`
+	Deuda     string `gorm:"column:deuda"`
+	Destinado int
+	Fecha     time.Time
+}
 
+func (DestinoDePago) TableName() string { return "destino_de_pagos" }
+
+// ICuota -> internal_cuotas (tabla base, escrituras)
+type ICuota struct {
+	ID             string `gorm:"primaryKey"`
+	Tipo           tipodecuota.TipoDeCuota
+	Monto          int
+	Mes            mes.Mes
+	Anio           int
+	Registro       time.Time
+	RegistradoPor  string `gorm:"column:registrado_por"`
+	Actualizacion  time.Time
+	ActualizadoPor string `gorm:"column:actualizado_por"`
+}
+
+func (ICuota) TableName() string { return "internal_cuotas" }
+
+// Cuota -> cuotas (vista de lectura, incluye nombre)
+type Cuota struct {
+	ID             string `gorm:"primaryKey"`
+	Tipo           tipodecuota.TipoDeCuota
+	Monto          int
+	Mes            mes.Mes
+	Anio           int
+	Registro       time.Time
+	RegistradoPor  string `gorm:"column:registrado_por"`
+	Actualizacion  time.Time
+	ActualizadoPor string `gorm:"column:actualizado_por"`
+	NombreComputado string `gorm:"column:nombre"`
+
+	Proyecto *Proyecto `gorm:"foreignKey:CuotaID"`
+}
+
+func (Cuota) TableName() string { return "cuotas" }
+
+func (c Cuota) NombreCompleto() string {
+	if c.NombreComputado != "" {
+		return c.NombreComputado
+	}
+	if c.Tipo.Regular() {
+		return fmt.Sprintf("Cuota %s %d", c.Mes.String(), c.Anio)
+	}
+	if c.Tipo.Especial() {
+		if c.Proyecto != nil && c.Proyecto.Titulo != "" {
+			return c.Proyecto.Titulo
+		}
+		return "NULL"
+	}
+	return "Cuota sin nombre"
+}
+
+// Nombre for backward compatibility (used by Deuda.Cuota.Nombre())
+func (c Cuota) Nombre() string {
+	return c.NombreCompleto()
+}
+
+func (c Cuota) ToDomainCuota(factory *cuota.CuotaFactory) cuota.Cuota {
 	switch c.Tipo {
 	case tipodecuota.Regular:
 		return factory.AssembleRegular(
@@ -267,21 +331,25 @@ func (c Cuota) ToDomainCuota(factory *cuota.CuotaFactory) cuota.Cuota {
 		)
 
 	case tipodecuota.Especial:
+		var proyecto *Proyecto
+		if c.Proyecto != nil {
+			proyecto = c.Proyecto
+		}
 		return factory.AssembleEspecial(
 			c.ID,
 			c.Mes,
 			c.Anio,
 			c.Monto,
-			c.Proyecto.Titulo,
-			c.Proyecto.Descripcion,
-			c.Proyecto.Justificacion,
-			c.Proyecto.Estado.String(),
-			c.Proyecto.FechaLimite,
-			int64(c.Proyecto.InteresPorMora),
-			c.Proyecto.Registro,
-			c.Proyecto.Actualizacion,
-			c.Proyecto.RegistradoPor,
-			c.Proyecto.ActualizadoPor,
+			proyecto.Titulo,
+			proyecto.Descripcion,
+			proyecto.Justificacion,
+			proyecto.Estado.String(),
+			proyecto.FechaLimite,
+			int64(proyecto.InteresPorMora),
+			proyecto.Registro,
+			proyecto.Actualizacion,
+			proyecto.RegistradoPor,
+			proyecto.ActualizadoPor,
 		)
 
 	case tipodecuota.Semilla:
@@ -297,50 +365,6 @@ func (c Cuota) ToDomainCuota(factory *cuota.CuotaFactory) cuota.Cuota {
 	}
 
 	return nil
-}
-
-// DestinoDePago -> destino_de_pagos
-type DestinoDePago struct {
-	ID        string `gorm:"primaryKey"`
-	Operacion string `gorm:"column:operacion"`
-	Deuda     string `gorm:"column:deuda"`
-	Destinado int
-	Fecha     time.Time
-}
-
-func (DestinoDePago) TableName() string { return "destino_de_pagos" }
-
-// Cuota -> cuotas
-type Cuota struct {
-	ID             string `gorm:"primaryKey"`
-	Tipo           tipodecuota.TipoDeCuota
-	Monto          int
-	Mes            mes.Mes
-	Anio           int
-	Registro       time.Time
-	RegistradoPor  string `gorm:"column:registrado_por"`
-	Actualizacion  time.Time
-	ActualizadoPor string `gorm:"column:actualizado_por"`
-
-	Proyecto *Proyecto `gorm:"foreignKey:CuotaID"`
-}
-
-func (Cuota) TableName() string { return "cuotas" }
-func (c Cuota) Nombre() string {
-	if c.Tipo.Regular() {
-		return fmt.Sprintf("Cuota %s %d", c.Mes.String(), c.Anio)
-	}
-
-	if c.Tipo.Especial() {
-
-		if c.Proyecto == nil {
-			return "NULL"
-		}
-
-		return c.Proyecto.Titulo
-	}
-
-	return "Cuota sin nombre"
 }
 
 // Proveedor -> proveedores

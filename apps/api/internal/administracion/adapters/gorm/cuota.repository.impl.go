@@ -47,7 +47,7 @@ func NewGORMCuotaRepository(db *gorm.DB, factory *cuota.CuotaFactory) cuota.Cuot
 
 // Count implements [cuota.CuotaRepository].
 func (r *GORMCuotaRepository) Count(ctx context.Context, filter filter.Clause) (int, core.Error) {
-	count, err := gorm.G[Cuota](r.db).Scopes(gormAdapter.GFilter(filter)).Count(ctx, "id")
+	count, err := gorm.G[ICuota](r.db).Scopes(gormAdapter.GFilter(filter)).Count(ctx, "id")
 	if err != nil {
 		return 0, core.WrapError(err)
 	}
@@ -87,7 +87,7 @@ func (r *GORMCuotaRepository) Guardar(
 		audit = cuotaEntity.AsSemilla().Audit
 	}
 
-	model := Cuota{
+	model := ICuota{
 		ID:             string(cuotaEntity.ID()),
 		Tipo:           tipo,
 		Monto:          int(cuotaEntity.Monto().Value()),
@@ -112,7 +112,7 @@ func (r *GORMCuotaRepository) ObtenerPorID(
 	ctx context.Context,
 	id cuota.CuotaID,
 ) (cuota.Cuota, core.Error) {
-	cuota, err := gorm.G[Cuota](
+	cuota, err := gorm.G[ICuota](
 		r.db,
 	).Preload("Proyecto", nil).
 		Where("id = ?", id.String()).
@@ -173,7 +173,7 @@ func (r *GORMCuotaRepository) Obtener(
 func (r *GORMCuotaRepository) ObtenerPeriodosEmitidos(
 	ctx context.Context,
 ) ([]periodo.Periodo, core.Error) {
-	registros, err := gorm.G[Cuota](r.db).Find(ctx)
+	registros, err := gorm.G[ICuota](r.db).Find(ctx)
 	if err != nil {
 		return nil, core.WrapError(err)
 	}
