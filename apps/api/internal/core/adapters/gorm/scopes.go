@@ -45,9 +45,11 @@ func applyPagination(db *gorm.DB, p common.Paginator) *gorm.DB {
 // }
 
 // Filter aplica el AST de filtros a una consulta GORM
-func Filter(filter filter.Clause) func(db *gorm.DB) *gorm.DB {
+// Acepta opcionalmente mapas de alias campo->columna (ej: "unidad"->"unidad_codigo")
+// para adaptar los nombres del filtro al modelo de base de datos.
+func Filter(filter filter.Clause, aliases ...map[string][]string) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
-		return applyFilter(db, filter)
+		return applyFilter(db, filter, aliases...)
 	}
 }
 

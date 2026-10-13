@@ -17,7 +17,7 @@ export async function main() {
   await prisma.iOperacion.deleteMany();
   await prisma.proyecto.deleteMany();
   await prisma.iDeuda.deleteMany();
-  await prisma.cuota.deleteMany();
+  await prisma.iCuota.deleteMany();
   await prisma.proveedor.deleteMany();
   await prisma.titularidad.deleteMany();
   await prisma.unidad.deleteMany();

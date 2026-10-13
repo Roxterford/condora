@@ -1,7 +1,6 @@
 DROP VIEW IF EXISTS deudas CASCADE;
 CREATE VIEW deudas AS
-SELECT
-  d.id,
+SELECT d.id,
   u.id AS unidad_id,
   u.codigo AS unidad_codigo,
   d.cuota,
@@ -14,13 +13,11 @@ SELECT
   END AS estado,
   d.registro,
   d.actualizacion
-FROM
-  internal_deudas d
-  JOIN cuotas c ON d.cuota = c.id
+FROM internal_deudas d
+  JOIN internal_cuotas c ON d.cuota = c.id
   LEFT JOIN destino_de_pagos dp ON dp.deuda = d.id
   LEFT JOIN unidades u ON u.codigo = d.unidad
-GROUP BY
-  d.id,
+GROUP BY d.id,
   d.monto,
   u.id,
   u.codigo;

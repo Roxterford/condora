@@ -334,7 +334,7 @@ type ComplexityRoot struct {
 	Query struct {
 		Empty                      func(childComplexity int) int
 		ObtenerCuota               func(childComplexity int, id string) int
-		ObtenerCuotas              func(childComplexity int, filter *model.CuotaFilter, paginator *model.Paginator) int
+		ObtenerCuotas              func(childComplexity int, filtro *model.CuotaFilter, paginador *model.Paginator) int
 		ObtenerDeudas              func(childComplexity int, filtro *model.DeudaFilter, paginador *model.Paginator) int
 		ObtenerGastos              func(childComplexity int, paginator *model.Paginator, filter *model.GastoFilter) int
 		ObtenerOperaciones         func(childComplexity int, filtro *model.OperacionFilter, paginador *model.Paginator) int
@@ -424,7 +424,7 @@ type MutationResolver interface {
 type QueryResolver interface {
 	Empty(ctx context.Context) (*string, error)
 	ObtenerCuota(ctx context.Context, id string) (model.CuotaType, error)
-	ObtenerCuotas(ctx context.Context, filter *model.CuotaFilter, paginator *model.Paginator) (*model.PaginatedCuota, error)
+	ObtenerCuotas(ctx context.Context, filtro *model.CuotaFilter, paginador *model.Paginator) (*model.PaginatedCuota, error)
 	ObtenerDeudas(ctx context.Context, filtro *model.DeudaFilter, paginador *model.Paginator) (*model.PaginatedDeuda, error)
 	ObtenerPeriodosDisponibles(ctx context.Context, anio *int32) ([]*model.PeriodoDisponible, error)
 	ObtenerProveedores(ctx context.Context, filter *model.ObtenerProveedoresDto) ([]*model.Proveedor, error)
@@ -1694,7 +1694,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.complexity.Query.ObtenerCuotas(childComplexity, args["filter"].(*model.CuotaFilter), args["paginator"].(*model.Paginator)), true
+		return e.complexity.Query.ObtenerCuotas(childComplexity, args["filtro"].(*model.CuotaFilter), args["paginador"].(*model.Paginator)), true
 	case "Query.obtenerDeudas":
 		if e.complexity.Query.ObtenerDeudas == nil {
 			break
@@ -2224,6 +2224,7 @@ extend type Mutation {
   id: StringCondition
   monto: IntCondition
   tipo: StringCondition
+  nombre: StringCondition
 
   # Code injected by tools/autofilter/main.go
   and: [CuotaFilter!] # @autofilter injected
@@ -2232,7 +2233,7 @@ extend type Mutation {
 }
 
 extend type Query {
-  obtenerCuotas(filter: CuotaFilter, paginator: Paginator): PaginatedCuota!
+  obtenerCuotas(filtro: CuotaFilter, paginador: Paginator): PaginatedCuota!
 }
 `, BuiltIn: false},
 	{Name: "../internal/administracion/app/query/obtener_deudas.graphqls", Input: `extend type Query {
@@ -2461,6 +2462,7 @@ type PaginatedDeuda {
   eq: String @goField(omittable: true)
   neq: String @goField(omittable: true)
   like: String
+  ilike: String
   regex: String
   in: [String]
 }
@@ -2976,16 +2978,16 @@ func (ec *executionContext) field_Query_obtenerCuota_args(ctx context.Context, r
 func (ec *executionContext) field_Query_obtenerCuotas_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "filter", ec.unmarshalOCuotaFilter2ᚖgithubᚗcomᚋSanarucaᚋcondominioᚋgraphᚋmodelᚐCuotaFilter)
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "filtro", ec.unmarshalOCuotaFilter2ᚖgithubᚗcomᚋSanarucaᚋcondominioᚋgraphᚋmodelᚐCuotaFilter)
 	if err != nil {
 		return nil, err
 	}
-	args["filter"] = arg0
-	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "paginator", ec.unmarshalOPaginator2ᚖgithubᚗcomᚋSanarucaᚋcondominioᚋgraphᚋmodelᚐPaginator)
+	args["filtro"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "paginador", ec.unmarshalOPaginator2ᚖgithubᚗcomᚋSanarucaᚋcondominioᚋgraphᚋmodelᚐPaginator)
 	if err != nil {
 		return nil, err
 	}
-	args["paginator"] = arg1
+	args["paginador"] = arg1
 	return args, nil
 }
 
@@ -9203,7 +9205,7 @@ func (ec *executionContext) _Query_obtenerCuotas(ctx context.Context, field grap
 		ec.fieldContext_Query_obtenerCuotas,
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.resolvers.Query().ObtenerCuotas(ctx, fc.Args["filter"].(*model.CuotaFilter), fc.Args["paginator"].(*model.Paginator))
+			return ec.resolvers.Query().ObtenerCuotas(ctx, fc.Args["filtro"].(*model.CuotaFilter), fc.Args["paginador"].(*model.Paginator))
 		},
 		nil,
 		ec.marshalNPaginatedCuota2ᚖgithubᚗcomᚋSanarucaᚋcondominioᚋgraphᚋmodelᚐPaginatedCuota,
@@ -12505,7 +12507,7 @@ func (ec *executionContext) unmarshalInputCuotaFilter(ctx context.Context, obj a
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "monto", "tipo", "and", "or", "not"}
+	fieldsInOrder := [...]string{"id", "monto", "tipo", "nombre", "and", "or", "not"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -12533,6 +12535,13 @@ func (ec *executionContext) unmarshalInputCuotaFilter(ctx context.Context, obj a
 				return it, err
 			}
 			it.Tipo = data
+		case "nombre":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nombre"))
+			data, err := ec.unmarshalOStringCondition2ᚖgithubᚗcomᚋSanarucaᚋcondominioᚋgraphᚋmodelᚐStringCondition(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Nombre = data
 		case "and":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
 			data, err := ec.unmarshalOCuotaFilter2ᚕᚖgithubᚗcomᚋSanarucaᚋcondominioᚋgraphᚋmodelᚐCuotaFilterᚄ(ctx, v)
@@ -13359,7 +13368,7 @@ func (ec *executionContext) unmarshalInputStringCondition(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"eq", "neq", "like", "regex", "in"}
+	fieldsInOrder := [...]string{"eq", "neq", "like", "ilike", "regex", "in"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -13387,6 +13396,13 @@ func (ec *executionContext) unmarshalInputStringCondition(ctx context.Context, o
 				return it, err
 			}
 			it.Like = data
+		case "ilike":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ilike"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Ilike = data
 		case "regex":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("regex"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)

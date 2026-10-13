@@ -151,12 +151,13 @@ func (this CuotaEspecial) GetGastos() []GastoType {
 func (CuotaEspecial) IsCuotaType() {}
 
 type CuotaFilter struct {
-	ID    *StringCondition `json:"id,omitempty"`
-	Monto *IntCondition    `json:"monto,omitempty"`
-	Tipo  *StringCondition `json:"tipo,omitempty"`
-	And   []*CuotaFilter   `json:"and,omitempty"`
-	Or    []*CuotaFilter   `json:"or,omitempty"`
-	Not   *CuotaFilter     `json:"not,omitempty"`
+	ID     *StringCondition `json:"id,omitempty"`
+	Monto  *IntCondition    `json:"monto,omitempty"`
+	Tipo   *StringCondition `json:"tipo,omitempty"`
+	Nombre *StringCondition `json:"nombre,omitempty"`
+	And    []*CuotaFilter   `json:"and,omitempty"`
+	Or     []*CuotaFilter   `json:"or,omitempty"`
+	Not    *CuotaFilter     `json:"not,omitempty"`
 }
 
 type CuotaRegular struct {
@@ -686,6 +687,7 @@ type StringCondition struct {
 	Eq    graphql.Omittable[*string] `json:"eq,omitempty"`
 	Neq   graphql.Omittable[*string] `json:"neq,omitempty"`
 	Like  *string                    `json:"like,omitempty"`
+	Ilike *string                    `json:"ilike,omitempty"`
 	Regex *string                    `json:"regex,omitempty"`
 	In    []*string                  `json:"in,omitempty"`
 }
