@@ -3,6 +3,8 @@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Paginacion } from "@/components/paginacion/paginacion";
+import { InputGroup, InputGroupInput, InputGroupAddon } from "@/components/ui/input-group";
+import { Search } from "lucide-react";
 import {
   CuotasTable,
   CuotasTableProps,
@@ -26,6 +28,8 @@ export interface CuotasPageTapsProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+  onSearchChange?: (value: string) => void;
+  busqueda?: string;
 }
 
 export function CuotasPageTaps({
@@ -38,6 +42,8 @@ export function CuotasPageTaps({
   currentPage,
   totalPages,
   onPageChange,
+  onSearchChange,
+  busqueda,
 }: CuotasPageTapsProps) {
   return (
     <>
@@ -58,13 +64,29 @@ export function CuotasPageTaps({
         </TabsList>
         </div>
       </Tabs>
-      <Paginacion
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={onPageChange}
-        className="justify-end"
-      />
-      <CuotasTable data={cuotas} loading={loading} loadingRows={loadingRows} />
+      {onSearchChange && (
+        <div className="toolbar">
+          <form>
+            <InputGroup>
+              <InputGroupInput
+                placeholder="Buscar por nombre…"
+                className="w-full md:min-w-68"
+                onChange={(e) => onSearchChange(`%${e.target.value}%`)}
+              />
+              <InputGroupAddon>
+                <Search className="size-4" />
+              </InputGroupAddon>
+            </InputGroup>
+          </form>
+          <Paginacion
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={onPageChange}
+            className="justify-end"
+          />
+        </div>
+      )}
+      <CuotasTable data={cuotas} loading={loading} loadingRows={loadingRows} busqueda={busqueda} />
     </>
   );
 }

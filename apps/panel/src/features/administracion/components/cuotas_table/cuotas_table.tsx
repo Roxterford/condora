@@ -32,7 +32,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { TableSkeleton } from "@/components/table-skeleton/table-skeleton";
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, SearchX } from "lucide-react";
+import {
+  Empty,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+  EmptyDescription,
+} from "@/components/ui/empty";
 
 const NOMBRE_DE_MES: Record<Mes, string> = {
   [Mes.Enero]: "Enero",
@@ -80,6 +87,7 @@ export interface CuotasTableProps {
   data: CuotasTableData[];
   loading?: boolean;
   loadingRows?: number;
+  busqueda?: string;
 }
 
 type ColumnConfig = {
@@ -193,6 +201,7 @@ export function CuotasTable({
   data: cuotas,
   loading,
   loadingRows = 5,
+  busqueda,
 }: CuotasTableProps) {
   const { open } = useDrawer();
   const router = useRouter();
@@ -227,6 +236,34 @@ export function CuotasTable({
     onSingle: verDetalles,
     onDouble: (cuota) => router.push(`/cuotas/${cuota.id}`),
   });
+
+  function EmptyState() {
+  return (
+    <Empty>
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <SearchX className="text-muted-foreground" />
+        </EmptyMedia>
+        <EmptyTitle>Sin cuotas registradas</EmptyTitle>
+        <EmptyDescription>Comienza creando tu primera cuota</EmptyDescription>
+      </EmptyHeader>
+    </Empty>
+  );
+}
+
+function NotFoundState() {
+  return (
+    <Empty>
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <SearchX className="text-muted-foreground" />
+        </EmptyMedia>
+        <EmptyTitle>No se encontraron cuotas</EmptyTitle>
+        <EmptyDescription>Intenta una búsqueda diferente</EmptyDescription>
+      </EmptyHeader>
+    </Empty>
+  );
+}
 
   return (
     <Table>
@@ -279,7 +316,7 @@ export function CuotasTable({
               }
             }}
           />
-        ) : (
+        ) : cuotas.length > 0 ? (
           cuotas.map((cuota) => (
             <TableRow
               key={cuota.id}
@@ -311,6 +348,18 @@ export function CuotasTable({
               </TableCell>
             </TableRow>
           ))
+        ) : busqueda ? (
+          <TableRow>
+            <TableCell colSpan={6}>
+              <NotFoundState />
+            </TableCell>
+          </TableRow>
+        ) : (
+          <TableRow>
+            <TableCell colSpan={6}>
+              <EmptyState />
+            </TableCell>
+          </TableRow>
         )}
       </TableBody>
     </Table>

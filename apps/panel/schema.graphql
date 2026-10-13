@@ -64,6 +64,7 @@ input CuotaFilter {
   and: [CuotaFilter!]
   id: StringCondition
   monto: IntCondition
+  nombre: StringCondition
   not: CuotaFilter
   or: [CuotaFilter!]
   tipo: StringCondition
@@ -475,7 +476,7 @@ type Proyecto {
 type Query {
   _empty: String
   obtenerCuota(id: String!): CuotaType
-  obtenerCuotas(filter: CuotaFilter, paginator: Paginator): PaginatedCuota!
+  obtenerCuotas(filtro: CuotaFilter, paginador: Paginator): PaginatedCuota!
   obtenerDeudas(filtro: DeudaFilter, paginador: Paginator): PaginatedDeuda!
   obtenerGastos(filter: GastoFilter, paginator: Paginator): PaginatedGasto!
   obtenerOperaciones(filtro: OperacionFilter, paginador: Paginator): PaginatedOperacion!
@@ -569,6 +570,7 @@ enum RolDestinoDeOperacion {
 
 input StringCondition {
   eq: String
+  ilike: String
   in: [String]
   like: String
   neq: String

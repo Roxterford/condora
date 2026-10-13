@@ -3,23 +3,23 @@
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PaginacionFooter } from "@/components/paginacion/pagination-footer";
 import { RESULTADOS_POR_PAGINA } from "@/components/paginacion/resultados-por-pagina";
 import { useSmoothScrollToTop } from "@/hooks/useSmoothScrollToTop";
-import { graphql } from "@/providers/graphql";
 import { execute } from "@/providers/graphql/execute";
 import { TipoDeCuota, CuotaFilter } from "@/providers/graphql/graphql";
 import { CuotasTableData } from "@/features/administracion/components/cuotas_table/cuotas_table";
 import { CuotasPageTaps, CuotasPageTab, CUOTAS_TABS } from "./cuotas-page-taps";
+import { useDebounce } from "@/hooks/useDebounce";
 
-const PageQuery = graphql(/* GraphQL */ `
+const PageQueryString = /* GraphQL */ `
   query CuotasPage($page: Int!, $limit: Int!, $filter: CuotaFilter) {
     cuotas: obtenerCuotas(
-      filter: $filter
-      paginator: { limit: $limit, page: $page }
+      filtro: $filter
+      paginador: { limit: $limit, page: $page }
     ) {
       data {
         __typename
@@ -59,15 +59,15 @@ const PageQuery = graphql(/* GraphQL */ `
       total
     }
   }
-`);
+`;
 
-const ConteoQuery = graphql(/* GraphQL */ `
+const ConteoQueryString = /* GraphQL */ `
   query ConteoCuotasPorTipo($filter: CuotaFilter) {
-    cuotas: obtenerCuotas(filter: $filter, paginator: { page: 1, limit: 1 }) {
+    cuotas: obtenerCuotas(filtro: $filter, paginador: { page: 1, limit: 1 }) {
       total
     }
   }
-`);
+`;
 
 // El enum `TipoDeCuota` del schema usa PascalCase, pero la columna `cuotas.tipo`
 // almacena el valor en mayúsculas, que es lo que espera el filtro del backend.
@@ -91,28 +91,50 @@ export function CuotasPageContent() {
     ? limitParam
     : RESULTADOS_POR_PAGINA[1];
   const [tab, setTab] = useState<CuotasPageTab>("todas");
+  const [busqueda, setBusqueda] = useState("%%");
+  const onDebounceBusqueda = useDebounce(setBusqueda);
   const scrollToTop = useSmoothScrollToTop();
 
+  const buildFilter = useCallback((): any => {
+    const baseFilter = FILTROS_POR_TAB[tab];
+    if (busqueda === "%%") return baseFilter;
+    
+    return {
+      and: [
+        baseFilter,
+        { display_name: { like: busqueda } },
+      ],
+    };
+  }, [tab, busqueda]);
+
+  const filter = buildFilter();
+
   const { data, isFetching } = useQuery({
-    queryKey: ["cuotas", tab, currentPage, limit],
+    queryKey: ["cuotas", tab, busqueda, currentPage, limit],
     queryFn: async () => {
-      const result = await execute(PageQuery, {
+      const result = await execute<{ cuotas: { data: any[]; pages: number; total: number; limit: number; page: number } }, { page: number; limit: number; filter: CuotaFilter }>(PageQueryString, {
         page: currentPage,
         limit,
-        filter: FILTROS_POR_TAB[tab],
+        filter,
       });
       return result.data;
     },
     placeholderData: (previousData, previousQuery) =>
-      previousQuery?.queryKey[1] === tab ? previousData : undefined,
+      previousQuery?.queryKey[1] === tab && previousQuery?.queryKey[2] === busqueda
+        ? previousData
+        : undefined,
   });
 
   const conteos = useQueries({
     queries: CUOTAS_TABS.map((t) => ({
-      queryKey: ["cuotas", "conteo", t.value],
+      queryKey: ["cuotas", "conteo", t.value, busqueda],
       queryFn: async () => {
-        const result = await execute(ConteoQuery, {
-          filter: FILTROS_POR_TAB[t.value],
+        const tabFilter = FILTROS_POR_TAB[t.value];
+        const combinedFilter = busqueda === "%%"
+          ? tabFilter
+          : { and: [tabFilter, { display_name: { like: busqueda } }] };
+        const result = await execute<{ cuotas: { total: number } }, { filter: any }>(ConteoQueryString, {
+          filter: combinedFilter as any,
         });
         return result.data?.cuotas.total ?? 0;
       },
@@ -137,7 +159,7 @@ export function CuotasPageContent() {
 
   const onTabChange = (value: CuotasPageTab) => {
     setTab(value);
-    router.push(`/cuotas?limit=${limit}`, { scroll: false });
+    router.push("/cuotas", { scroll: false });
   };
 
   const cuota_table_data = (cuotas?.data ?? []).map<CuotasTableData>((c) => ({
@@ -194,6 +216,8 @@ export function CuotasPageContent() {
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={setPage}
+          onSearchChange={onDebounceBusqueda}
+          busqueda={busqueda}
         />
         <PaginacionFooter
           currentPage={currentPage}

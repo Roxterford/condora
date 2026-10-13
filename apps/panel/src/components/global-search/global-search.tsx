@@ -19,6 +19,7 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { Kbd } from "@/components/ui/kbd";
+import { Moneda } from "@/providers/graphql/graphql";
 import { money } from "@/lib/money-display";
 import { useGlobalSearch, useRecentSearches } from "./global-search-hook";
 import {
@@ -26,11 +27,16 @@ import {
   type GlobalSearchState,
 } from "./global-search-content";
 import type { ResultRow } from "./search-result-row";
+import type { CuotaDeBusqueda } from "./global-search-hook";
 import {
   accionesDestacadas,
   buscarAcciones,
   type AccionSistema,
 } from "./buscar-acciones";
+
+const getMoneda = (cuota: CuotaDeBusqueda): Moneda => {
+  return Moneda.Ved;
+};
 
 type RowBase = {
   key: string;
@@ -108,6 +114,8 @@ export function GlobalSearch() {
     operaciones,
     operacionesTotal,
     proveedores,
+    cuotas,
+    cuotasTotal,
     sujetos,
     totalCoincidencias,
   } = useGlobalSearch(query);
@@ -231,16 +239,15 @@ export function GlobalSearch() {
     for (const operacion of operaciones) {
       const conUnidad =
         operacion.__typename === "Pago" ? operacion.unidad?.codigo : undefined;
+      const titulo = operacion.concepto ?? operacion.operacion ?? "Sin título";
       rows.push({
-        key: `operacion-${operacion.operacion ?? operacion.concepto}`,
+        key: `operacion-${operacion.operacion ?? operacion.concepto ?? "unknown"}`,
         groupLabel: "Operaciones",
         icon: <ArrowLeftRight />,
-        title: conUnidad
-          ? `${operacion.concepto} · ${conUnidad}`
-          : operacion.concepto,
-        meta: `${formatFecha(operacion.fecha)} · ${money(
-          operacion.monto,
-          operacion.moneda,
+        title: conUnidad ? `${titulo} · ${conUnidad}` : titulo,
+        meta: `${formatFecha(operacion.fecha ?? "")} · ${money(
+          operacion.monto ?? 0,
+          (operacion.moneda as Moneda) ?? Moneda.Usd,
         )}`,
         typeLabel: "Operación",
         trackSearch: true,
@@ -261,8 +268,22 @@ export function GlobalSearch() {
       });
     }
 
+    for (const cuota of cuotas) {
+      const mesAnio = cuota.mes ? `${cuota.mes}/${cuota.anio}` : cuota.detalles?.titulo ?? "Especial";
+      rows.push({
+        key: `cuota-${cuota.id}`,
+        groupLabel: "Cuotas",
+        icon: <Newspaper />,
+        title: cuota.display_name,
+        meta: `${mesAnio} · ${money(cuota.monto, getMoneda(cuota))}`,
+        typeLabel: cuota.__typename === "CuotaEspecial" ? "Cuota Especial" : "Cuota",
+        trackSearch: true,
+        onClick: () => go(`/cuotas/${cuota.id}`),
+      });
+    }
+
     return rows;
-  }, [unidades, sujetos, operaciones, proveedores, go]);
+  }, [unidades, sujetos, operaciones, proveedores, cuotas, go]);
 
   const idle = trimmed.length === 0;
   const debouncePendiente = idle ? false : trimmed !== debouncedTerm;

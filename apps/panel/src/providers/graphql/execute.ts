@@ -80,7 +80,18 @@ export async function execute<TResult, TVariables>(
 ): Promise<GraphqlResponse<TResult>>;
 
 export async function execute<TResult, TVariables>(
-  query: TypedDocumentString<TResult, TVariables>,
+  query: string,
+  ...[variables]: TVariables extends Record<string, never> ? [] : [TVariables]
+): Promise<GraphqlResponse<TResult>>;
+
+export async function execute<TResult, TVariables>(
+  query: string,
+  options: RequestInit,
+  ...[variables]: TVariables extends Record<string, never> ? [] : [TVariables]
+): Promise<GraphqlResponse<TResult>>;
+
+export async function execute<TResult, TVariables>(
+  query: TypedDocumentString<TResult, TVariables> | string,
   optionsOrVariables?:
     | RequestInit
     | (TVariables extends Record<string, never> ? never : TVariables),
